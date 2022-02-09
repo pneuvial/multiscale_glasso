@@ -1,0 +1,154 @@
+---
+title: "Gut data analysis"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("./rscripts/mglasso_functions/onload.R")
+```
+
+### Data Handling
+
+Load 
+```{r}
+# data also available in spiec-easi package. Use `data(amgut1.filt)`
+load(paste0(path_data, "amgut1.filt.rda"))
+dta <- amgut1.filt
+```
+
+Transform data using `clr` approach or non paranormal method
+```{r}
+dta <- t(clr(dta + 1 , 1))
+```
+
+Hierarchical clustering   
+```{r}
+S <- cor(dta)
+hclust_dta <- hclust(dist(t(dta)), method = "ward.D")
+hclust_dta <- hclust(as.dist(1-S^2), method = "ward.D")
+
+cut_dta <- cutree(hclust_dta, 4)
+```
+
+```{r}
+image(S[order(cut_dta), order(cut_dta)])
+```
+
+```{r}
+image(as(S[order(cut_dta), order(cut_dta)],
+         "sparseMatrix"), 
+      sub = "", xlab = "", ylab = "",
+      colorkey = FALSE)
+```
+
+Correlation matrix for groups 
+```{r}
+# mean of vars in the same clusters
+dta_grouped <- t(aggregate(t(dta), list(cut_dta), "mean"))
+dta_grouped <- dta_grouped[-1,]
+
+# cor mat of the meta-vars
+cor_dta_grouped <- cor(dta_grouped)
+cor_dta_grouped
+```
+
+Mean correlations inside blocks
+```{r}
+C <- cor(dta)
+diag(C) <- 0
+clusters <- cut_dta
+
+seq_p <- 1:length(clusters)
+L <- split(seq_p, factor(clusters))
+
+mat <- t(sapply(L,
+                FUN = function(v) {
+                  summary(as.vector(C[v,v]))
+                }))
+
+mat[, "Mean"]
+```
+
+### Stars selection  
+```{r}
+mb_out      <- neighbor_select(data = dta, lambda_min = 1e-2, nlambda = 10, 
+                               nresamples = 50, verbose = TRUE, estim_var = 0.01)
+lambda1     <- mb_out$lambda_opt
+#0.3525136
+```
+
+### Neighborhood selection  
+This step is not needed. MGLasso wit $\lambda_2 = 0$ is theoretically equivalent to Meinshausen-Bühlmann neighborhood selection.
+```{r}
+mb_dta <- glasso(cov(scale(dta)),
+                 rho = lambda1,
+                 approx = TRUE)
+```
+
+### MGLasso  
+```{r eval = FALSE}
+pen_params <- seq_l2_l1_fixed(dt = dta, l1 = lambda1, nl2 = 4, l2_max = TRUE) 
+
+system.time(mgl_amgut <- lapply(pen_params, 
+                                FUN = mglasso_pair_param, 
+                                X_ = dta, 
+                                type = "initial"))
+```
+
+```{r eval = FALSE}
+save(mgl_amgut, 
+     file = paste0(path_real_data, "mgl_amgut_dta_se.RData"))
+```
+
+### Adjacency matrices
+```{r}
+image(as(adj_mat(mb_dta$wi), "sparseMatrix"), sub = "MB", xlab = "", ylab = "")
+image(as(adj_mat(glasso_dta$wi), "sparseMatrix"), sub = "GLasso", xlab = "", ylab = "")
+
+image(as(adj_mat(mgl_amgut$`1`$selected_Theta), "sparseMatrix"), sub = "MGLasso tv0", xlab = "", ylab = "")
+image(as(adj_mat(mgl_amgut$`2`$selected_Theta), "sparseMatrix"), sub = "MGLasso tv5", xlab = "", ylab = "")
+image(as(adj_mat(mgl_amgut$`3`$selected_Theta), "sparseMatrix"), sub = "MGLasso tv10", xlab = "", ylab = "")
+image(as(adj_mat(mgl_amgut$`4`$selected_Theta), "sparseMatrix"), sub = "MGLasso tv15", xlab = "", ylab = "")
+```
+
+### Confusion matrix
+```{r}
+library(caret)
+
+ref_mb <- adj_mat(mgl_amgut$`1`$selected_Theta)
+ref_mb <- factor(as.vector(ref_mb))
+
+pred_mglasso <- adj_mat(mgl_amgut$`2`$selected_Theta)
+pred_mglasso <- factor(as.vector(pred_mglasso))
+
+confusionMatrix(data = pred_mglasso, reference = ref_mb)
+```
+
+### Clusters  
+```{r}
+get_min_different_from_zero <- function(mdat) {
+  mdat <- abs(mdat)
+  mdat[mdat == 0] <- Inf
+  return(min(mdat))
+}
+
+min_val <- get_min_different_from_zero(mgl_amgut$`2`$selected_Theta)
+
+clusters_tv5 <- get_clusters_mgl(mgl_amgut$`2`$selected_Theta, min_val, ncol(dta))
+# absolute minimum which is different from 0
+```
+
+Adjacency graph $\lambda_2 = 0$
+```{r}
+image(as(adj_mat(mgl_amgut$`1`$selected_Theta[order(clusters_tv5), order(clusters_tv5)]), "sparseMatrix"), sub = TeX(r'($\lambda_2 = 0$)'), xlab = "", ylab = "")
+```
+
+Adjacency graph $\lambda_2 = 5$
+```{r}
+adj_matrix <- as(adj_mat(mgl_amgut$`2`$selected_Theta), "sparseMatrix")
+
+image(adj_matrix[order(clusters_tv5), order(clusters_tv5)], sub = TeX(r'($\lambda_2 = 5$)'), xlab = "", ylab = "")
+```
+
+

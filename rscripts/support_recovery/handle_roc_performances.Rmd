@@ -1,0 +1,168 @@
+---
+title: "Handling support recovery results"
+output: pdf_document
+---
+
+File used to generate `roc_dtf_sbm.RData`, `roc_dtf_sfree`, `roc_dtf_erdos`
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("./rscripts/mglasso_functions/onload.R")
+```
+
+## Erdos
+```{r}
+load(paste0(path_roc, "roc_config_p40_erdos01.RData")) 
+dt_full <- roc_config_p40_erdos01
+```
+
+### Merge in one graph
+```{r}
+# Three sample sizes are used and the vector c(20,40,80) is replicated 50 times
+# I subset the dataframe in three parts corresponding to the relevant sample sizes
+index <- seq(1, 150, by = 3)
+roc_dt20 <- dt_full[index]
+
+index <- seq(2, 150, by = 3)
+roc_dt40 <- dt_full[index]
+
+index <- seq(3, 150, by = 3)
+roc_dt80 <- dt_full[index]
+
+# Here we compute the mean over the 50 ROC curves
+roc_dt20 <- get_mean_ROC_stat(roc_dt20)
+roc_dt40 <- get_mean_ROC_stat(roc_dt40)
+roc_dt80 <- get_mean_ROC_stat(roc_dt80)
+
+# I restructure the list result in a matrix for plot
+roc_dt20 <- reformat_roc_res_for_ggplot(roc_dt20)
+roc_dt20$np <- 0.5 # add a ratio n over p variable
+roc_dt40 <- reformat_roc_res_for_ggplot(roc_dt40)
+roc_dt40$np <- 1
+roc_dt80 <- reformat_roc_res_for_ggplot(roc_dt80)
+roc_dt80$np <- 2
+
+roc_dtf_erdos <- rbind(roc_dt20, roc_dt40, roc_dt80)
+```
+
+### Save
+```{r}
+save(roc_dtf_erdos,
+     file = paste0(path_roc, "roc_dtf_erdos.RData"))
+```
+
+### Plot
+```{r}
+ggplot(roc_dtf_erdos, aes(x     = fpr, 
+                    y     = tpr, 
+                    color = method )) + 
+  geom_line() + 
+  facet_grid(np ~ tv) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "grey") +
+  xlab("False Positive Rate") +
+  ylab("True Positive Rate") +
+  scale_colour_grey(start = 0.2, end = 0.6) + 
+  theme_bw()
+```
+
+## Scale-free
+```{r}
+load(paste0(path_roc, "roc_config_p40_scalefree.RData")) 
+dt_full <- roc_config_p40_scalefree
+```
+
+### Merge in one graph
+```{r}
+index <- seq(1, 150, by = 3)
+roc_dt20 <- dt_full[index]
+
+index <- seq(2, 150, by = 3)
+roc_dt40 <- dt_full[index]
+
+index <- seq(3, 150, by = 3)
+roc_dt80 <- dt_full[index]
+
+roc_dt20 <- get_mean_ROC_stat(roc_dt20)
+roc_dt40 <- get_mean_ROC_stat(roc_dt40)
+roc_dt80 <- get_mean_ROC_stat(roc_dt80)
+
+roc_dt20 <- reformat_roc_res_for_ggplot(roc_dt20)
+roc_dt20$np <- 0.5
+roc_dt40 <- reformat_roc_res_for_ggplot(roc_dt40)
+roc_dt40$np <- 1
+roc_dt80 <- reformat_roc_res_for_ggplot(roc_dt80)
+roc_dt80$np <- 2
+
+roc_dtf_sfree <- rbind(roc_dt20, roc_dt40, roc_dt80)
+```
+
+### Save
+```{r}
+save(roc_dtf_sfree,
+     file = paste0(path_roc, "roc_dtf_sfree.RData"))
+```
+
+### Plot
+```{r}
+ggplot(roc_dtf_sfree, aes(x     = fpr, 
+                          y     = tpr, 
+                          color = method )) + 
+  geom_line() + 
+  facet_grid(np ~ tv) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "grey") +
+  xlab("False Positive Rate") +
+  ylab("True Positive Rate") +
+  scale_colour_grey(start = 0.2, end = 0.6) + 
+  theme_bw()
+```
+
+## Stochastic Block model  
+```{r}
+load(paste0(path_roc, "roc_config_p40_bdiagflip001.RData")) 
+dt_full <- roc_config_p40_bdiagflip001
+```
+
+### Merge in one graph
+```{r}
+index <- seq(1, 150, by = 3)
+roc_dt20 <- dt_full[index]
+
+index <- seq(2, 150, by = 3)
+roc_dt40 <- dt_full[index]
+
+index <- seq(3, 150, by = 3)
+roc_dt80 <- dt_full[index]
+
+roc_dt20 <- get_mean_ROC_stat(roc_dt20)
+roc_dt40 <- get_mean_ROC_stat(roc_dt40)
+roc_dt80 <- get_mean_ROC_stat(roc_dt80)
+
+roc_dt20 <- reformat_roc_res_for_ggplot(roc_dt20)
+roc_dt20$np <- 0.5
+roc_dt40 <- reformat_roc_res_for_ggplot(roc_dt40)
+roc_dt40$np <- 1
+roc_dt80 <- reformat_roc_res_for_ggplot(roc_dt80)
+roc_dt80$np <- 2
+
+roc_dtf_sbm <- rbind(roc_dt20, roc_dt40, roc_dt80)
+```
+
+### Save
+```{r}
+save(roc_dtf_sbm,
+     file = paste0(path_roc, "roc_dtf_sbm.RData"))
+```
+
+### Plot
+```{r}
+ggplot(roc_dtf_sbm, aes(x     = fpr, 
+                        y     = tpr, 
+                        color = method )) + 
+  geom_line() + 
+  facet_grid(np ~ tv) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "grey") +
+  xlab("False Positive Rate") +
+  ylab("True Positive Rate") +
+  scale_colour_grey(start = 0.2, end = 0.6) + 
+  theme_bw()
+```
