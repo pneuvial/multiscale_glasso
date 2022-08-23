@@ -9,52 +9,45 @@ on:
       - main
       - master
 
-env: # Change this if needed
+env:
+  quarto_file: content
   GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-  Rmarkdown-file: template-computo-Rmarkdown.Rmd
 
 jobs:
-  build_computorticle:
-    name: Build Computo article with Rmarkdown
-    runs-on: "macos-latest"
-    defaults:
-      run:
-        shell: bash -l {0}
+  computorticle:
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checking out repository for Github action
         uses: actions/checkout@v2
 
-      - name: Cache conda
-        uses: actions/cache@v1
-        env:
-          # Increase this value to reset cache if environment.yml has not changed
-          CACHE_NUMBER: 0
-        with:
-          path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
-
-      - name: Setting up miniconda with specified Python and R dependencies
+      - name: Installing dependencies with Miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          activate-environment: computorbuild
+          auto-activate-base: false
+          miniconda-version: 'latest'
+          python-version: 3.9
           environment-file: environment.yml
-          channel-priority: strict
-          use-only-tar-bz2: true
-
-      - name: Setup pandoc for Rmarkdown
-        uses: r-lib/actions/setup-pandoc@v1 
+          activate-environment: computo
 
       - name: Install additional R dependencies
         run: | 
           conda run -n computorbuild Rscript r-addons.R
           
-      - name: Rendering Rmd file to HTML
-        run: |          
-          conda run -n computorbuild Rscript -e 'rmarkdown::render("${{ env.Rmarkdown-file }}", output_file = "index.html", output_dir = "_build")'
+      - name: Installing quarto
+        uses: quarto-dev/quarto-actions/install-quarto@v1
+        
+      - name: Rendering with Quarto
+        shell: bash -l {0}
+        run: |
+            quarto render ${{ env.quarto_file }}.qmd
+            mkdir _build
+            mv ${{ env.quarto_file }}.html _build/index.html
+            cp environment.yml _build/
 
       - name: Deploying article on github pages
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
