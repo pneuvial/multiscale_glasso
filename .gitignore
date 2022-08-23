@@ -33,3 +33,4 @@ template-computo-Rmarkdown.html
 multiscale_glasso.Rproj
 
 *.DS_Store
+/.quarto/
