@@ -1,25 +1,25 @@
 ---
-title: "Template for contribution to Computo"
-subtitle: "Example based on the quarto system"
+title: "Inference of Multiscale Gaussian Graphical Model"
+subtitle: ""
 author:
-  - name: "The Computo team"
-    url: https://computorg.github.io/
-    affiliation: Société Française de Statistique
-    affiliation-url: https://www.sfds.asso.fr/
+  - name: "Do Edmond Sanou, Christophe Ambroise, Geneviève Robin"
+    url: 
+    affiliation: Laboratoire de Mathématiques et Modélisation d'Évry
+    affiliation-url: http://www.math-evry.cnrs.fr/
 date: last-modified
 abstract: >+
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur posuere vestibulum facilisis. Aenean pretium orci augue, quis lobortis libero accumsan eu. Nam mollis lorem sit amet pellentesque ullamcorper. Curabitur lobortis libero eget malesuada vestibulum. Nam nec nibh massa. Pellentesque porttitor cursus tellus. Mauris urna erat, rhoncus sed faucibus sit amet, venenatis eu ipsum.
+  Gaussian Graphical Models (GGMs) are widely used for exploratory data analysis in various fields such as genomics, ecology, psychometry. In a high-dimensional setting, when the number of variables exceeds the number of observations by several orders of magnitude, the estimation of GGM is a difficult and unstable optimization problem. Clustering of variables or variable selection is often performed prior to GGM estimation. We propose a new method allowing to simultaneously infer a hierarchical clustering structure and the graphs describing the structure of independence at each level of the hierarchy. This method is based on solving a convex optimization problem combining a graphical lasso penalty with a fused type lasso penalty. Results on real and synthetic data are presented.
 citation:
   type: article-journal
   container-title: "Computo"
   doi: "xxxx"
-  url: https://computo.sfds.asso.fr/template-computo-quarto
-github: https://github.com/computorg/template-computo-quarto
+  url: https://github.com/desanou/multiscale_glasso
+github: https://github.com/desanou/multiscale_glasso
 bibliography: references.bib
-repo: "template-computo-quarto"
+repo: "multiscale_glasso"
 ---
 
-[![build status](https://github.com/computorg/{{< meta repo >}}/workflows/build/badge.svg)](https://github.com/computorg/{{< meta repo >}})
+[![build status](https://github.com/desanou/{{< meta repo >}}/workflows/build/badge.svg)](https://github.com/desanou/{{< meta repo >}})
 [![Creative Commons License](https://i.creativecommons.org/l/by/4.0/80x15.png)](http://creativecommons.org/licenses/by/4.0/)
 
 # Introduction
