@@ -5,8 +5,8 @@
 ## Settings ----------------------------------------------------------------
 ### Model -------------------------------------------------------------------
 # NA values for some parameter mean they are not relevant
-p         <- 40
-seq_n     <- c(20, 40, 80)
+p         <- 9 #40
+seq_n     <- 10 #c(20, 40, 80)
 seq_rho   <- 0.95
 seq_dnsty <- NA 
 type      <- NA
@@ -15,7 +15,7 @@ ngroup    <- length(alpha)
 pi        <- diag(0.75, ngroup)
 
 ### Simulation --------------------------------------------------------------
-n_simu      <- 50
+n_simu      <- 2#50
 list_ii_rho <- configs_simu(n_simu, seq_rho, seq_dnsty, seq_n, type)
 no_cores    <- min(72, length(list_ii_rho))
 
