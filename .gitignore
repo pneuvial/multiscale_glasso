@@ -34,3 +34,5 @@ multiscale_glasso.Rproj
 
 *.DS_Store
 /.quarto/
+/.idea/
+temp-test-scripts.R
