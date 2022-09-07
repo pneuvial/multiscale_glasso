@@ -260,8 +260,8 @@ $$ {#eq-cost-fct-general}
 where $w_{ij}$ is a positive weight encoding prior knowledge of the
 groups to which variables $i$ and $j$ belong to. <edmond> A good choice
 for these pairwise affinities can help save time in computation and
-improve clustering performances[@chakraborty2020biconvex]. </edmond> In the remainder of the
-paper, we will ~~consider~~ <edmond> assume that </edmond> $w_{ij} = 1.$
+improve clustering performances. The choice can be guided by the application however improper specification can give rise to difficulty interpretable clustering structures [@chakraborty2020biconvex]. </edmond> In the remainder of the
+paper, we will ~~consider~~ <edmond> assume that </edmond> $w_{ij} = 1$ <edmond> for simplicity. </edmond>
 
 # Numerical scheme
 
@@ -530,7 +530,7 @@ path_checks <- "./rscripts/mglasso_functions/"
 source(paste0(path_checks, "simulate.R"))
 source(paste0(path_checks, "plot.R"))
 
-set.seed(2022)
+set.seed(2020)
 sim_sbm <- sim_data(p = 40, structure = "block_diagonal", 
                     alpha = rep(1/5, 5), 
                     prob_mat = diag(0.75, 5), 
