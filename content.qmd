@@ -511,14 +511,7 @@ $\Omega_{ij} = 0$ if $Z_i\neq Z_j$ ; otherwise, we define
 $\Omega_{ij} = A_{ij}\omega_{ij}$ where, for all $i\in\{1,\ldots,p\}$
 and for all $j\in\{1,\ldots,p| Z_j = Z_i\}$, $\omega_{ij}$ is given by :
 
-```{=tex}
-\begin{equation}
-\begin{aligned}
-&\omega_{ii} := \frac{1+\rho(p_{Z_i}-2)}{1+\rho(p_{Z_i}-2)-\rho^2(p_{Z_i}-1)};\\
-&\omega_{ij} := \frac{-\rho}{1+\rho(p_{Z_i}-2)-\rho^2(p_{Z_i}-1)}.
-\end{aligned}
-\end{equation}
-```
+
 If $\alpha_{ll}$ were to be equal to one, this construction of
 $\mathbf{\Omega}$ would make it possible to control the level of
 correlation between the variables in each block to $\rho$. Introducing a
@@ -692,14 +685,6 @@ Matrix::image(as(gsbm, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")   
 ```
 
-```{=tex}
-\begin{figure}[H]
-\centering
-\includegraphics[width = 6cm]{figures/graph_stochastic_block.png}
-\caption{Adjacency matrix of a stochastic block model with $5$ blocks.}
-\label{fig:graph_sbm}
-\end{figure}
-```
 ### Erdös-Renyi Model
 
 The Erdös-Renyi model is a special case of the stochastic block model
@@ -717,14 +702,7 @@ Matrix::image(as(gerdos, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")
 ```
 
-```{=tex}
-\begin{figure}[H]
-\centering
-\includegraphics[width = 6cm]{figures/graph_erdos.png}
-\caption{Adjacency matrix of an Erdös-Renyi model}
-\label{fig:graph_erdos}
-\end{figure}
-```
+
 ### Scale-free Model
 
 The Scale-free Model generates networks whose degree distributions
@@ -744,14 +722,6 @@ Matrix::image(as(gsfree, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")
 ```
 
-```{=tex}
-\begin{figure}[H]
-\centering
-\includegraphics[width = 6cm]{figures/graph_scale_free.png}
-\caption{Adjcency matrix of a Scale-free model}
-\label{fig:graph_scale_free}
-\end{figure}
-```
 ## Support recovery
 
 ```{r include=FALSE}
@@ -789,30 +759,7 @@ curves for the three models are given in `r f.ref('fig_4')`,
 `r f.ref('fig_5')` and `r f.ref('fig_6')` by varying
 $\frac{n}{p}\in \{0.5,1,2\}$.
 
-```{=tex}
-\begin{figure}[H]
-\centering
-\includegraphics[width = 15cm]{figures/roc_erdos_renyi.png}
-\caption{ROC curves for the Erdös-Renyi model comparing MGLasso and \text{GLasso} methods. The ratio $\frac{n}{p}\in \{0.5,1,2\}$ and the total variation penalty $\lambda_2 \in \{0, 3.33,6.67, 10\}$}
-\label{fig:roc_erdos}
-\end{figure}
-```
-```{=tex}
-\begin{figure}[H]
-\centering
-\includegraphics[width = 15cm]{figures/roc_scale_free.png}
-\caption{ROC curves for the Scale-free model comparing MGLasso and \text{GLasso} methods. The ratio $\frac{n}{p}\in \{0.5,1,2\}$ and the total variation penalty $\lambda_2 \in \{0, 3.33,6.67, 10\}$}
-\label{fig:roc_scale_free}
-\end{figure}
-```
-```{=tex}
-\begin{figure}[H]
-\centering
-\includegraphics[width = 15cm]{figures/roc_stochastic_block.png}
-\caption{ROC curves for the Stochastic Block model comparing MGLasso and \text{GLasso} methods. The ratio $\frac{n}{p}\in \{0.5,1,2\}$ and the total variation penalty $\lambda_2 \in \{0, 3.33,6.67, 10\}$}
-\label{fig:roc_sbm}
-\end{figure}
-```
+
 ```{r roc_erdos , message=FALSE, fig.cap=fig.4_cap}
 load("./data/roc_dtf_erdos.RData")
 
@@ -906,22 +853,6 @@ plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.95, np_
          main = "")
 ```
 
-```{=tex}
-\begin{figure}[H]
-\centering
-\includegraphics[width = 15cm]{figures/rand_stochastic_bloc.png}
-\caption{Adjusted Rand Indices for the HAC, k-means and MGLasso methods. Performances are observed for 4 different number of clusters in a high correlation context}
-\label{fig:graph_rand_sbm_095}
-\end{figure}
-```
-```{=tex}
-\begin{figure}[H]
-\centering
-\includegraphics[width = 15cm]{figures/rand_stochastic_bloc_025.png}
-\caption{Adjusted Rand Indices for the HAC, k-means and MGLasso methods. Performances are observed for 4 different number of clusters in a low correlation context}
-\label{fig:graph_rand_sbm_025}
-\end{figure}
-```
 The results shown in `r f.ref('fig_7')` and `r f.ref('fig_8')`
 demonstrate that, particularly at the lower to medium levels of the
 hierarchy (between 20 and 10 clusters), the hierarchical clustering
@@ -969,14 +900,7 @@ Matrix::image(as(S[order(cut_dta), order(cut_dta)],
       colorkey = FALSE)
 ```
 
-```{=tex}
-\begin{figure}[H]
-\centering
-\includegraphics[width = 5cm]{figures/cor_gut_data_order_hac.png}
-\caption{Empirical correlations in the gut data}
-\label{fig:cor_gut_data_order_hac}
-\end{figure}
-```
+
 The average correlations within blocks of variables belonging to the
 same cluster are given below. We observe relatively high levels of
 correlation in small blocks, similar to the simulation models used to
@@ -1016,26 +940,7 @@ chosen by stability selection (see [Model Selection] section).
 knitr::include_graphics(c("figures/mglasso_tv0.png","figures/mglasso_full_graph_tv5.png"))
 ```
 
-```{=tex}
-\begin{figure}[H]
-     \centering
-      \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/mglasso_tv0.png}
-        \caption{MGLasso with $\lambda_2 = 0$}
-        \label{fig:mglasso_tv0}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[b]{0.47\textwidth}
-         \centering
-         \includegraphics[width=\textwidth]{figures/mglasso_full_graph_tv5.png}
-         \caption{MGLasso with $\lambda_2 = 5$}
-         \label{fig:mglasso_full_graph_tv5}
-     \end{subfigure}
-        \caption{Infered graphs using MGLasso for different values of $\lambda_2$ }
-        \label{fig:mglasso_tv0_tv5}
-\end{figure}
-```
+
 The variables were reordered according to the clustering partition
 obtained from the distances between the regression vectors. Increasing
 $\lambda_2$ reduces the number of clusters and leads to a shrinking
