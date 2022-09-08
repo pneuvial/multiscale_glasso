@@ -39,7 +39,8 @@ License](https://i.creativecommons.org/l/by/4.0/80x15.png)](http://creativecommo
 
 ```{=html}
 <style>
-christophe { color: Orange }
+old {color: silver}
+revision { color: Orange }
 genevieve { color: Cyan }
 edmond { color: Red }
 </style>
@@ -226,6 +227,14 @@ The model is likely to cluster together variables that have the same
 conditional effects on the others. Variables $X^i$ and $X^j$ are
 assigned to the same cluster when
 $\boldsymbol{\beta}^i = \tau_{ij}(\boldsymbol{\beta}^j).$
+
+<old>
+Let us illustrate by an example the effect of the proposed approach. If we consider a group of $q$ variables whose regression vectors have at least $q$ non-zero coefficients and further assume that for each pair of group variables $i$ and $j$, $\|\boldsymbol{\beta}^i - \tau_{ij} (\boldsymbol{\beta}^j)\|_2=0$. After some permutations, we get a $q\times q$ block of non-zeros coefficient $\beta_{ij}$ corresponding to the group in the $\boldsymbol{\beta}$ matrix, where $(i,j)\in \{1,\cdots, q\}^2$. If we consider three different indices $i,j,k \ \in \{1,\cdots, q\}^3$, it is straightforward to show that the six coefficients indexed by $(i,j,k)$ are all equal. Thus the distance constraints between vectors $\boldsymbol{\beta}^i$ of a group forces equality of all regression coefficients in the group.
+</old>
+
+<revision>
+Let us illustrate by an example the effect of the proposed approach. Two variables $i$ and $j$ are in the same group when $\|\boldsymbol{\beta}^i - \tau_{ij} (\boldsymbol{\beta}^j)\|_2=0$. Considering a cluster $\mathcal C$ of $q$ variables, it is straightforward to show that $\forall (i,j) \in \mathcal C^2$, we have $\beta_{ij}=\beta_{\mathcal C}$. Thus the algorithm tend to produce precision matrices with blocks of constant entries for a given value of $\lambda_2$. Each block corresponds to a cluster.
+</revision>
 
 Let us illustrate by an example the effect of the proposed approach. If
 we consider a group of $q$ variables whose regression vectors have at
@@ -734,8 +743,8 @@ $\frac{n}{p}\in \{0.5,1,2\}$.
 path_checks <- "./rscripts/mglasso_functions/"
 source(paste0(path_checks, "simulate.R"))
 source(paste0(path_checks, "plot.R"))
-load("./data/roc_dtf_erdos.RData")
 
+load("./data/roc_dtf_erdos.RData")
 
 ggplot(roc_dtf_erdos, aes(x     = fpr, 
                           y     = tpr, 
