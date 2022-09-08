@@ -212,7 +212,9 @@ $\boldsymbol{\beta}^j_j$ and $\boldsymbol{\beta}^j_i$ and leaves other
 coefficients untouched, $\mathbf{X}^{i}\in \mathbb{R}^n$ denotes the
 $i$-th column of $\mathbf{X}$, $\boldsymbol{\beta}_{i}$ denotes the
 $i$-th row of $\beta$, $\lambda_1$ and $\lambda_2$ are penalization
-parameters. Let us consider $$
+parameters. Let us consider 
+
+$$
 \hat{\boldsymbol{\beta}} \in \underset{\boldsymbol{\beta}}{\operatorname{argmin}} J_{\lambda_1, \lambda_2}(\boldsymbol{\beta}, \mathbf{X}).
 $$
 
@@ -253,15 +255,17 @@ hierarchical clustering of the variables.
 In practice, if some information about the clustering structure is
 available, the problem can be generalized into:
 
-$$
-\min_{\boldsymbol{\beta}} \sum_{i=1}^p\frac{1}{2} \left \lVert \mathbf{X}^i - \mathbf{X}^{\setminus i} \boldsymbol{\beta}^i \right \rVert_2 ^2  + \lambda_1 \sum_{i = 1}^p \left \lVert \boldsymbol{\beta}^i \right \rVert_1 + \lambda_2 \sum_{i < j}  w_{ij} \left \lVert \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2,
+$$\min_{\boldsymbol{\beta}} \sum_{i=1}^p\frac{1}{2} \left \lVert \mathbf{X}^i - \mathbf{X}^{\setminus i} \boldsymbol{\beta}^i \right \rVert_2 ^2  + \lambda_1 \sum_{i = 1}^p \left \lVert \boldsymbol{\beta}^i \right \rVert_1 + \lambda_2 \sum_{i < j}  w_{ij} \left \lVert \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2,
 $$ {#eq-cost-fct-general}
 
 where $w_{ij}$ is a positive weight encoding prior knowledge of the
 groups to which variables $i$ and $j$ belong to. <edmond> A good choice
 for these pairwise affinities can help save time in computation and
-improve clustering performances. The choice can be guided by the application however improper specification can give rise to difficulty interpretable clustering structures [@chakraborty2020biconvex]. </edmond> In the remainder of the
-paper, we will ~~consider~~ <edmond> assume that </edmond> $w_{ij} = 1$ <edmond> for simplicity. </edmond>
+improve clustering performances. The choice can be guided by the
+application however improper specification can give rise to difficulty
+interpretable clustering structures [@chakraborty2020biconvex].
+</edmond> In the remainder of the paper, we will ~~consider~~ <edmond>
+assume that </edmond> $w_{ij} = 1$ <edmond> for simplicity. </edmond>
 
 # Numerical scheme
 
@@ -340,7 +344,7 @@ objective of MGLasso can indeed be written as
 
 $$
 \operatorname{argmin} \frac{1}{2} ||\mathbf{Y} - \tilde{\mathbf{X}} \tilde{\boldsymbol{\beta}}||_2^2 + \lambda_1 ||\tilde{\boldsymbol{\beta}}||_1 + \lambda_2 \sum_{i<j} ||\boldsymbol A_{ij} \tilde{\boldsymbol{\beta}}||_2,
-$$ {#eq-reformulated-pbm}
+$$ {#eq-refpbm}
 
 where
 $\mathbf{Y} = \operatorname{Vec}(\mathbf{X}) \in \mathbb{R}^{np}, \tilde{\boldsymbol{\beta}} = \operatorname{Vec(\boldsymbol{\beta})} \in \mathbb{R}^{p (p-1)}, \tilde{\mathbf{X}}$
@@ -358,14 +362,13 @@ $$
 
 Note that we introduce this notation for simplicity of exposition, but,
 in practice, the sparsity of the matrices $A_{ij}$ allows a more
-efficient implementation. Based on reformulation @eq-reformulated-pbm,
-we may apply CONESTA to solve the objective of MGLasso for fixed
-$\lambda_1$ and $\lambda_2$. The procedure is applied, for fixed
-$\lambda_1$, to a range of decreasing values of $\lambda_2$ to obtain a
-hierarchical clustering. The corresponding pseudo-code is given in the
-following algorithm where $(\mathbf{X}^i)^{+}$ denotes the
-pseudo-inverse of $\mathbf{X}^i$ and $\epsilon_{fuse}$ the threshold for
-merging clusters.
+efficient implementation. Based on reformulation @eq-refpbm, we may
+apply CONESTA to solve the objective of MGLasso for fixed $\lambda_1$
+and $\lambda_2$. The procedure is applied, for fixed $\lambda_1$, to a
+range of decreasing values of $\lambda_2$ to obtain a hierarchical
+clustering. The corresponding pseudo-code is given in the following
+algorithm where $(\mathbf{X}^i)^{+}$ denotes the pseudo-inverse of
+$\mathbf{X}^i$ and $\epsilon_{fuse}$ the threshold for merging clusters.
 
 ::: {#algo-label}
 ```{=html}
@@ -476,7 +479,7 @@ at $40$: $\frac{n}{p}\in \{0.5,1,2\}$.
 
 ### Stochastic Block-Model
 
-```{r include=FALSE}
+```{r stochastic-block-model}
 figure_nums <- captioner::captioner(prefix = "Figure")
 
 f.ref <- function(x) {
@@ -511,17 +514,16 @@ $\Omega_{ij} = 0$ if $Z_i\neq Z_j$ ; otherwise, we define
 $\Omega_{ij} = A_{ij}\omega_{ij}$ where, for all $i\in\{1,\ldots,p\}$
 and for all $j\in\{1,\ldots,p| Z_j = Z_i\}$, $\omega_{ij}$ is given by :
 
-
 If $\alpha_{ll}$ were to be equal to one, this construction of
 $\mathbf{\Omega}$ would make it possible to control the level of
 correlation between the variables in each block to $\rho$. Introducing a
 more realistic scheme with $\alpha_{ll}=0.75$ allows only to have an
 approximate control.
 
-```{r fig.cap = fig.1_cap}
-#path_checks <- "./rscripts/mglasso_functions/"
-#source(paste0(path_checks, "simulate.R"))
-#source(paste0(path_checks, "plot.R"))
+```{r fig.cap = fig.1_cap, echo = TRUE}
+path_checks <- "./rscripts/mglasso_functions/"
+source(paste0(path_checks, "simulate.R"))
+source(paste0(path_checks, "plot.R"))
 
 bloc_diag <- function(n_vars, connectivity_mat, prop_clusters, rho) {
   
@@ -673,14 +675,11 @@ adj_mat <- function(mat) {
 }
 
 set.seed(2020)
-
 sim_sbm <- sim_data(p = 40, structure = "block_diagonal", 
                     alpha = rep(1/5, 5), 
                     prob_mat = diag(0.75, 5), 
                     rho = 0.2, inter_cluster_edge_prob = 0.01)
-
 gsbm <- adj_mat(sim_sbm$graph)
-
 Matrix::image(as(gsbm, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")   
 ```
@@ -692,16 +691,13 @@ where $\alpha_{kl} = \alpha_{ll} = \alpha$ is constant. We set the
 density $\alpha$ of the graph to $0.1$; see `r f.ref('fig_2')` for an
 example of the graph resulting from this model.
 
-```{r fig.cap=fig.2_cap}
+```{r fig.cap=fig.2_cap, echo = TRUE}
 set.seed(2022)
 sim_erdos <- sim_data(p = 40, structure = "erdos", p_erdos = 0.1)
-
 gerdos <- adj_mat(sim_erdos$graph)
-
 Matrix::image(as(gerdos, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")
 ```
-
 
 ### Scale-free Model
 
@@ -712,7 +708,7 @@ is connected to an existing node with a probability proportional to the
 degree of the existing node. We set the number of edges in the graph to
 $40$. An example of scale-free graph is shown in `r f.ref('fig_3')`.
 
-```{r fig.cap=fig.3_cap}
+```{r fig.cap=fig.3_cap, echo = TRUE}
 set.seed(2022)
 sim_sfree <- sim_data(p = 40, structure = "scale_free")
 
@@ -724,7 +720,7 @@ Matrix::image(as(gsfree, "sparseMatrix"),
 
 ## Support recovery
 
-```{r include=FALSE}
+```{r include=FALSE, echo = TRUE}
 fig.4_cap <- figure_nums(name = "fig_4", caption = "ROC curves for the Erdös-Renyi model comparing MGLasso and GLasso methods.")
 fig.5_cap <- figure_nums(name = "fig_5", caption = "ROC curves for the Scale-free model comparing MGLasso and GLasso methods.")
 fig.6_cap <- figure_nums(name = "fig_6", caption = "ROC curves for the Stochastic Block model comparing MGLasso and GLasso methods.")
@@ -759,8 +755,7 @@ curves for the three models are given in `r f.ref('fig_4')`,
 `r f.ref('fig_5')` and `r f.ref('fig_6')` by varying
 $\frac{n}{p}\in \{0.5,1,2\}$.
 
-
-```{r roc_erdos , message=FALSE, fig.cap=fig.4_cap}
+```{r roc_erdos , message=FALSE, fig.cap=fig.4_cap, echo = TRUE}
 load("./data/roc_dtf_erdos.RData")
 
 ggplot(roc_dtf_erdos, aes(x     = fpr, 
@@ -776,7 +771,7 @@ ggplot(roc_dtf_erdos, aes(x     = fpr,
   theme_bw()
 ```
 
-```{r roc_scale_free , message=FALSE, fig.cap=fig.5_cap}
+```{r roc_scale_free , message=FALSE, fig.cap=fig.5_cap, echo = TRUE}
 load("./data/roc_dtf_sfree.RData")
 
 ggplot(roc_dtf_sfree, aes(x     = fpr, 
@@ -792,7 +787,7 @@ ggplot(roc_dtf_sfree, aes(x     = fpr,
   theme_bw()
 ```
 
-```{r roc_sbm , message=FALSE, fig.cap=fig.6_cap}
+```{r roc_sbm , message=FALSE, fig.cap=fig.6_cap, echo = TRUE}
 load("./data/roc_dtf_sbm.RData")
 
 ggplot(roc_dtf_sbm, aes(x     = fpr, 
@@ -822,7 +817,7 @@ of group-fused penalty terms was also observed in [@chu2021adaptive].
 
 ## Clustering
 
-```{r include=FALSE}
+```{r include=FALSE, echo = TRUE}
 fig.7_cap <- figure_nums(name = "fig_7", caption = "Adjusted Rand Indices for the HAC, k-means and MGLasso methods. \n Performances are observed for 4 different number of clusters in a low correlation context")
 fig.8_cap <- figure_nums(name = "fig_8", caption = "Adjusted Rand Indices for the HAC, k-means and MGLasso methods. \n Performances are observed for 4 different number of clusters in a high correlation context")
 ```
@@ -841,13 +836,13 @@ sparsity penalty for MGLasso is chosen by the Stability Approach to
 Regularization Selection (StARS) method [@Liu2010], and we vary the
 parameter $\lambda_2.$
 
-```{r fig.cap=fig.7_cap}
+```{r fig.cap=fig.7_cap, echo = TRUE}
 load("./data/rand_dt_lower_cor_sbm.RData")
 plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.25, np_ = c(0.5, 1, 2), 
          main = "")
 ```
 
-```{r fig.cap=fig.8_cap}
+```{r fig.cap=fig.8_cap, echo = TRUE}
 load("./data/rand_dt_higher_cor_sbm.RData")
 plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.95, np_ = c(0.5, 1, 2),
          main = "")
@@ -864,7 +859,7 @@ decreases.
 
 # Analysis of microbial associations data
 
-```{r include=FALSE}
+```{r include=FALSE, echo = TRUE}
 fig.9_cap <- figure_nums(name = "fig_9", caption = "Empirical correlations in the gut data")
 fig.10_cap <- figure_nums(name = "fig_10", caption = "Infered graphs using MGLasso for different values of total variation penalty")
 ```
@@ -883,7 +878,7 @@ preliminary analysis, we perform a hierarchical agglomerative clustering
 The correlation matrix of the dataset is given in `r f.ref('fig_9')`;
 variables have been rearranged according to the HAC partition.
 
-```{r fig.cap=fig.9_cap}
+```{r fig.cap=fig.9_cap, echo = TRUE}
 data(amgut1.filt, package = "SpiecEasi")
 dta <- amgut1.filt
 dta <- t(SpiecEasi::clr(dta + 1 , 1))
@@ -900,14 +895,13 @@ Matrix::image(as(S[order(cut_dta), order(cut_dta)],
       colorkey = FALSE)
 ```
 
-
 The average correlations within blocks of variables belonging to the
 same cluster are given below. We observe relatively high levels of
 correlation in small blocks, similar to the simulation models used to
 evaluate the performance of clustering in the [Simulation Experiments]
 section.
 
-```{r}
+```{r , echo = TRUE}
 C <- cor(dta)
 diag(C) <- 0
 clusters <- cut_dta
@@ -924,7 +918,7 @@ out <- data.frame(Cluster = 1:4, "Mean correlation" = round(mat[, "Mean"], 3))
 knitr::kable(out)
 ```
 
-```{r include = FALSE, eval = FALSE}
+```{r include = FALSE, eval = FALSE, echo = TRUE}
 | Clusters         |   1    |   2   |   3   |   4   |
 |:-----------------|:------:|:-----:|:-----:|:-----:|
 | Mean correlation | 0.0127 | 0.815 | 0.555 | 0.566 |
@@ -936,10 +930,9 @@ and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
 clusters) are given below. In each case, the parameter $\lambda_1$ is
 chosen by stability selection (see [Model Selection] section).
 
-```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap=fig.10_cap,fig.show='hold',fig.align='center'}
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap=fig.10_cap,fig.show='hold',fig.align='center', echo = TRUE}
 knitr::include_graphics(c("figures/mglasso_tv0.png","figures/mglasso_full_graph_tv5.png"))
 ```
-
 
 The variables were reordered according to the clustering partition
 obtained from the distances between the regression vectors. Increasing
@@ -983,6 +976,6 @@ distributions belonging to the exponential family as outlined by
 
 # Session information {.appendix .unnumbered}
 
-```{r session-info}
+```{r session-info, echo = TRUE}
 sessionInfo()
 ```
