@@ -1,25 +1,25 @@
 # Create relevant folders for paths if needed.
 
 ### LIBRARIES
-# library(capushe)
-# library(corpcor)
-# library(glasso)
-# library(glmnet)
-# library(ggplot2)
-# library(huge)
-# library(igraph)
-# library(latex2exp)
-# library(Matrix)
-# library(mclust)
-# library(mvtnorm)
-# library(parallel)
-# library(reticulate)
-# library(simone)
-# library(vegan)
-# library(gridExtra)
-# require(lattice)
-# require(devtools)
-# library(SpiecEasi)
+library(capushe)
+library(corpcor)
+library(glasso)
+library(glmnet)
+library(ggplot2)
+library(huge)
+library(igraph)
+library(latex2exp)
+library(Matrix)
+library(mclust)
+library(mvtnorm)
+library(parallel)
+library(reticulate)
+library(simone)
+library(vegan)
+library(gridExtra)
+require(lattice)
+require(devtools)
+library(SpiecEasi)
 
 ### PATHS
 path_data       <- "./data/"
@@ -41,9 +41,5 @@ source("perform.R")
 source("normalize.R")
 
 ### PYTHON
-# At first launch Install pylearn_parsimony library in the python environment
-# pip install git+git://github.com/neurospin/pylearn-parsimony.git
-
-# If needed specify the python version to be used with use_python
 source_python("solve.py")
 setwd(oldpath)
