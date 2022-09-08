@@ -521,15 +521,11 @@ more realistic scheme with $\alpha_{ll}=0.75$ allows only to have an
 approximate control.
 
 ```{r fig.cap = fig.1_cap, echo = TRUE}
-path_checks <- "./rscripts/mglasso_functions/"
-source(paste0(path_checks, "simulate.R"))
-source(paste0(path_checks, "plot.R"))
-
 bloc_diag <- function(n_vars, connectivity_mat, prop_clusters, rho) {
   
   true_nclusters <- 0
   
-  while (true_nclusters != length(prop_clusters)){ ## controle pour s'assurer qu'il y a bien le nombre de clusters voulu
+  while (true_nclusters != length(prop_clusters)){ ## To make sure we have the required number of clusters
     network <- simone::rNetwork(n_vars, connectivity_mat, prop_clusters)
     true_nclusters <- length(unique(network$clusters))
   }
@@ -543,41 +539,22 @@ bloc_diag <- function(n_vars, connectivity_mat, prop_clusters, rho) {
   
   
   for (i in 1:length(eff_clusters)) {
-    #bloc <- matrix(b[i], eff_clusters[i], eff_clusters[i])
     temp <- precision_mat[which(row.names(precision_mat) == i), which(row.names(precision_mat) == i)]
     temp <- as.matrix(temp)
-    
     temp[temp != 0] = b[i]
     diag(temp) = d[i]
-    
     precision_mat[which(row.names(precision_mat) == i), which(row.names(precision_mat) == i)] = temp
-    
   }
   
   flag <- min(svd(precision_mat)$d)
   if(flag < 0){
     diag(precision_mat) <- 1 - flag
-    
   }
   
   return(precision_mat)
 }
 
 #' simulate data with given graph structure
-#'
-#' @param p 
-#' @param np_ratio 
-#' @param structure 
-#' @param alpha 
-#' @param prob_mat 
-#' @param rho 
-#' @param g 
-#' @param inter_cluster_edge_prob 
-#' @param p_erdos 
-#' @param verbose 
-#'
-#' @return A list:
-#' graph : precision
 sim_data <- function(p = 20,
                      np_ratio = 2,
                      structure = c("block_diagonal", "hub", "scale_free", "erdos"),
@@ -627,7 +604,7 @@ sim_data <- function(p = 20,
             if(inter_cluster_edge_prob != 0) { # inter-clusters edges added in the flipped way
               flag <- TRUE
               
-              while(flag) { # To do: treat the flag case instead of generating a new model
+              while(flag) {
                 K <- bloc_diag(p, prob_mat, alpha, rho)
                 
                 target_indices <- which(K[upper.tri(K)] == 0) # Random selection of edges to be set to 1
@@ -636,8 +613,7 @@ sim_data <- function(p = 20,
                 selected_indices <- sample(target_indices, select_len)
                 
                 precision_level <- unique(K[upper.tri(K)])
-                precision_level <- max(precision_level[precision_level != 0]) # je prends la precision max à l'intérieur des blocs
-                                                                              # et je l'affecte dans les arêtes inter-blocs
+                precision_level <- max(precision_level[precision_level != 0]) 
                 
                 K[upper.tri(K)][selected_indices] <- precision_level
                 K <- as.matrix(Matrix::forceSymmetric(K, uplo = "U"))
@@ -663,7 +639,6 @@ sim_data <- function(p = 20,
             }
           }
   )
-  
   return(list(X=X, graph=graph, correlation=correlation))
 }
 
@@ -756,7 +731,11 @@ curves for the three models are given in `r f.ref('fig_4')`,
 $\frac{n}{p}\in \{0.5,1,2\}$.
 
 ```{r roc_erdos , message=FALSE, fig.cap=fig.4_cap, echo = TRUE}
+path_checks <- "./rscripts/mglasso_functions/"
+source(paste0(path_checks, "simulate.R"))
+source(paste0(path_checks, "plot.R"))
 load("./data/roc_dtf_erdos.RData")
+
 
 ggplot(roc_dtf_erdos, aes(x     = fpr, 
                           y     = tpr, 
