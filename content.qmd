@@ -51,7 +51,7 @@ edmond { color: Red }
 
 <!-- ~~text~~ -->
 
-```{r setup, include=FALSE, message=FALSE}
+```{r setup, include=FALSE, message=FALSE, echo = TRUE}
 knitr::opts_chunk$set(tidy = FALSE, out.width="49%", out.height="20%",fig.show='hold',fig.align='center', echo = FALSE)
 options(htmltools.dir.version = FALSE)
 
@@ -488,22 +488,9 @@ at $40$: $\frac{n}{p}\in \{0.5,1,2\}$.
 
 ### Stochastic Block-Model
 
-```{r stochastic-block-model}
-figure_nums <- captioner::captioner(prefix = "Figure")
-
-f.ref <- function(x) {
-  stringr::str_extract(figure_nums(x), "[^:]*")
-}
-
-fig.1_cap <- figure_nums(name = "fig_1", caption = "Adjacency matrix of a stochastic block model with 5 blocks.")
-fig.2_cap <- figure_nums(name = "fig_2", caption = "Adjacency matrix of an Erdös-Renyi model.")
-fig.3_cap <- figure_nums(name = "fig_3", caption = "Adjacency matrix of a Scale-free model.")
-
-```
-
 We construct a block-diagonal precision matrix $\mathbf{\Omega}$ as
 follows. First, we generate the support of $\mathbf{\Omega}$ as shown in
-`r f.ref('fig_1')`, denoted by $\boldsymbol A\in\{0,1\}^{p\times p}$. To
+@fig-model-sbm, denoted by $\boldsymbol A\in\{0,1\}^{p\times p}$. To
 do this, the variables are first partitioned into $K = 5$ hidden groups,
 noted $C_1, \dots, C_K$ described by a latent random variable $Z_i$,
 such that $Z_i = k$ if $i = C_k$. $Z_i$ follows a multinomial
@@ -529,7 +516,8 @@ correlation between the variables in each block to $\rho$. Introducing a
 more realistic scheme with $\alpha_{ll}=0.75$ allows only to have an
 approximate control.
 
-```{r fig.cap = fig.1_cap, echo = TRUE}
+:::{#fig-model-sbm}
+```{r echo = TRUE}
 bloc_diag <- function(n_vars, connectivity_mat, prop_clusters, rho) {
   
   true_nclusters <- 0
@@ -668,20 +656,28 @@ Matrix::image(as(gsbm, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")   
 ```
 
+Adjacency matrix of a stochastic block model with 5 blocks.
+:::
+
 ### Erdös-Renyi Model
 
 The Erdös-Renyi model is a special case of the stochastic block model
 where $\alpha_{kl} = \alpha_{ll} = \alpha$ is constant. We set the
-density $\alpha$ of the graph to $0.1$; see `r f.ref('fig_2')` for an
+density $\alpha$ of the graph to $0.1$; see @fig-model-erdos for an
 example of the graph resulting from this model.
 
-```{r fig.cap=fig.2_cap, echo = TRUE}
+:::{#fig-model-erdos}
+```{r echo = TRUE}
 set.seed(2022)
 sim_erdos <- sim_data(p = 40, structure = "erdos", p_erdos = 0.1)
 gerdos <- adj_mat(sim_erdos$graph)
 Matrix::image(as(gerdos, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")
 ```
+
+Adjacency matrix of an Erdös-Renyi model.
+
+:::
 
 ### Scale-free Model
 
@@ -690,9 +686,10 @@ follow a power law. The graph starts with an initial chain graph of $2$
 nodes. Then, new nodes are added to the graph one by one. Each new node
 is connected to an existing node with a probability proportional to the
 degree of the existing node. We set the number of edges in the graph to
-$40$. An example of scale-free graph is shown in `r f.ref('fig_3')`.
+$40$. An example of scale-free graph is shown in @fig-model-sfree.
 
-```{r fig.cap=fig.3_cap, echo = TRUE}
+:::{#fig-model-sfree}
+```{r echo = TRUE}
 set.seed(2022)
 sim_sfree <- sim_data(p = 40, structure = "scale_free")
 
@@ -702,13 +699,11 @@ Matrix::image(as(gsfree, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")
 ```
 
-## Support recovery
+Adjacency matrix of a Scale-free model.
 
-```{r include=FALSE, echo = TRUE}
-fig.4_cap <- figure_nums(name = "fig_4", caption = "ROC curves for the Erdös-Renyi model comparing MGLasso and GLasso methods.")
-fig.5_cap <- figure_nums(name = "fig_5", caption = "ROC curves for the Scale-free model comparing MGLasso and GLasso methods.")
-fig.6_cap <- figure_nums(name = "fig_6", caption = "ROC curves for the Stochastic Block model comparing MGLasso and GLasso methods.")
-```
+:::
+
+## Support recovery
 
 We compare the network structure learning performance of our approach to
 that of GLasso in its neighborhood selection version using ROC curves.
@@ -735,11 +730,13 @@ $1 - \text{specificity}(\lambda_1)$ which is the false positive rate.
 
 For each configuration ($n, p$ fixed), we generate $50$ replications and
 their associated ROC curves, which are then averaged. The average ROC
-curves for the three models are given in `r f.ref('fig_4')`,
-`r f.ref('fig_5')` and `r f.ref('fig_6')` by varying
+curves for the three models are given in @fig-roc-erdos,
+@fig-roc-sfree and @fig-roc-sbm by varying
 $\frac{n}{p}\in \{0.5,1,2\}$.
 
-```{r roc_erdos , message=FALSE, fig.cap=fig.4_cap, echo = TRUE}
+
+:::{#fig-roc-erdos}
+```{r roc_erdos, message=FALSE, echo = TRUE}
 path_checks <- "./rscripts/mglasso_functions/"
 source(paste0(path_checks, "simulate.R"))
 source(paste0(path_checks, "plot.R"))
@@ -759,7 +756,13 @@ ggplot(roc_dtf_erdos, aes(x     = fpr,
   theme_bw()
 ```
 
-```{r roc_scale_free , message=FALSE, fig.cap=fig.5_cap, echo = TRUE}
+ROC curves for the Erdös-Renyi model comparing MGLasso and GLasso methods.
+
+:::
+
+
+:::{#fig-roc-sfree}
+```{r roc_scale_free , message=FALSE, echo = TRUE}
 load("./data/roc_dtf_sfree.RData")
 
 ggplot(roc_dtf_sfree, aes(x     = fpr, 
@@ -775,7 +778,13 @@ ggplot(roc_dtf_sfree, aes(x     = fpr,
   theme_bw()
 ```
 
-```{r roc_sbm , message=FALSE, fig.cap=fig.6_cap, echo = TRUE}
+ROC curves for the Scale-free model comparing MGLasso and GLasso methods.
+
+:::
+
+
+:::{#fig-roc-sbm}
+```{r roc_sbm , message=FALSE, echo = TRUE}
 load("./data/roc_dtf_sbm.RData")
 
 ggplot(roc_dtf_sbm, aes(x     = fpr, 
@@ -790,6 +799,9 @@ ggplot(roc_dtf_sbm, aes(x     = fpr,
   scale_colour_grey(start = 0.2, end = 0.6) + 
   theme_bw()
 ```
+ROC curves for the Stochastic Block model comparing MGLasso and GLasso methods.
+
+:::
 
 Based on these empirical results, we first observe that, in all the
 considered simulation models, MGLasso improves over GLasso in terms of
@@ -805,11 +817,6 @@ of group-fused penalty terms was also observed in [@chu2021adaptive].
 
 ## Clustering
 
-```{r include=FALSE, echo = TRUE}
-fig.7_cap <- figure_nums(name = "fig_7", caption = "Adjusted Rand Indices for the HAC, k-means and MGLasso methods. \n Performances are observed for 4 different number of clusters in a low correlation context")
-fig.8_cap <- figure_nums(name = "fig_8", caption = "Adjusted Rand Indices for the HAC, k-means and MGLasso methods. \n Performances are observed for 4 different number of clusters in a high correlation context")
-```
-
 In order to obtain clustering performance, we compared the partitions
 estimated by MGLasso, Hierarchical Agglomerative Clustering (HAC) with
 Ward's distance and K-means to the true partition in a stochastic block
@@ -824,19 +831,28 @@ sparsity penalty for MGLasso is chosen by the Stability Approach to
 Regularization Selection (StARS) method [@Liu2010], and we vary the
 parameter $\lambda_2.$
 
-```{r fig.cap=fig.7_cap, echo = TRUE}
+:::{#fig-ari-low-cor}
+```{r echo = TRUE}
 load("./data/rand_dt_lower_cor_sbm.RData")
 plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.25, np_ = c(0.5, 1, 2), 
          main = "")
 ```
 
-```{r fig.cap=fig.8_cap, echo = TRUE}
+Adjusted Rand Indices for the HAC, k-means and MGLasso methods. Performances are observed for 4 different number of clusters in a low correlation context.
+:::
+
+:::{#fig-ari-high-cor}
+```{r echo = TRUE}
 load("./data/rand_dt_higher_cor_sbm.RData")
 plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.95, np_ = c(0.5, 1, 2),
          main = "")
 ```
 
-The results shown in `r f.ref('fig_7')` and `r f.ref('fig_8')`
+Adjusted Rand Indices for the HAC, k-means and MGLasso methods. Performances are observed for 4 different number of clusters in a high correlation context.
+
+:::
+
+The results shown in @fig-ari-low-cor and @fig-ari-high-cor
 demonstrate that, particularly at the lower to medium levels of the
 hierarchy (between 20 and 10 clusters), the hierarchical clustering
 structure uncovered by MGLasso is comparable to popular clustering
@@ -846,11 +862,6 @@ methods also deteriorate as the level of correlation inside clusters
 decreases.
 
 # Analysis of microbial associations data
-
-```{r include=FALSE, echo = TRUE}
-fig.9_cap <- figure_nums(name = "fig_9", caption = "Empirical correlations in the gut data")
-fig.10_cap <- figure_nums(name = "fig_10", caption = "Infered graphs using MGLasso for different values of total variation penalty")
-```
 
 We finally illustrate our new method of inferring the multiscale
 Gaussian graphical model, with an application to the analysis of
@@ -863,10 +874,11 @@ samples (removed if sequencing depth below 2700), the top OTUs are
 grouped in a dataset composed of $n_1 = 289$ for $127$ OTUs. As a
 preliminary analysis, we perform a hierarchical agglomerative clustering
 (HAC) on the OTUs, which allows us to identify four significant groups.
-The correlation matrix of the dataset is given in `r f.ref('fig_9')`;
+The correlation matrix of the dataset is given in @fig-emp-cor;
 variables have been rearranged according to the HAC partition.
 
-```{r fig.cap=fig.9_cap, echo = TRUE}
+:::{#fig-emp-cor}
+```{r echo = TRUE}
 data(amgut1.filt, package = "SpiecEasi")
 dta <- amgut1.filt
 dta <- t(SpiecEasi::clr(dta + 1 , 1))
@@ -883,13 +895,18 @@ Matrix::image(as(S[order(cut_dta), order(cut_dta)],
       colorkey = FALSE)
 ```
 
+Empirical correlations in the gut data.
+
+:::
+
 The average correlations within blocks of variables belonging to the
 same cluster are given below. We observe relatively high levels of
 correlation in small blocks, similar to the simulation models used to
 evaluate the performance of clustering in the [Simulation Experiments]
 section.
 
-```{r , echo = TRUE}
+
+```{r echo = TRUE}
 C <- cor(dta)
 diag(C) <- 0
 clusters <- cut_dta
@@ -905,12 +922,7 @@ mat <- t(sapply(L,
 out <- data.frame(Cluster = 1:4, "Mean correlation" = round(mat[, "Mean"], 3))
 knitr::kable(out)
 ```
-
-```{r include = FALSE, eval = FALSE, echo = TRUE}
-| Clusters         |   1    |   2   |   3   |   4   |
-|:-----------------|:------:|:-----:|:-----:|:-----:|
-| Mean correlation | 0.0127 | 0.815 | 0.555 | 0.566 |
-```
+<!-- : my table caption {#tbl-mylabel} -->
 
 We apply MGLasso to the normalised counts to infer a graph and a
 clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
@@ -918,16 +930,21 @@ and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
 clusters) are given below. In each case, the parameter $\lambda_1$ is
 chosen by stability selection (see [Model Selection] section).
 
-```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap=fig.10_cap,fig.show='hold',fig.align='center', echo = TRUE}
+:::{#fig-real-data-mglasso}
+
+```{r, out.width="49%", out.height="20%", fig.show='hold',fig.align='center', echo = TRUE}
 knitr::include_graphics(c("figures/mglasso_tv0.png","figures/mglasso_full_graph_tv5.png"))
 ```
+Infered graphs using MGLasso for different values of total variation penalty.
+
+:::
 
 The variables were reordered according to the clustering partition
 obtained from the distances between the regression vectors. Increasing
 $\lambda_2$ reduces the number of clusters and leads to a shrinking
 effect on the estimates. The adjacency matrix of the neighborhood
 selection equivalent to setting $\lambda_2$ to $0$ is given in
-`r f.ref('fig_10')` (left). In `r f.ref('fig_10')` (right), the deduced
+@fig-real-data-mglasso (up). In @fig-real-data-mglasso (down), the deduced
 partition is composed of $80$ clusters. A confusion matrix comparing the
 edges deduced by MGLasso with $\lambda_2 = 5$ and neighborhood selection
 is given below. Adding a total variation parameter increases the merging
@@ -938,6 +955,9 @@ effect, resulting in a larger number of edges in the graph.
 | MGLasso ($\lambda_2 = 5$) |           |       non-edges        | edges |
 |                           | non-edges |         15678          | 0     |
 |                           | edges     |          288           | 163   |
+
+<!-- : my table caption {#tbl-mylabel} -->
+<!-- @tbl-mylabel -->
 
 # Conclusion
 
@@ -955,9 +975,7 @@ method with the analysis of microbial associations data. The present
 work paves the way for future improvements: first, by incorporating
 prior knowledge through more flexible weighted regularization; second,
 by studying the theoretical properties of the method in terms of
-statistical guarantees for the MGLasso estimator.
-
-<edmond> Moreover the node-wise regression approach on which our method
+statistical guarantees for the MGLasso estimator. <edmond> Moreover the node-wise regression approach on which our method
 is based can be extended to a broader family of non-gaussian
 distributions belonging to the exponential family as outlined by
 @yang2012graphical. </edmond>
