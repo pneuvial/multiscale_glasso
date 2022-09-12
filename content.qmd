@@ -352,25 +352,21 @@ order to comply with the form of loss function required by CONESTA. The
 objective of MGLasso can indeed be written as
 
 $$
-\operatorname{argmin} \frac{1}{2} ||\mathbf{Y} - \tilde{\mathbf{X}} \tilde{\boldsymbol{\beta}}||_2^2 + \lambda_1 ||\tilde{\boldsymbol{\beta}}||_1 + \lambda_2 \sum_{i<j} ||\boldsymbol A_{ij} \tilde{\boldsymbol{\beta}}||_2,
+\operatorname{argmin} \frac{1}{2} ||\mathbf{Y} - \tilde{\mathbf{X}} \tilde{\boldsymbol{\beta}}||_2^2 + \lambda_1 ||\tilde{\boldsymbol{\beta}}||_1 + \lambda_2 \sum_{i<j} ||\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}}||_2,
 $$ {#eq-refpbm}
 
 where
 $\mathbf{Y} = \operatorname{Vec}(\mathbf{X}) \in \mathbb{R}^{np}, \tilde{\boldsymbol{\beta}} = \operatorname{Vec(\boldsymbol{\beta})} \in \mathbb{R}^{p (p-1)}, \tilde{\mathbf{X}}$
 is a $\mathbb{R}^{[np]\times [p \times (p-1)]}$ block-diagonal matrix
 with $\mathbf{X}^{\setminus i}$ on the $i$-th block. The matrix
-$\boldsymbol A_{ij}$ is a $p\times p(p-1)$ matrix defined by
+$\boldsymbol A_{ij}$ is a $p\times p(p-1)$ matrix ~~defined by~~  <edmond> chosen so that $\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}} = \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j).$ Some practical details about the implementation are provided in appendix. </edmond>
 
-$$
-\boldsymbol A_{ij} (k, l) = \begin{cases}
-1, \ \text{if} \ l =(i-1)p+k, \\
--1, \ \text{if} \ l = (j-1)p+k,\\
-0, \ \text{otherwise.}
-\end{cases}
-$$
+<old>
+~~$$\boldsymbol D_{ij} (k, l) = \begin{cases} 1, \ \text{if} \ l =(i-1)p+k, \\ -1, \ \text{if} \ l = (j-1)p+k,\\ 0, \ \text{otherwise.} \end{cases}$$~~
+</old>
 
 Note that we introduce this notation for simplicity of exposition, but,
-in practice, the sparsity of the matrices $A_{ij}$ allows a more
+in practice, the sparsity of the matrices $\boldsymbol D_{ij}$ allows a more
 efficient implementation. Based on reformulation @eq-refpbm, we may
 apply CONESTA to solve the objective of MGLasso for fixed $\lambda_1$
 and $\lambda_2$. The procedure is applied, for fixed $\lambda_1$, to a
@@ -840,19 +836,18 @@ roc_dtf_erdos <- rbind(roc_dt20, roc_dt40, roc_dt80)
 
 :::{#fig-roc-erdos}
 ```{r roc_erdos, message=FALSE, echo = TRUE}
-load("./data/roc_dtf_erdos.RData")
+#load("./data/roc_dtf_erdos.RData")
 
 ggplot(roc_dtf_erdos, aes(x     = fpr, 
                           y     = tpr, 
                           color = method )) + 
-  geom_line() + 
+  geom_line(size = 0.7) + 
   facet_grid(np ~ tv) +
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "grey") +
   xlab("False Positive Rate") +
   ylab("True Positive Rate") +
   ggtitle("") +
-  scale_colour_grey(start = 0.2, end = 0.6) + 
-  theme_bw()
+  scale_colour_manual(values = ghibli_palette("MarnieMedium1")[5:6])
 ```
 
 ROC curves for the Erdös-Renyi model comparing MGLasso and GLasso methods.
@@ -940,8 +935,7 @@ ggplot(roc_dtf_sfree, aes(x     = fpr,
   xlab("False Positive Rate") +
   ylab("True Positive Rate") +
   ggtitle("") + 
-  scale_colour_grey(start = 0.2, end = 0.6) + 
-  theme_bw()
+  scale_colour_manual(values = ghibli_palette("MarnieMedium1")[5:6])
 ```
 
 ROC curves for the Scale-free model comparing MGLasso and GLasso methods.
@@ -1024,8 +1018,7 @@ ggplot(roc_dtf_sbm, aes(x     = fpr,
   xlab("False Positive Rate") +
   ylab("True Positive Rate") +
   ggtitle("") +
-  scale_colour_grey(start = 0.2, end = 0.6) + 
-  theme_bw()
+  scale_colour_manual(values = ghibli_palette("MarnieMedium1")[5:6])
 ```
 ROC curves for the Stochastic Block model comparing MGLasso and GLasso methods.
 

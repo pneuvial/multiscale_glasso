@@ -12,6 +12,7 @@ local({
 ## ____________________________________________________
 remotes::install_github("jchiquet/simone")
 remotes::install_github("zdk123/SpiecEasi")
+remotes::install_github("ewenme/ghibli")
 ## ____________________________________________________
 ## Additional R packages needed by the user (CRAN)
 ## example: remote

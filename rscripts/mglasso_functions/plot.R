@@ -127,7 +127,7 @@ plot_res <- function(dt, crit_, ncluster_, cor_, np_, perfs_threshold_ = 50, met
     facet_grid(. ~ ncluster) + 
     ggtitle(main) + 
     xlab("Ratio n/p") + 
-    theme_bw()  + scale_fill_grey()
+    scale_fill_manual(values = rev(ghibli_palette("MarnieMedium1")))
   
   if(crit_ == "rand"){
     bp_error <- bp_error + 
