@@ -60,6 +60,7 @@ library(simone)
 library(SpiecEasi)
 library(huge)
 library(Matrix)
+library(ghibli)
 ```
 
 # Introduction
@@ -273,7 +274,7 @@ for these pairwise affinities can help save time in computation and
 improve clustering performances. The choice can be guided by the
 application however improper specification can give rise to difficulty
 interpretable clustering structures [@chakraborty2020biconvex].
-</edmond> In the remainder of the paper, we will ~~consider~~ <edmond>
+</edmond> In the remainder of the paper, we will <old> consider </old> <edmond>
 assume that </edmond> $w_{ij} = 1$ <edmond> for simplicity. </edmond>
 
 # Numerical scheme
@@ -301,30 +302,44 @@ regression problems with structured sparsity such as group structures.
 
 The CONESTA solver, initially introduced for neuro-imaging problems,
 addresses a general class of convex optimization problems which includes
-group-wise penalties, admitting loss functions of the form:
+group-wise penalties.  <old> admitting loss functions of the form: </old> <edmond> The algorithm solves problems in the form </edmond>
 
+<old> $$f(\boldsymbol{\theta} ) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),$$ </old>
+
+<edmond>
 $$
-f(\boldsymbol{\theta} ) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),
+\operatorname{minimize} \quad g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),
 $$ {#eq-conesta-criterion}
+</edmond>
 
-where $\lambda_1$ and $\lambda_2$ are penalty weights, and
+<edmond> with parameters vector $\boldsymbol{\theta}\in \mathbb{R}^d$ where $\lambda_1$ and $\lambda_2$ are penalty parameters.<edmond>
+
+<old> where $\lambda_1$ and $\lambda_2$ are penalty weights, and
 $\boldsymbol{\theta}\in \mathbb{R}^d$ is a $d$-dimensional vector of
-parameters to optimize. In the original paper [@hadjselem2018], the
-function $g(\boldsymbol{\theta})$ is the sum of a least squares
-criterion and a ridge penalty, $h(\boldsymbol{\theta})$ is a penalty
-whose proximal operator is known in closed-form, and
-$s(\boldsymbol{\theta})$ is an $\ell_{1,2}$ penalty of the form
+parameters to optimize.</old>
 
-$$
-s(\boldsymbol{\theta}) = \sum_{\phi \in \Phi} \|\mathbf{D}_\phi \boldsymbol{\theta}_\phi\|_2. 
-$$ In the definition of $s(\boldsymbol{\theta})$,
+In the original paper [@hadjselem2018], <old> the
+function </old> $g(\boldsymbol{\theta})$ is <old> the sum of a least squares
+criterion and a ridge penalty </old> a differentiable function, $h(\boldsymbol{\theta})$ is a penalty function
+whose proximal operator is known in closed-form.
+
+<edmond> Given $\phi \subseteq \{1,\ldots, d\}$, let $\boldsymbol{\theta}_\phi = (\theta_i)_{i \in \phi}$ denote the subvector of $\boldsymbol{\theta}$ referenced by the indices in $\phi.$ Denote $\Phi = \{ \phi_1, \dots, \phi_{\operatorname{Card}(\Phi)}\}$ a collection with $\phi_i \subseteq \{1,\ldots, d\}.$ Let the matrix $\mathbf{A}_\phi \in \mathbb{R}^{m \times \operatorname{Card}(\Phi) }$ define a linear map from $\mathbb{R}^{\operatorname{Card}(\phi)}$ to $\mathbb{R}^m$ by sending the column vector $\boldsymbol{\theta}_\phi \in \mathbb{R}^{\operatorname{Card}(\phi)}$ to the column vector $\mathbf{A}_\phi \boldsymbol{\theta}_\phi \in \mathbb{R}^m.$ The function $s(\boldsymbol{\theta})$ is assumed to be an $\ell_{1,2}$-norm i.e. the sum of the group-wise $\ell_2$-norms of the elements $\mathbf{A}_\phi \boldsymbol{\theta}_\phi, \phi \in \Phi.$ Namely,  </edmond>
+
+<old> and $s(\boldsymbol{\theta})$ is an $\ell_{1,2}$ penalty of the form </old>
+
+$$s(\boldsymbol{\theta}) = \sum_{\phi \in \Phi} \|\mathbf{A}_\phi \boldsymbol{\theta}_\phi\|_2.$$ 
+<old> In the definition of $s(\boldsymbol{\theta})$,
 $\Phi = \{ \phi_1, \dots, \phi_{\operatorname{Card}(\Phi)}\}$ is a set
 of subsets of indices, i.e., $\Phi_i\subset \{1,\ldots, d\}$ for all
 $i\in\{1,\ldots,\operatorname{Card}(\Phi)\}$ and, for all
 $\phi\in \Phi$, $\boldsymbol{\theta}_\phi$ is the sub-vector of
 $\boldsymbol{\theta}$ defined by
 $\boldsymbol{\theta}_\phi = (\theta_i)_{i\in\phi}$. Finally,
-$\mathbf{D}_\phi$ are linear operators. The main ingredient of CONESTA
+$\mathbf{D}_\phi$ are linear operators. <\old>
+
+<edmond> When $\mathbf{A}_\phi$ is the identity operator such as $\mathbf{A}_\phi \boldsymbol{\theta}_\phi = \boldsymbol{\theta}_\phi$, the penalty function $s$ is the overlapping group-lasso and $m = \operatorname{Card}(\phi)$. When it is a discrete derivative operator, therefore $s$ is a total variation penalty and $m$ can be seen as the number of neighborhood relationships.</edmond>
+
+The main ingredient of CONESTA
 is the approximation of the non-smooth $\ell_{2,1}$-norm penalty with
 unknown proximal gradient, by a smooth function with known proximal
 gradient computed using Nesterov's smoothing. Given a smoothing
@@ -359,11 +374,9 @@ where
 $\mathbf{Y} = \operatorname{Vec}(\mathbf{X}) \in \mathbb{R}^{np}, \tilde{\boldsymbol{\beta}} = \operatorname{Vec(\boldsymbol{\beta})} \in \mathbb{R}^{p (p-1)}, \tilde{\mathbf{X}}$
 is a $\mathbb{R}^{[np]\times [p \times (p-1)]}$ block-diagonal matrix
 with $\mathbf{X}^{\setminus i}$ on the $i$-th block. The matrix
-$\boldsymbol A_{ij}$ is a $p\times p(p-1)$ matrix ~~defined by~~  <edmond> chosen so that $\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}} = \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j).$ Some practical details about the implementation are provided in appendix. </edmond>
+$\boldsymbol A_{ij}$ is a $p\times p(p-1)$ matrix <old> defined by </old>  <edmond> chosen so that $\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}} = \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j).$ Some practical details about the implementation are provided in appendix. </edmond>
 
-<old>
-~~$$\boldsymbol D_{ij} (k, l) = \begin{cases} 1, \ \text{if} \ l =(i-1)p+k, \\ -1, \ \text{if} \ l = (j-1)p+k,\\ 0, \ \text{otherwise.} \end{cases}$$~~
-</old>
+<old> $$\boldsymbol D_{ij} (k, l) = \begin{cases} 1, \ \text{if} \ l =(i-1)p+k, \\ -1, \ \text{if} \ l = (j-1)p+k,\\ 0, \ \text{otherwise.} \end{cases}$$ </old>
 
 Note that we introduce this notation for simplicity of exposition, but,
 in practice, the sparsity of the matrices $\boldsymbol D_{ij}$ allows a more
@@ -836,7 +849,7 @@ roc_dtf_erdos <- rbind(roc_dt20, roc_dt40, roc_dt80)
 
 :::{#fig-roc-erdos}
 ```{r roc_erdos, message=FALSE, echo = TRUE}
-#load("./data/roc_dtf_erdos.RData")
+load("./data/roc_dtf_erdos.RData")
 
 ggplot(roc_dtf_erdos, aes(x     = fpr, 
                           y     = tpr, 
