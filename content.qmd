@@ -214,7 +214,7 @@ $\boldsymbol{\beta}^j_j$ and $\boldsymbol{\beta}^j_i$ and leaves other
 coefficients untouched, $\mathbf{X}^{i}\in \mathbb{R}^n$ denotes the
 $i$-th column of $\mathbf{X}$, $\boldsymbol{\beta}_{i}$ denotes the
 $i$-th row of $\beta$, $\lambda_1$ and $\lambda_2$ are penalization
-parameters. Let us consider 
+parameters. Let us consider
 
 $$
 \hat{\boldsymbol{\beta}} \in \underset{\boldsymbol{\beta}}{\operatorname{argmin}} J_{\lambda_1, \lambda_2}(\boldsymbol{\beta}, \mathbf{X}).
@@ -229,13 +229,28 @@ conditional effects on the others. Variables $X^i$ and $X^j$ are
 assigned to the same cluster when
 $\boldsymbol{\beta}^i = \tau_{ij}(\boldsymbol{\beta}^j).$
 
-<old>
-Let us illustrate by an example the effect of the proposed approach. If we consider a group of $q$ variables whose regression vectors have at least $q$ non-zero coefficients and further assume that for each pair of group variables $i$ and $j$, $\|\boldsymbol{\beta}^i - \tau_{ij} (\boldsymbol{\beta}^j)\|_2=0$. After some permutations, we get a $q\times q$ block of non-zeros coefficient $\beta_{ij}$ corresponding to the group in the $\boldsymbol{\beta}$ matrix, where $(i,j)\in \{1,\cdots, q\}^2$. If we consider three different indices $i,j,k \ \in \{1,\cdots, q\}^3$, it is straightforward to show that the six coefficients indexed by $(i,j,k)$ are all equal. Thus the distance constraints between vectors $\boldsymbol{\beta}^i$ of a group forces equality of all regression coefficients in the group.
+<old> Let us illustrate by an example the effect of the proposed
+approach. If we consider a group of $q$ variables whose regression
+vectors have at least $q$ non-zero coefficients and further assume that
+for each pair of group variables $i$ and $j$,
+$\|\boldsymbol{\beta}^i - \tau_{ij} (\boldsymbol{\beta}^j)\|_2=0$. After
+some permutations, we get a $q\times q$ block of non-zeros coefficient
+$\beta_{ij}$ corresponding to the group in the $\boldsymbol{\beta}$
+matrix, where $(i,j)\in \{1,\cdots, q\}^2$. If we consider three
+different indices $i,j,k \ \in \{1,\cdots, q\}^3$, it is straightforward
+to show that the six coefficients indexed by $(i,j,k)$ are all equal.
+Thus the distance constraints between vectors $\boldsymbol{\beta}^i$ of
+a group forces equality of all regression coefficients in the group.
 </old>
 
-<revision>
-Let us illustrate by an example the effect of the proposed approach. Two variables $i$ and $j$ are in the same group when $\|\boldsymbol{\beta}^i - \tau_{ij} (\boldsymbol{\beta}^j)\|_2=0$. Considering a cluster $\mathcal C$ of $q$ variables, it is straightforward to show that $\forall (i,j) \in \mathcal C^2$, we have $\beta_{ij}=\beta_{\mathcal C}$. Thus the algorithm tend to produce precision matrices with blocks of constant entries for a given value of $\lambda_2$. Each block corresponds to a cluster.
-</revision>
+<revision> Let us illustrate by an example the effect of the proposed
+approach. Two variables $i$ and $j$ are in the same group when
+$\|\boldsymbol{\beta}^i - \tau_{ij} (\boldsymbol{\beta}^j)\|_2=0$.
+Considering a cluster $\mathcal C$ of $q$ variables, it is
+straightforward to show that $\forall (i,j) \in \mathcal C^2$, we have
+$\beta_{ij}=\beta_{\mathcal C}$. Thus the algorithm tend to produce
+precision matrices with blocks of constant entries for a given value of
+$\lambda_2$. Each block corresponds to a cluster. </revision>
 
 Let us illustrate by an example the effect of the proposed approach. If
 we consider a group of $q$ variables whose regression vectors have at
@@ -274,8 +289,9 @@ for these pairwise affinities can help save time in computation and
 improve clustering performances. The choice can be guided by the
 application however improper specification can give rise to difficulty
 interpretable clustering structures [@chakraborty2020biconvex].
-</edmond> In the remainder of the paper, we will <old> consider </old> <edmond>
-assume that </edmond> $w_{ij} = 1$ <edmond> for simplicity. </edmond>
+</edmond> In the remainder of the paper, we will <old> consider </old>
+<edmond> assume that </edmond> $w_{ij} = 1$ <edmond> for simplicity.
+</edmond>
 
 # Numerical scheme
 
@@ -302,32 +318,49 @@ regression problems with structured sparsity such as group structures.
 
 The CONESTA solver, initially introduced for neuro-imaging problems,
 addresses a general class of convex optimization problems which includes
-group-wise penalties.  <old> admitting loss functions of the form: </old> <edmond> The algorithm solves problems in the form </edmond>
+group-wise penalties. <old> admitting loss functions of the form: </old>
+<edmond> The algorithm solves problems in the form </edmond>
+<old> $$f(\boldsymbol{\theta} ) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),$$</old>
 
-<old> $$f(\boldsymbol{\theta} ) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),$$ </old>
-
-<edmond>
+<edmond> 
 $$
-\operatorname{minimize} \quad g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),
-$$ {#eq-conesta-criterion}
+\operatorname{minimize} \quad f(\boldsymbol{\theta}) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),
+$$ {#eq-conesta-criterion} 
 </edmond>
 
-<edmond> with parameters vector $\boldsymbol{\theta}\in \mathbb{R}^d$ where $\lambda_1$ and $\lambda_2$ are penalty parameters.<edmond>
+<edmond> with parameters vector $\boldsymbol{\theta}\in \mathbb{R}^d$
+where $\lambda_1$ and $\lambda_2$ are penalty parameters.<edmond>
 
 <old> where $\lambda_1$ and $\lambda_2$ are penalty weights, and
 $\boldsymbol{\theta}\in \mathbb{R}^d$ is a $d$-dimensional vector of
 parameters to optimize.</old>
 
-In the original paper [@hadjselem2018], <old> the
-function </old> $g(\boldsymbol{\theta})$ is <old> the sum of a least squares
-criterion and a ridge penalty </old> a differentiable function, $h(\boldsymbol{\theta})$ is a penalty function
-whose proximal operator is known in closed-form.
+In the original paper [@hadjselem2018], <old> the function </old>
+$g(\boldsymbol{\theta})$ is <old> the sum of a least squares criterion
+and a ridge penalty </old> a differentiable function,
+$h(\boldsymbol{\theta})$ is a penalty function whose proximal operator
+$\operatorname{prox}_{\lambda_1 h}$ is known in closed-form.
 
-<edmond> Given $\phi \subseteq \{1,\ldots, d\}$, let $\boldsymbol{\theta}_\phi = (\theta_i)_{i \in \phi}$ denote the subvector of $\boldsymbol{\theta}$ referenced by the indices in $\phi.$ Denote $\Phi = \{ \phi_1, \dots, \phi_{\operatorname{Card}(\Phi)}\}$ a collection with $\phi_i \subseteq \{1,\ldots, d\}.$ Let the matrix $\mathbf{A}_\phi \in \mathbb{R}^{m \times \operatorname{Card}(\Phi) }$ define a linear map from $\mathbb{R}^{\operatorname{Card}(\phi)}$ to $\mathbb{R}^m$ by sending the column vector $\boldsymbol{\theta}_\phi \in \mathbb{R}^{\operatorname{Card}(\phi)}$ to the column vector $\mathbf{A}_\phi \boldsymbol{\theta}_\phi \in \mathbb{R}^m.$ The function $s(\boldsymbol{\theta})$ is assumed to be an $\ell_{1,2}$-norm i.e. the sum of the group-wise $\ell_2$-norms of the elements $\mathbf{A}_\phi \boldsymbol{\theta}_\phi, \phi \in \Phi.$ Namely,  </edmond>
+<edmond> Given $\phi \subseteq \{1,\ldots, d\}$, let
+$\boldsymbol{\theta}_\phi = (\theta_i)_{i \in \phi}$ denote the
+subvector of $\boldsymbol{\theta}$ referenced by the indices in $\phi.$
+Denote $\Phi = \{ \phi_1, \dots, \phi_{\operatorname{Card}(\Phi)}\}$ a
+collection with $\phi_i \subseteq \{1,\ldots, d\}.$ Let the matrix
+$\mathbf{A}_\phi \in \mathbb{R}^{m \times \operatorname{Card}(\Phi) }$
+define a linear map from $\mathbb{R}^{\operatorname{Card}(\phi)}$ to
+$\mathbb{R}^m$ by sending the column vector
+$\boldsymbol{\theta}_\phi \in \mathbb{R}^{\operatorname{Card}(\phi)}$ to
+the column vector
+$\mathbf{A}_\phi \boldsymbol{\theta}_\phi \in \mathbb{R}^m.$ The
+function $s(\boldsymbol{\theta})$ is assumed to be an $\ell_{1,2}$-norm
+i.e. the sum of the group-wise $\ell_2$-norms of the elements
+$\mathbf{A}_\phi \boldsymbol{\theta}_\phi, \phi \in \Phi.$ Namely,
+</edmond>
 
-<old> and $s(\boldsymbol{\theta})$ is an $\ell_{1,2}$ penalty of the form </old>
+<old> and $s(\boldsymbol{\theta})$ is an $\ell_{1,2}$ penalty of the
+form </old>
 
-$$s(\boldsymbol{\theta}) = \sum_{\phi \in \Phi} \|\mathbf{A}_\phi \boldsymbol{\theta}_\phi\|_2.$$ 
+$$s(\boldsymbol{\theta}) = \sum_{\phi \in \Phi} \|\mathbf{A}_\phi \boldsymbol{\theta}_\phi\|_2.$$
 <old> In the definition of $s(\boldsymbol{\theta})$,
 $\Phi = \{ \phi_1, \dots, \phi_{\operatorname{Card}(\Phi)}\}$ is a set
 of subsets of indices, i.e., $\Phi_i\subset \{1,\ldots, d\}$ for all
@@ -335,30 +368,102 @@ $i\in\{1,\ldots,\operatorname{Card}(\Phi)\}$ and, for all
 $\phi\in \Phi$, $\boldsymbol{\theta}_\phi$ is the sub-vector of
 $\boldsymbol{\theta}$ defined by
 $\boldsymbol{\theta}_\phi = (\theta_i)_{i\in\phi}$. Finally,
-$\mathbf{D}_\phi$ are linear operators. <\old>
+$\mathbf{D}_\phi$ are linear operators. \<\old\>
 
-<edmond> When $\mathbf{A}_\phi$ is the identity operator such as $\mathbf{A}_\phi \boldsymbol{\theta}_\phi = \boldsymbol{\theta}_\phi$, the penalty function $s$ is the overlapping group-lasso and $m = \operatorname{Card}(\phi)$. When it is a discrete derivative operator, therefore $s$ is a total variation penalty and $m$ can be seen as the number of neighborhood relationships.</edmond>
+<edmond> When $\mathbf{A}_\phi$ is the identity operator such as
+$\mathbf{A}_\phi \boldsymbol{\theta}_\phi = \boldsymbol{\theta}_\phi$,
+the penalty function $s$ is the overlapping group-lasso and
+$m = \operatorname{Card}(\phi)$. When it is a discrete derivative
+operator, therefore $s$ is a total variation penalty and $m$ can be seen
+as the number of neighborhood relationships.</edmond>
 
-The main ingredient of CONESTA
-is the approximation of the non-smooth $\ell_{2,1}$-norm penalty with
-unknown proximal gradient, by a smooth function with known proximal
-gradient computed using Nesterov's smoothing. Given a smoothing
-parameter $\mu>0$, let us define the smooth approximation
-
+<old> The main ingredient of CONESTA is the approximation of </old> The
+non-smooth $\ell_{1,2}$-norm penalty <old> with unknown proximal
+gradient </old>, can be approximated by a smooth function with known
+<old> proximal </old> gradient computed using Nesterov's smoothing
+[@nesterov2005smooth]. Given a <edmond> smoothness </edmond> parameter
+$\mu>0$, let us define the smooth approximation
 $$ 
-s_{\mu}(\boldsymbol{\theta}) = \max_{\boldsymbol{\alpha} \in \mathcal{K}} \left \{ \boldsymbol{\alpha}^T \mathbf{D} \boldsymbol{\theta} - \frac{\mu}{2} \| \boldsymbol{\alpha} \|_2^2 \right \},
-$$ where $\mathcal{K}$ is the $\ell_2$ unit ball. Note that
+s_{\mu}(\boldsymbol{\theta}) = \max_{\boldsymbol{\alpha} \in \mathcal{K}} \left \{ \boldsymbol{\alpha}^T \mathbf{A} \boldsymbol{\theta} - \frac{\mu}{2} \| \boldsymbol{\alpha} \|_2^2 \right \},
+$$ where $\mathcal{K}$ is <edmond> the cartesian product </edmond> of $\ell_2$-unit balls, <edmond> $\mathbf{A}$ is the vertical concatenation
+of the matrices $\mathbf{A}_\phi$ and $\boldsymbol{\alpha}$ is an
+auxiliary variable resulting from the dual reformulation of
+$s(\boldsymbol{\theta})$ </edmond>. Note that
 $\lim_{\mu \rightarrow 0} s_{\mu}(\boldsymbol{\theta}) = s(\boldsymbol{\theta}).$
-An accelerated proximal gradient algorithm (FISTA, @Beck2009) step can
-then be applied after computing the gradient of the smooth part of the
-approximated criterion which is given by
-$g(\boldsymbol{\theta}) + s_{\mu}(\boldsymbol{\theta}).$ At each
-iteration, the smoothing parameter $\mu$ is updated dynamically using
-the duality gap, and a new approximation is computed. The CONESTA
-algorithm enjoys a linear convergence rate, and was shown empirically to
-outperform other computational options for structured-sparsity problems
-such as ADMM and inexact FISTA in terms of convergence speed
-[@hadjselem2018].
+<edmond> A Fast Iterative Shrinkage-Thresholding Algorithm <edmond> (FISTA, @Beck2009) step can
+then be applied after computing the gradient of the smooth part <edmond>
+i.e. $g(\boldsymbol{\theta}) + \lambda_2 s_{\mu}(\boldsymbol{\theta})$ </edmond>
+of the approximated criterion.
+
+<edmond> The main ingredient of CONESTA remains in the the determination
+of the optimal smoothness parameter using the duality gap, which
+minimizes the number of FISTA iterations for a given precision
+$\epsilon.$ The specification of $\mu$ is subject to dynamic update. A
+sequence of decreasing optimal smoothness parameters is generated in
+order to dynamically adapt the FISTA algorithm stepsize towards
+$\epsilon.$ Namely, $\mu^k = \mu_{opt}(\epsilon^k).$ The smoothness
+parameter decreases as one get closer to $\boldsymbol{\theta} ^\star$,
+the solution of the problem defined in @eq-conesta-criterion. Since
+$\boldsymbol{\theta} ^\star$ is unknown, the approximation of the
+distance to the minimum is achieved via the duality gap. Indeed 
+$$
+\operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k) \ge f_{\mu^k}(\boldsymbol{\theta}^k) - f(\boldsymbol{\theta}^\star) \ge 0.
+$$ 
+We refer the reader to the seminal paper for more details on the
+formulation of $\operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k).$ The
+CONESTA routine is spelled out in the algorithm CONESTA solver where
+$L(g + \lambda_2 s_{\mu})$ is the Lipschitz constant of
+$\nabla(g + \lambda_2 s_{\mu})$.</edmond> <old> At each iteration of the
+CONESTA algoithm, the smoothing parameter $\mu$ is updated dynamically
+using the duality gap, and a new approximation is computed.</old> The
+CONESTA <old> algorithm enjoys </old> a linear convergence rate, and was
+shown empirically to outperform other computational options for
+structured-sparsity problems such as ADMM and inexact FISTA in terms of
+convergence speed [@hadjselem2018].
+
+::: {#conesta}
+```{=html}
+<pre id="conesta">
+
+\begin{algorithm}
+\caption{CONESTA solver}
+\begin{algorithmic}
+  \STATE \textbf{Inputs}: \\
+    $\quad$ functions $g(\boldsymbol{\theta}), h(\boldsymbol{\theta}), s(\boldsymbol{\theta})$ \\
+    $\quad$ precision $\epsilon$ \\
+    $\quad$ penalty parameters $\lambda_1, \lambda_2$ \\
+    $\quad$ decreasing factor $\tau \in (0,1)$ for sequence of precisions
+    
+  \STATE \textbf{Output:} $\boldsymbol{\theta}^{i+1} \in \mathbb{R}^d$
+
+  \STATE \textbf{Initializations:} \\
+    $\quad \boldsymbol{\theta}^0 \in \mathbb{R}^d$ \\
+    $\quad \epsilon^0 = \tau \operatorname{GAP}_{\mu = 10^{-8}}(\boldsymbol{\theta}^0)$ \\
+    $\quad \mu^0 = \mu_{opt}(\epsilon^0)$
+
+  \Repeat
+    \STATE $\epsilon^i_{\mu} = \epsilon^i - \mu^i \lambda_2 \frac{d}{2}$ \\
+    \COMMENT{FISTA Algorithm starts here}
+    \STATE $k=2$ \COMMENT{new iterator}
+    \STATE $\boldsymbol{\theta}_{\operatorname{FISTA}}^1 = \boldsymbol{\theta}_{\operatorname{FISTA}}^0 = \boldsymbol{\theta}^i$ \COMMENT{Initial parameters value}
+    \STATE $t_{\mu} = \frac{1}{L(g + \lambda_2 s_{\mu})}$ \COMMENT{Compute stepsize}
+    
+    \Repeat
+      \STATE $\boldsymbol{z} = \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} + \frac{k-2}{k+1}(\boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} - \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-2})$
+      \STATE $\boldsymbol{\theta}_{\operatorname{FISTA}}^k = \operatorname{prox}_{\lambda_1 h}(\boldsymbol{z} - t_{\mu} \nabla(g + \lambda_2 s_{\mu})(\boldsymbol{z}))$
+    \Until{$\operatorname{GAP}_{\mu}(\boldsymbol{\theta}_{\operatorname{FISTA}}^k) \le \epsilon_{\mu}^i$} 
+    \COMMENT{FISTA Algorithm ends here}
+  \STATE $\boldsymbol{\theta}^{i+1} = \boldsymbol{\theta}_{\operatorname{FISTA}}^k$ \\
+  \STATE $\epsilon^i = \operatorname{GAP}_{\mu = \mu_i} \boldsymbol{\theta}^{i+1} + \mu^i \lambda_2 \frac{d}{2}$ \\
+  \STATE $\epsilon^{i+1} = \tau \epsilon^{i}$ \\
+  \STATE $\mu^{i+1} = \mu_{opt}(\epsilon^{i+1})$
+  \Until{$\epsilon^i \le \epsilon$}
+  
+\end{algorithmic}
+\end{algorithm}
+</pre>
+```
+:::
 
 ## Reformulation of MGLasso for CONESTA algorithm
 
@@ -374,13 +479,16 @@ where
 $\mathbf{Y} = \operatorname{Vec}(\mathbf{X}) \in \mathbb{R}^{np}, \tilde{\boldsymbol{\beta}} = \operatorname{Vec(\boldsymbol{\beta})} \in \mathbb{R}^{p (p-1)}, \tilde{\mathbf{X}}$
 is a $\mathbb{R}^{[np]\times [p \times (p-1)]}$ block-diagonal matrix
 with $\mathbf{X}^{\setminus i}$ on the $i$-th block. The matrix
-$\boldsymbol A_{ij}$ is a $p\times p(p-1)$ matrix <old> defined by </old>  <edmond> chosen so that $\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}} = \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j).$ Some practical details about the implementation are provided in appendix. </edmond>
+$\boldsymbol A_{ij}$ is a $(p-1)\times p(p-1)$ matrix <old> defined by
+</old> <edmond> chosen so that
+$\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}} = \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j).$
+</edmond>
 
-<old> $$\boldsymbol D_{ij} (k, l) = \begin{cases} 1, \ \text{if} \ l =(i-1)p+k, \\ -1, \ \text{if} \ l = (j-1)p+k,\\ 0, \ \text{otherwise.} \end{cases}$$ </old>
+<old>$\boldsymbol D_{ij} (k, l) = \begin{cases} 1, \ \text{if} \ l =(i-1)p+k, \\ -1, \ \text{if} \ l = (j-1)p+k,\\ 0, \ \text{otherwise.} \end{cases}$</old>
 
 Note that we introduce this notation for simplicity of exposition, but,
-in practice, the sparsity of the matrices $\boldsymbol D_{ij}$ allows a more
-efficient implementation. Based on reformulation @eq-refpbm, we may
+in practice, the sparsity of the matrices $\boldsymbol D_{ij}$ allows a
+more efficient implementation. Based on reformulation @eq-refpbm, we may
 apply CONESTA to solve the objective of MGLasso for fixed $\lambda_1$
 and $\lambda_2$. The procedure is applied, for fixed $\lambda_1$, to a
 range of decreasing values of $\lambda_2$ to obtain a hierarchical
@@ -388,9 +496,9 @@ clustering. The corresponding pseudo-code is given in the following
 algorithm where $(\mathbf{X}^i)^{+}$ denotes the pseudo-inverse of
 $\mathbf{X}^i$ and $\epsilon_{fuse}$ the threshold for merging clusters.
 
-::: {#algo-label}
+::: {#algo-mglasso}
 ```{=html}
-<pre id="myalgo">
+<pre id="algo-mglasso">
 
 \begin{algorithm}
 \caption{MGLasso algorithm}
@@ -499,8 +607,8 @@ at $40$: $\frac{n}{p}\in \{0.5,1,2\}$.
 
 We construct a block-diagonal precision matrix $\mathbf{\Omega}$ as
 follows. First, we generate the support of $\mathbf{\Omega}$ as shown in
-@fig-model-sbm, denoted by $\boldsymbol A\in\{0,1\}^{p\times p}$. To
-do this, the variables are first partitioned into $K = 5$ hidden groups,
+@fig-model-sbm, denoted by $\boldsymbol A\in\{0,1\}^{p\times p}$. To do
+this, the variables are first partitioned into $K = 5$ hidden groups,
 noted $C_1, \dots, C_K$ described by a latent random variable $Z_i$,
 such that $Z_i = k$ if $i = C_k$. $Z_i$ follows a multinomial
 distribution
@@ -525,7 +633,7 @@ correlation between the variables in each block to $\rho$. Introducing a
 more realistic scheme with $\alpha_{ll}=0.75$ allows only to have an
 approximate control.
 
-:::{#fig-model-sbm}
+::: {#fig-model-sbm}
 ```{r echo = TRUE}
 bloc_diag <- function(n_vars, connectivity_mat, prop_clusters, rho) {
   
@@ -675,7 +783,7 @@ where $\alpha_{kl} = \alpha_{ll} = \alpha$ is constant. We set the
 density $\alpha$ of the graph to $0.1$; see @fig-model-erdos for an
 example of the graph resulting from this model.
 
-:::{#fig-model-erdos}
+::: {#fig-model-erdos}
 ```{r echo = TRUE}
 set.seed(2022)
 sim_erdos <- sim_data(p = 40, structure = "erdos", p_erdos = 0.1)
@@ -685,7 +793,6 @@ Matrix::image(as(gerdos, "sparseMatrix"),
 ```
 
 Adjacency matrix of an Erdös-Renyi model.
-
 :::
 
 ### Scale-free Model
@@ -697,7 +804,7 @@ is connected to an existing node with a probability proportional to the
 degree of the existing node. We set the number of edges in the graph to
 $40$. An example of scale-free graph is shown in @fig-model-sfree.
 
-:::{#fig-model-sfree}
+::: {#fig-model-sfree}
 ```{r echo = TRUE}
 set.seed(2022)
 sim_sfree <- sim_data(p = 40, structure = "scale_free")
@@ -709,7 +816,6 @@ Matrix::image(as(gsfree, "sparseMatrix"),
 ```
 
 Adjacency matrix of a Scale-free model.
-
 :::
 
 ## Support recovery
@@ -739,10 +845,8 @@ $1 - \text{specificity}(\lambda_1)$ which is the false positive rate.
 
 For each configuration ($n, p$ fixed), we generate $50$ replications and
 their associated ROC curves, which are then averaged. The average ROC
-curves for the three models are given in @fig-roc-erdos,
-@fig-roc-sfree and @fig-roc-sbm by varying
-$\frac{n}{p}\in \{0.5,1,2\}$.
-
+curves for the three models are given in @fig-roc-erdos, @fig-roc-sfree
+and @fig-roc-sbm by varying $\frac{n}{p}\in \{0.5,1,2\}$.
 
 ```{r echo=TRUE}
 path_checks <- "./rscripts/mglasso_functions/"
@@ -847,7 +951,7 @@ roc_dt80$np <- 2
 roc_dtf_erdos <- rbind(roc_dt20, roc_dt40, roc_dt80)
 ```
 
-:::{#fig-roc-erdos}
+::: {#fig-roc-erdos}
 ```{r roc_erdos, message=FALSE, echo = TRUE}
 load("./data/roc_dtf_erdos.RData")
 
@@ -863,8 +967,8 @@ ggplot(roc_dtf_erdos, aes(x     = fpr,
   scale_colour_manual(values = ghibli_palette("MarnieMedium1")[5:6])
 ```
 
-ROC curves for the Erdös-Renyi model comparing MGLasso and GLasso methods.
-
+ROC curves for the Erdös-Renyi model comparing MGLasso and GLasso
+methods.
 :::
 
 ```{r eval = FALSE, echo = TRUE}
@@ -935,7 +1039,7 @@ save(roc_dtf_sfree,
      file = paste0(path_roc, "roc_dtf_sfree.RData"))
 ```
 
-:::{#fig-roc-sfree}
+::: {#fig-roc-sfree}
 ```{r roc_scale_free , message=FALSE, echo = TRUE}
 load("./data/roc_dtf_sfree.RData")
 
@@ -951,10 +1055,9 @@ ggplot(roc_dtf_sfree, aes(x     = fpr,
   scale_colour_manual(values = ghibli_palette("MarnieMedium1")[5:6])
 ```
 
-ROC curves for the Scale-free model comparing MGLasso and GLasso methods.
-
+ROC curves for the Scale-free model comparing MGLasso and GLasso
+methods.
 :::
-
 
 ```{r eval = FALSE, echo = TRUE}
 # Launched on a cluster using 72 cores
@@ -1018,7 +1121,7 @@ save(roc_dtf_sbm,
      file = paste0(path_roc, "roc_dtf_sbm.RData"))
 ```
 
-:::{#fig-roc-sbm}
+::: {#fig-roc-sbm}
 ```{r roc_sbm , message=FALSE, echo = TRUE}
 load("./data/roc_dtf_sbm.RData")
 
@@ -1033,8 +1136,9 @@ ggplot(roc_dtf_sbm, aes(x     = fpr,
   ggtitle("") +
   scale_colour_manual(values = ghibli_palette("MarnieMedium1")[5:6])
 ```
-ROC curves for the Stochastic Block model comparing MGLasso and GLasso methods.
 
+ROC curves for the Stochastic Block model comparing MGLasso and GLasso
+methods.
 :::
 
 Based on these empirical results, we first observe that, in all the
@@ -1135,36 +1239,37 @@ plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.95, np_
 # The files `rand_dt_higher_cor_sbm.RData` and `rand_dt_lower_cor_sbm.RData` are obtained from splitting `dt_rand`according to theoritical correlation levels.
 ```
 
-
-:::{#fig-ari-low-cor}
+::: {#fig-ari-low-cor}
 ```{r echo = TRUE}
 load("./data/rand_dt_lower_cor_sbm.RData")
 plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.25, np_ = c(0.5, 1, 2), 
          main = "")
 ```
 
-Adjusted Rand Indices for the HAC, k-means and MGLasso methods. Performances are observed for 4 different number of clusters in a low correlation context.
+Adjusted Rand Indices for the HAC, k-means and MGLasso methods.
+Performances are observed for 4 different number of clusters in a low
+correlation context.
 :::
 
-:::{#fig-ari-high-cor}
+::: {#fig-ari-high-cor}
 ```{r echo = TRUE}
 load("./data/rand_dt_higher_cor_sbm.RData")
 plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.95, np_ = c(0.5, 1, 2),
          main = "")
 ```
 
-Adjusted Rand Indices for the HAC, k-means and MGLasso methods. Performances are observed for 4 different number of clusters in a high correlation context.
-
+Adjusted Rand Indices for the HAC, k-means and MGLasso methods.
+Performances are observed for 4 different number of clusters in a high
+correlation context.
 :::
 
-The results shown in @fig-ari-low-cor and @fig-ari-high-cor
-demonstrate that, particularly at the lower to medium levels of the
-hierarchy (between 20 and 10 clusters), the hierarchical clustering
-structure uncovered by MGLasso is comparable to popular clustering
-methods used in practice. For the higher levels (5 clusters), the
-performances of MGLasso deteriorate. As expected, the three compared
-methods also deteriorate as the level of correlation inside clusters
-decreases.
+The results shown in @fig-ari-low-cor and @fig-ari-high-cor demonstrate
+that, particularly at the lower to medium levels of the hierarchy
+(between 20 and 10 clusters), the hierarchical clustering structure
+uncovered by MGLasso is comparable to popular clustering methods used in
+practice. For the higher levels (5 clusters), the performances of
+MGLasso deteriorate. As expected, the three compared methods also
+deteriorate as the level of correlation inside clusters decreases.
 
 # Analysis of microbial associations data
 
@@ -1182,7 +1287,7 @@ preliminary analysis, we perform a hierarchical agglomerative clustering
 The correlation matrix of the dataset is given in @fig-emp-cor;
 variables have been rearranged according to the HAC partition.
 
-:::{#fig-emp-cor}
+::: {#fig-emp-cor}
 ```{r echo = TRUE}
 data(amgut1.filt, package = "SpiecEasi")
 dta <- amgut1.filt
@@ -1201,7 +1306,6 @@ Matrix::image(as(S[order(cut_dta), order(cut_dta)],
 ```
 
 Empirical correlations in the gut data.
-
 :::
 
 The average correlations within blocks of variables belonging to the
@@ -1209,7 +1313,6 @@ same cluster are given below. We observe relatively high levels of
 correlation in small blocks, similar to the simulation models used to
 evaluate the performance of clustering in the [Simulation Experiments]
 section.
-
 
 ```{r echo = TRUE}
 C <- cor(dta)
@@ -1227,6 +1330,7 @@ mat <- t(sapply(L,
 out <- data.frame(Cluster = 1:4, "Mean correlation" = round(mat[, "Mean"], 3))
 knitr::kable(out)
 ```
+
 <!-- : my table caption {#tbl-mylabel} -->
 
 We apply MGLasso to the normalised counts to infer a graph and a
@@ -1235,13 +1339,13 @@ and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
 clusters) are given below. In each case, the parameter $\lambda_1$ is
 chosen by stability selection (see [Model Selection] section).
 
-:::{#fig-real-data-mglasso}
-
+::: {#fig-real-data-mglasso}
 ```{r, out.width="49%", out.height="20%", fig.show='hold',fig.align='center', echo = TRUE}
 knitr::include_graphics(c("figures/mglasso_tv0.png","figures/mglasso_full_graph_tv5.png"))
 ```
-Infered graphs using MGLasso for different values of total variation penalty.
 
+Infered graphs using MGLasso for different values of total variation
+penalty.
 :::
 
 The variables were reordered according to the clustering partition
@@ -1249,11 +1353,12 @@ obtained from the distances between the regression vectors. Increasing
 $\lambda_2$ reduces the number of clusters and leads to a shrinking
 effect on the estimates. The adjacency matrix of the neighborhood
 selection equivalent to setting $\lambda_2$ to $0$ is given in
-@fig-real-data-mglasso (up). In @fig-real-data-mglasso (down), the deduced
-partition is composed of $80$ clusters. A confusion matrix comparing the
-edges deduced by MGLasso with $\lambda_2 = 5$ and neighborhood selection
-is given below. Adding a total variation parameter increases the merging
-effect, resulting in a larger number of edges in the graph.
+@fig-real-data-mglasso (up). In @fig-real-data-mglasso (down), the
+deduced partition is composed of $80$ clusters. A confusion matrix
+comparing the edges deduced by MGLasso with $\lambda_2 = 5$ and
+neighborhood selection is given below. Adding a total variation
+parameter increases the merging effect, resulting in a larger number of
+edges in the graph.
 
 |                           |           | Neighborhood selection |       |
 |---------------------------|-----------|:----------------------:|-------|
@@ -1262,6 +1367,7 @@ effect, resulting in a larger number of edges in the graph.
 |                           | edges     |          288           | 163   |
 
 <!-- : my table caption {#tbl-mylabel} -->
+
 <!-- @tbl-mylabel -->
 
 # Conclusion
@@ -1280,10 +1386,10 @@ method with the analysis of microbial associations data. The present
 work paves the way for future improvements: first, by incorporating
 prior knowledge through more flexible weighted regularization; second,
 by studying the theoretical properties of the method in terms of
-statistical guarantees for the MGLasso estimator. <edmond> Moreover the node-wise regression approach on which our method
-is based can be extended to a broader family of non-gaussian
-distributions belonging to the exponential family as outlined by
-@yang2012graphical. </edmond>
+statistical guarantees for the MGLasso estimator. <edmond> Moreover the
+node-wise regression approach on which our method is based can be
+extended to a broader family of non-gaussian distributions belonging to
+the exponential family as outlined by @yang2012graphical. </edmond>
 
 # Session information {.appendix .unnumbered}
 
