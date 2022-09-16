@@ -434,7 +434,8 @@ convergence speed [@hadjselem2018].
     $\quad$ penalty parameters $\lambda_1, \lambda_2$ \\
     $\quad$ decreasing factor $\tau \in (0,1)$ for sequence of precisions
     
-  \STATE \textbf{Output:} $\boldsymbol{\theta}^{i+1} \in \mathbb{R}^d$
+  \STATE \textbf{Output:} \\
+    $\quad$ $\boldsymbol{\theta}^{i+1} \in \mathbb{R}^d$
 
   \STATE \textbf{Initializations:} \\
     $\quad \boldsymbol{\theta}^0 \in \mathbb{R}^d$ \\
@@ -443,7 +444,7 @@ convergence speed [@hadjselem2018].
 
   \Repeat
     \STATE $\epsilon^i_{\mu} = \epsilon^i - \mu^i \lambda_2 \frac{d}{2}$ \\
-    \COMMENT{FISTA Algorithm starts here}
+    \COMMENT{FISTA}
     \STATE $k=2$ \COMMENT{new iterator}
     \STATE $\boldsymbol{\theta}_{\operatorname{FISTA}}^1 = \boldsymbol{\theta}_{\operatorname{FISTA}}^0 = \boldsymbol{\theta}^i$ \COMMENT{Initial parameters value}
     \STATE $t_{\mu} = \frac{1}{L(g + \lambda_2 s_{\mu})}$ \COMMENT{Compute stepsize}
@@ -452,7 +453,7 @@ convergence speed [@hadjselem2018].
       \STATE $\boldsymbol{z} = \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} + \frac{k-2}{k+1}(\boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} - \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-2})$
       \STATE $\boldsymbol{\theta}_{\operatorname{FISTA}}^k = \operatorname{prox}_{\lambda_1 h}(\boldsymbol{z} - t_{\mu} \nabla(g + \lambda_2 s_{\mu})(\boldsymbol{z}))$
     \Until{$\operatorname{GAP}_{\mu}(\boldsymbol{\theta}_{\operatorname{FISTA}}^k) \le \epsilon_{\mu}^i$} 
-    \COMMENT{FISTA Algorithm ends here}
+    
   \STATE $\boldsymbol{\theta}^{i+1} = \boldsymbol{\theta}_{\operatorname{FISTA}}^k$ \\
   \STATE $\epsilon^i = \operatorname{GAP}_{\mu = \mu_i} \boldsymbol{\theta}^{i+1} + \mu^i \lambda_2 \frac{d}{2}$ \\
   \STATE $\epsilon^{i+1} = \tau \epsilon^{i}$ \\
@@ -493,7 +494,7 @@ apply CONESTA to solve the objective of MGLasso for fixed $\lambda_1$
 and $\lambda_2$. The procedure is applied, for fixed $\lambda_1$, to a
 range of decreasing values of $\lambda_2$ to obtain a hierarchical
 clustering. The corresponding pseudo-code is given in the following
-algorithm where $(\mathbf{X}^i)^{+}$ denotes the pseudo-inverse of
+algorithm where $(\mathbf{X}^i)^{\dagger}$ denotes the pseudo-inverse of
 $\mathbf{X}^i$ and $\epsilon_{fuse}$ the threshold for merging clusters.
 
 ::: {#algo-mglasso}
@@ -503,21 +504,34 @@ $\mathbf{X}^i$ and $\epsilon_{fuse}$ the threshold for merging clusters.
 \begin{algorithm}
 \caption{MGLasso algorithm}
 \begin{algorithmic}
-\STATE \textbf{Input}: data $\mathbf{X} \in \mathbb R^{n\times p}$, $\lambda_1$, starting value $\lambda_2$, step $\kappa > 1$ \\ $\operatorname{clusters} \leftarrow \left \{\{1\}, \dots, \{p\}\right \}$ \\ $\boldsymbol{\beta}^i \leftarrow (\mathbf{X}^i)^{+}\mathbf{X}^i$
-<!-- \STATE optimization parameters: number of iterations $T$, learning rate $\eta$ -->
-\WHILE{$\operatorname{Card}(\operatorname{clusters}) \ge 2$}
-  \STATE $\boldsymbol{\beta} \leftarrow CONESTA(\mathbf{X}, \boldsymbol A, \lambda_1, \lambda_2)$
-  \FOR{$i = 1$ \TO $p$}
-    \FOR{$j = i$ \TO $p$}
-      \IF{$\operatorname{dist}(\boldsymbol{\beta}^i, \boldsymbol{\beta}^j) < \epsilon_{fuse}$}
-        \STATE $\operatorname{clusters}_i = \operatorname{clusters}_j$
-      \ENDIF
-    \ENDFOR
-  \ENDFOR
-  \STATE \textbf{Update}: $\operatorname{clusters}$
-  \STATE $\lambda_2 \leftarrow \lambda_2 \times \kappa$
-\ENDWHILE
-\STATE \textbf{Return} $\boldsymbol{\beta}$ for each couple $(\lambda_1, \lambda_2$)
+  \STATE \textbf{Inputs}: \\
+    $\quad$ Set of variables $\mathbf{X} = \{\mathbf{X}^1, \dots, \mathbf{X}^p \} \in \mathbb R^{n\times p}$ \\
+    $\quad$ Penalty parameters $\lambda_1 \ge 0, {\lambda_2}_{\operatorname{initial}} > 0$ \\
+    $\quad$ Increasing factor $\eta > 1$ for fusion penalties $\lambda_2$\\ 
+    $\quad$ Fusion threshold $\epsilon_{fuse} \ge 0$
+  
+  \STATE \textbf{Outputs:} For $\lambda_1$ fixed and $\lambda_2$ from $0$ to ${\lambda_2}_{\operatorname{initial}} \times \eta^{(I)}$ with $I$ the number of iterations: \\
+    $\quad$ Regression vectors $\boldsymbol{\beta}(\lambda_1, \lambda_2) \in \mathbb R^{p \times (p-1)}$, \\
+    $\quad$ Clusters of variables indices $C(\lambda_1, \lambda_2) =\{ C_k \}_{(\lambda_1, \lambda_2)}, k=1, \dots, K$
+    
+  \STATE \textbf{Initializations:} \\
+    $\quad$ $\boldsymbol{\beta}^i = (\mathbf{X}^i)^{\dagger}\mathbf{X}^i$, $\forall i = 1, \dots, p$ for warm start in CONESTA solver \\
+    $\quad$ $C = \left \{\{1\}, \dots, \{p\}\right \}$ Initial clusters with one element per cluster. \\
+    $\quad$ Set $\lambda_2 = 0$ \\
+    $\quad$ Compute $\boldsymbol{\beta}$ using CONESTA solver (Equivalent to Meinshausen-Bühlmann approach) \\
+    $\quad$ Update clusters $C$ with rule described in \textbf{while} loop.
+  
+  \STATE \textbf{Set:} $\lambda_2 = {\lambda_2}_{\operatorname{initial}}$ \\
+  
+  \COMMENT{Clustering path}
+  \WHILE{$\operatorname{Card}(C) > 1$}
+    \STATE Compute $\boldsymbol{\beta}$ using CONESTA solver with warm start from previous iteration \\
+    \COMMENT{Clusters update}
+    \STATE Compute pairwises distances $d(i,j)=\left \lVert \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2$, $\forall i,j \in \{1, \dots, p\}$ \\
+    \STATE Determine clusters $C_k (k=1, \dots, K)$ with the rule $(i,j) \in C_k$ iff. $d(i,j) \le \epsilon_{fuse}$
+  
+    \STATE $\lambda_2 = \lambda_2 \times \kappa$
+  \ENDWHILE
 \end{algorithmic}
 \end{algorithm}
 
