@@ -595,8 +595,8 @@ where $\beta$ is the threshold chosen for the instability level.
 In this section, we conduct a simulation study to evaluate the
 performance of the MGLasso method, both in terms of clustering and
 support recovery. Receiver Operating Characteristic (ROC) curves are
-used to evaluate the adequacy of the inferred graphs with the reality
-for the MGLasso and GLasso methods in the Erdös-Renyi, Scale-free, and
+used to evaluate the adequacy of the inferred graphs with the <old> reality </old> <edmond> ground truth </edmond>
+for the MGLasso and GLasso <old> methods </old> <edmond> in its neighborhood selection version</edmond> in the Erdös-Renyi, Scale-free, and
 Stochastic Block Models frameworks. The Adjusted Rand indices are used
 to compare the partitions obtained with MGLasso, hierarchical
 agglomerative clustering, and K-means clustering in a stochastic block
