@@ -16,7 +16,7 @@ author:
     affiliation-url: http://www.math-evry.cnrs.fr/
 date: last-modified
 abstract: >+
-  Gaussian Graphical Models (GGMs) are widely used for exploratory data analysis in various fields such as genomics, ecology, psychometry. In a high-dimensional setting, when the number of variables exceeds the number of observations by several orders of magnitude, the estimation of GGM is a difficult and unstable optimization problem. Clustering of variables or variable selection is often performed prior to GGM estimation. We propose a new method allowing to simultaneously infer a hierarchical clustering structure and the graphs describing the structure of independence at each level of the hierarchy. This method is based on solving a convex optimization problem combining a graphical lasso penalty with a fused type lasso penalty. Results on real and synthetic data are presented.
+  Gaussian Graphical Models (GGMs) are widely used for exploratory data analysis in various fields such as genomics, ecology, psychometry. In a high-dimensional setting, when the number of variables exceeds the number of observations by several orders of magnitude, the estimation of GGM is a difficult and unstable optimization problem. Clustering of variables or variable selection is often performed prior to GGM estimation. We propose a new method allowing to simultaneously infer a hierarchical clustering structure and the graphs describing the structure of independence at each level of the hierarchy. This method is based on solving a convex optimization problem combining a graphical lasso penalty <edmond> in its neigborhood selection version <\edmond> with a fused type lasso penalty. Results on real and synthetic data are presented.
 citation:
   type: article-journal
   container-title: "Computo"
@@ -80,7 +80,7 @@ between variables [@Dempster1972] and allowing efficient algorithms
 [@Meinshausen2006]. See, for instance, [@Fan2016] for a review about
 sparse graphical models inference.
 
-In GGMs, it is well known (see, e.g., @Lauritzen1996) that inferring the
+In GGMs, it is well known (see, e.g., [@Lauritzen1996]) that inferring the
 graphical model or equivalently the Conditional Independence Graph (CIG)
 boils down to inferring the support of the precision matrix
 $\mathbf{\Omega}$ (the inverse of the variance-covariance matrix). To do
@@ -88,7 +88,7 @@ so, several $\ell_1$ penalized methods have been proposed in the
 literature to learn the CIG of GGMs. For instance, the neighborhood
 selection [@Meinshausen2006] (MB) based on a nodewise regression
 approach via the least absolute shrinkage and selection operator (Lasso,
-@tibshirani1996) is a popular method. Each variable is regressed on the
+[@tibshirani1996]) is a popular method. Each variable is regressed on the
 others, taking advantage of the link between the so-obtained regression
 coefficients and partial correlations. More precisely, for all
 $1 \le i \le p$, the following problem is solved:
@@ -150,17 +150,34 @@ proposing CIGs at more than two levels of granularity.
 We introduce the Multiscale Graphical Lasso (MGLasso), a novel method to
 estimate simultaneously a hierarchical clustering structure, and
 graphical models depicting the conditional independence structure
-between clusters of variables at each level of the hierarchy. The
-procedure is based on a convex optimization problem with a hybrid
-penalty term combining a graphical Lasso and a group-fused Lasso
-penalty. In the spirit of convex hierarchical clustering, introduced by
-[@Hocking2011; @Lindsten2011], the hierarchy is obtained by spanning the
-entire regularization path. At each level of the hierarchy, variables in
+between clusters of variables at each level of the hierarchy. <old> The
+procedure is based on a convex optimization problem  with a hybrid
+penalty term combining a graphical Lasso and a group-fused Lasso 
+penalty. </old>
+
+<edmond> The approach is based on
+neighborhood selection [@Meinshausen2006] and considers an additional
+fused-Lasso type penalty for clustering. </edmond>
+
+In the spirit of convex hierarchical clustering, introduced by
+@Hocking2011, @Lindsten2011, the hierarchy is obtained by spanning the
+entire regularization path. <old> At each level of the hierarchy, variables in
 the same clusters are represented by a meta-variable; the new CIG is
 estimated between these new meta-variables, leading to a multiscale
-graphical model. Unlike [@Yao2019], who introduced convex clustering in
+graphical model. Unlike @Yao2019, who introduced convex clustering in
 GGMs, our approach is expected to produce sparse estimations, thanks to
-an additional $\ell_1$ penalty.
+an additional $\ell_1$ penalty. </old>
+
+<edmond> The convex relaxation of hierarchical agglomerative clustering also known as sum of norms clustering can be formulated as follows. Given $\boldsymbol X = \{ \boldsymbol x_1, \dots, \boldsymbol x_n\} \in \mathbb R^{n \times p}$, @Hocking2011 minimize with respect to the centroids matrix $\boldsymbol \alpha \in \mathbb R^{n \times p}$ the criterion </edmond>
+
+$$
+\frac{1}{2} \sum_{i=1}^n \left \lVert \boldsymbol x_i - \boldsymbol  \alpha_i \right \rVert_2^2 + \lambda \sum_{i < j} w_{ij} \left \lVert \boldsymbol  \alpha_i - \boldsymbol  \alpha_j \right \rVert_q
+$$ {#eq-clusterpath}
+<edmond> where $\lambda$ is a sparsity penalization parameter, $\{ w_{ij} \}$ are symmetric positive weights, $\boldsymbol  \alpha_i \in \mathbb R^p$ is the centroid to which observation $\boldsymbol x_i$ is assigned to, and $\left \lVert . \right \rVert_2$ is the $\ell_q$-norm on $\mathbb R^p$ with $q \ge 1.$ The regularization path of solutions to problem in @eq-clusterpath can lead to a tree structure i.e hierarchy under some conditions [@chi2015splitting; @chiquet2017fast]. </edmond>
+
+<edmond>
+
+</edmond>
 
 The remainder of this paper is organized as follows. In section
 [Multiscale Graphical Lasso], we formally introduce the Multiscale
@@ -171,13 +188,13 @@ results on simulated and real data.
 
 # Multiscale Graphical Lasso
 
-The proposed method aims at inferring a graphical Gaussian model while
+<old> The proposed method aims at inferring a graphical Gaussian model while
 hierarchically grouping variables. It infers conditional independence
 between different groups of variables. The approach is based on
 neighborhood selection [@Meinshausen2006] and considers an additional
 fused-Lasso type penalty for clustering. In the spirit of hierarchical
 convex clustering, the hierarchical structure is recovered by spanning
-the regularization path.
+the regularization path. </old>
 
 Let $X = (X^1, \dots, X^p)^T \in \mathbb R^p$ be a $p$-dimensional
 Gaussian random vector, with mean vector $\mu$ and covariance matrix
@@ -185,7 +202,7 @@ $\mathbf \Sigma$. The conditional independence structure of $X$ is
 characterized by a graph $G = (V, E)$, where $V = \{1,\ldots p\}$ is the
 set of variables and $E$ the set of edges, uniquely determined by the
 support of the precision matrix $\mathbf{\Omega} = \mathbf{S}^{-1}$
-(see, e.g., @Dempster1972). In other words, for any two vertices
+(see, e.g., [@Dempster1972]). In other words, for any two vertices
 $i,j\in V$, the edge $(i,j)$ belongs to the set $E$ if and only if
 $\Omega_{ij} \neq 0$, that is if and only if the $i$-th and $j$-th
 variables are conditionally independent given all the others i.e.
@@ -299,7 +316,7 @@ This section introduces a complete numerical scheme to apply MGLasso in
 practice, using a convex optimization algorithm and a model selection
 procedure. Section [Optimization via CONESTA algorithm] reviews the
 principles of the Continuation with Nesterov smoothing in a
-shrinkage-thresholding algorithm (CONESTA, @hadjselem2018), the
+shrinkage-thresholding algorithm (CONESTA, [@hadjselem2018]), the
 optimization algorithm used in practice to solve MGLasso. Section
 [Reformulation of MGLasso for CONESTA algorithm] details a reformulation
 of MGLasso, which enables us to apply CONESTA. Finally, Section [Model
@@ -390,7 +407,7 @@ of the matrices $\mathbf{A}_\phi$ and $\boldsymbol{\alpha}$ is an
 auxiliary variable resulting from the dual reformulation of
 $s(\boldsymbol{\theta})$ </edmond>. Note that
 $\lim_{\mu \rightarrow 0} s_{\mu}(\boldsymbol{\theta}) = s(\boldsymbol{\theta}).$
-<edmond> A Fast Iterative Shrinkage-Thresholding Algorithm <edmond> (FISTA, @Beck2009) step can
+<edmond> A Fast Iterative Shrinkage-Thresholding Algorithm <edmond> (FISTA, [@Beck2009] step can
 then be applied after computing the gradient of the smooth part <edmond>
 i.e. $g(\boldsymbol{\theta}) + \lambda_2 s_{\mu}(\boldsymbol{\theta})$ </edmond>
 of the approximated criterion.
@@ -605,7 +622,7 @@ model framework.
 ## Synthetic data models
 
 We consider three different synthetic network models: the Stochastic
-Block Model (SBM, @fienberg1981categorical), the Erdös-Renyi model
+Block Model (SBM, [@fienberg1981categorical]), the Erdös-Renyi model
 [@erdHos1960evolution] and the Scale-Free model [@newman2001random]. In
 each case, Gaussian data is generated by drawing $n$ independent
 realizations of a multivariate Gaussian distribution
