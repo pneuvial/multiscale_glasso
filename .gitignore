@@ -36,3 +36,4 @@ multiscale_glasso.Rproj
 /.quarto/
 /.idea/
 temp-test-scripts.R
+.html
