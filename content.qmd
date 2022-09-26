@@ -176,11 +176,13 @@ $$ {#eq-clusterpath}
 <edmond> where $\lambda$ is a sparsity penalization parameter, $\{ w_{ij} \}$ are symmetric positive weights, $\boldsymbol  \alpha_i \in \mathbb R^p$ is the centroid to which observation $\boldsymbol x_i$ is assigned to, and $\left \lVert . \right \rVert_2$ is the $\ell_q$-norm on $\mathbb R^p$ with $q \ge 1.$ The regularization path of solutions to problem in @eq-clusterpath can lead to a tree structure i.e hierarchy under some conditions [@chi2015splitting; @chiquet2017fast]. </edmond>
 
 <edmond>
-The use of fusion penalties in the inference of gaussian graphical models is not new. Some approaches have considered the addition of a fusion penalty term to the graphical lasso global likelihood version, while infering graphical models accross multiple classes i.e. observations belonging to different known clusters in order to share characterics between the infered graphs [@danaher2014joint]. Other approaches in the same vein as ours use fusion penalties [@Yao2019; @lin2020estimation] to enforce local constancy among variables in the infered networks. Variables belonging to the same clusters are thus more likely to share the same neighborhood. To the best of our knowledge, the unpublised manuscript of @ganguly2014 is the first adaptation of a fusion-like penalty to the neighborhood selection framework. However the problem is solved in a columwise fashion where the $p$ regressions problems are not combined.
-Note that fusion penalties have also been used simple regression problems like [@tibshirani2005sparsity, ] 
-in joint regressions problems like (see the works of @chen2010graph; @hallac2015network; @degras2021sparse; chu2021adaptive among others). However an explicit link have not been made with the @Meinshausen2006 approach for undirected graphical model inference.
+The use of fusion penalties in the inference of Gaussian graphical models is not new. Some approaches have considered the addition of a fusion penalty term to the graphical lasso global likelihood version, while infering graphical models accross multiple classes i.e. observations belonging to different known clusters in order to share characterics between the infered graphs [@danaher2014joint, @yang2015fused]. 
+Other approaches in the same vein as ours use fusion penalties [@Yao2019, @lin2020estimation] to enforce local constancy among variables in the infered networks. Variables belonging to the same clusters are thus more likely to share the same neighborhood. The unpublised manuscript of @ganguly2014 introduced a fusion-like penalty in the neighborhood selection framework. However the problem is solved in a columwise fashion where the $p$ regressions problems are not combined.
+Note that fusion penalties have also been used in simple regression problems like [@tibshirani2005sparsity] 
+in joint regressions problems or multitask learning (see the works of @chen2010graph, @hallac2015network, @degras2021sparse, @chu2021adaptive among others). @dondelinger2020joint introduced a criterion similar to the MGLasso. However an explicit link have not been made with the @Meinshausen2006 and convex clustering approaches for undirected gaussian graphical models inference.
 
-So, the key novelty of the MGLasso is the adaptation the global likelihood maximization problem to the neighborhood selection framework [@Meinshausen2006] via the maximization of a pseudo-likelihood function. Moreover our fusion penalty differs from the ones recensed in the literature. We enforce fusion at the scale of the whole regression vector while permuting symmetric regression coefficients. Namely we use the general fusion term $\sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2$ where  $\tau_{ij}$ is a permutation function on symmetric coefficients.
+So, the key novelty of the MGLasso is the adaptation of the global likelihood maximization problem to the neighborhood selection framework [@Meinshausen2006] while using fusion penalties via the maximization of a pseudo-likelihood function. Our fusion penalty differs from the ones recensed in the literature. We enforce fusion at the scale of the whole regression vector while permuting symmetric regression coefficients. Namely we use the general fusion term $\sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2$ where  $\tau_{ij}$ is a permutation function on symmetric coefficients.
+Morover we use a conesta ...
 </edmond>
 
 The remainder of this paper is organized as follows. In section
@@ -1423,7 +1425,7 @@ prior knowledge through more flexible weighted regularization; second,
 by studying the theoretical properties of the method in terms of
 statistical guarantees for the MGLasso estimator. <edmond> Moreover the
 node-wise regression approach on which our method is based can be
-extended to a broader family of non-gaussian distributions belonging to
+extended to a broader family of non-Gaussian distributions belonging to
 the exponential family as outlined by @yang2012graphical. </edmond>
 
 # Session information {.appendix .unnumbered}
