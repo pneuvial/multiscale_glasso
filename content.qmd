@@ -52,7 +52,7 @@ edmond { color: Red }
 <!-- ~~text~~ -->
 
 ```{r setup, message=FALSE, echo = TRUE}
-knitr::opts_chunk$set(tidy = FALSE, out.width="49%", out.height="20%",fig.show='hold',fig.align='center')
+knitr::opts_chunk$set(tidy = FALSE,fig.show='hold',fig.align='center')
 options(htmltools.dir.version = FALSE)
 
 library(ggplot2)
@@ -996,7 +996,7 @@ ggplot(roc_dtf_erdos, aes(x     = fpr,
                           y     = tpr, 
                           color = method )) + 
   geom_line(size = 0.7) + 
-  facet_grid(np ~ tv) +
+  facet_grid(np ~ tv, labeller = label_parsed) +
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "grey") +
   xlab("False Positive Rate") +
   ylab("True Positive Rate") +
