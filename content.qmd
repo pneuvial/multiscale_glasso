@@ -316,6 +316,8 @@ interpretable clustering structures [@chakraborty2020biconvex].
 <edmond> assume that </edmond> $w_{ij} = 1$ <edmond> for simplicity.
 </edmond>
 
+<edmond>As a neighborhood selection approach based on pseudo-likelihood, the MGLasso focus on learning the graph structure and relevant clusters. However a precision matrix can be deduced from the graph by supposing a scaled precision matrix whose diagonal elements are set to $1$ and using $\beta^i_j = -\Omega_{ij}/\Omega_{ii}$ to find corresponding precision coefficients. Otherwise one can fit a penalized full likelihood problem with constraints on the known edges and clusters of the graphs (see e.g. \cite{hastie2009elements} section $17.3.1$) </edmond>
+
 # Numerical scheme
 
 This section introduces a complete numerical scheme to apply MGLasso in
@@ -503,7 +505,7 @@ where
 $\mathbf{Y} = \operatorname{Vec}(\mathbf{X}) \in \mathbb{R}^{np}, \tilde{\boldsymbol{\beta}} = \operatorname{Vec(\boldsymbol{\beta})} \in \mathbb{R}^{p (p-1)}, \tilde{\mathbf{X}}$
 is a $\mathbb{R}^{[np]\times [p \times (p-1)]}$ block-diagonal matrix
 with $\mathbf{X}^{\setminus i}$ on the $i$-th block. The matrix
-$\boldsymbol A_{ij}$ is a $(p-1)\times p(p-1)$ matrix <old> defined by
+$\boldsymbol D_{ij}$ is a $(p-1)\times p(p-1)$ matrix <old> defined by
 </old> <edmond> chosen so that
 $\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}} = \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j).$
 </edmond>
@@ -1381,8 +1383,7 @@ chosen by stability selection (see [Model Selection] section).
 knitr::include_graphics(c("figures/mglasso_tv0.png","figures/mglasso_full_graph_tv5.png"))
 ```
 
-Infered graphs using MGLasso for different values of total variation
-penalty.
+<edmond> Adjacency matrices of </edmond> infered graphs using MGLasso for different values of total variation penalty.
 :::
 
 The variables were reordered according to the clustering partition
@@ -1391,7 +1392,7 @@ $\lambda_2$ reduces the number of clusters and leads to a shrinking
 effect on the estimates. The adjacency matrix of the neighborhood
 selection equivalent to setting $\lambda_2$ to $0$ is given in
 @fig-real-data-mglasso (up). In @fig-real-data-mglasso (down), the
-deduced partition is composed of $80$ clusters. A confusion matrix
+deduced partition is composed of $80$ clusters.<edmond> In order to represent these graphs as adjacency matrices, the regression vectors are concatenated in a matrix which diagonal elements are set to zero. Note that in the MB approach of estimating a graph, it is possible to obtain a vector for which the coefficients are all equal to zero. A zero column in the adjacency matrix might correspond to a column in the precision matrix for which only the diagonal coefficient is non-zero. </edmond>A confusion matrix
 comparing the edges deduced by MGLasso with $\lambda_2 = 5$ and
 neighborhood selection is given below. Adding a total variation
 parameter increases the merging effect, resulting in a larger number of
