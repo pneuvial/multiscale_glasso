@@ -25,15 +25,14 @@
 *.knit.md
 # R Environment Variables
 .Renviron
-
 ##
 template-computo-Rmarkdown.soc
 template-computo-Rmarkdown.pdf
 template-computo-Rmarkdown.html
 multiscale_glasso.Rproj
-
 *.DS_Store
 /.quarto/
 /.idea/
 temp-test-scripts.R
 .html
+content.html
