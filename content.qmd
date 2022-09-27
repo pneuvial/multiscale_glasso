@@ -181,15 +181,15 @@ Note that fusion penalties have also been used in simple regression problems lik
 in multivariate regression analysis (multitask learning) with multiple outcomes (see e.g. the works of @chen2010graph; @degras2021sparse; @dondelinger2020joint; @hallac2015network; @chu2021adaptive among others). The defined fusion penalties either encourage fusion between predictors in simple regression or fusion between outcomes that share similar model coefficients in multitask learning. Fusions can be formulated in a general form assuming no order on the differences as in convex clustering problem (see e.g. [@Hoefling2010; @petry2011pairwise]), following a total variation scheme [@rudin1992nonlinear] or assuming the availability of a prior information about clusters (see e.g. [@hallac2015network]).
 An extension of these works to the pseudo-likelihood inference of gaussian graphical models can be ill-suited in term of interpretability. Indeed, the set of outcomes being identical to the set of predictors it might be tricky to define the fusion term between the regression vectors.
 A term-wise difference in the vectors without reordering coefficients would imply comparing coefficients that do not correspond to the same predictor. An alternative would be to only keep in the fusion penalty the common set of predictors between pairs of outcomes as presented by [@Yao2019] for a likelihood penalized problem with only fusion penalty. In the MGLasso, we consider reordering the coefficients in order to match common predictors coefficients and symmetric coefficients. This enforces the grouping property by encouraging variables belonging to the same cluster to have the same neighborhood and to belong to each other neighborhood.
-MGLasso exploits the multitask learning framework for GGMs inference coupled with a convex clustering problem over the nodes to simultaneously infer multiscale networks and clusters. To the best of our knowledge, this is the first attempt in the litterature of undirected GGMs. Namely we use the novel fusion term $\sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2$ coupled with a sparsity penalty on the vectors. The function $\tau_{ij}$ is a permutation on symmetric coefficients. MGLasso can also be seen as a sort of sparse group fused Lasso for graphical models and can be straightforwardly extended to probability distributions belonging to the exponential family [@yang2012graphical]. 
+MGLasso exploits the multitask learning framework for GGMs inference coupled with a convex clustering problem over the nodes to simultaneously infer multiscale networks and clusters. To the best of our knowledge, this is the first attempt in the litterature of undirected GGMs. Namely we use the novel fusion term $\sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2$ coupled with a sparsity penalty on the vectors. The matrix $\boldsymbol \tau_{ij}$ is a permutation matrix that reorder coefficients in $\boldsymbol{\beta}^j$. MGLasso can also be seen as a sort of sparse group fused Lasso for graphical models and can be straightforwardly extended to probability distributions belonging to the exponential family [@yang2012graphical]. 
 The MGLasso algorithm is implemented in path-algorithm way in the R package mglasso available at  <https://CRAN.R-project.org/package=mglasso>.
 </edmond>
 
 The remainder of this paper is organized as follows. In section
-[Multiscale Graphical Lasso], we formally introduce the Multiscale
+[2][Multiscale Graphical Lasso], we formally introduce the Multiscale
 Graphical Lasso based on a convex estimation problem and an optimization
 algorithm based on the continuation of Nesterov's smoothing technique
-[@hadjselem2018]. Section [Simulation experiments] presents numerical
+[@hadjselem2018]. Section [4][Simulation experiments] presents numerical
 results on simulated and real data.
 
 # Multiscale Graphical Lasso
@@ -214,43 +214,40 @@ $\Omega_{ij} \neq 0$, that is if and only if the $i$-th and $j$-th
 variables are conditionally independent given all the others i.e.
 $X^i \perp \!\!\! \perp X^j |X^{\setminus (i, j)}$ where
 $X^{\setminus (i, j)}$ is the set of all $p$ variables deprived of
-variables $i$ and $j$.
-
-Considering the linear model
+variables $i$ and $j$. Considering the linear model
 $X^i = \sum_{j\neq i} \beta^i_j X_j + \epsilon_i$ where $\epsilon_i$ is
 a Gaussian centered random variable, we have
 $\beta^i_j = -\frac{\Omega_{ij}}{\Omega_{ii}}$. We define the regression
-matrix
-$\boldsymbol{\beta} := [{\boldsymbol{\beta}^1}^T, \ldots, {\boldsymbol{\beta}^p}^T]^T \in \mathbb{R}^{p \times (p-1)}$,
-whose rows are the regression vectors for each of the $p$ regressions.
+matrix <old> $\boldsymbol{\beta} := [{\boldsymbol{\beta}^1}^T, \ldots, {\boldsymbol{\beta}^p}^T]^T \in \mathbb{R}^{p \times (p-1)}$</old> <edmond> $\boldsymbol{\beta} := [{\boldsymbol{\beta}^1}, \ldots, {\boldsymbol{\beta}^p}] \in \mathbb{R}^{(p-1) \times p},$ </edmond>
+whose <old> rows </old> <edmond> columns </edmond> are the regression vectors for each <edmond> one </edmond>  of the $p$ <edmond> multiple </edmond> regressions.
 
 Let the $n \times p$-dimensional matrix $\mathbf{X}$ contain $n$
 independent observations of $X$. We propose to minimize the following
 criterion which combines Lasso and group-fused Lasso penalties:
 
 $$
-J_{\lambda_1, \lambda_2}(\boldsymbol{\beta}; \mathbf{X} ) = \frac{1}{2} \sum_{i=1}^p \left \lVert \mathbf{X}^i - \mathbf{X}^{\setminus i} \boldsymbol{\beta}^i \right \rVert_2 ^2  + \lambda_1 \sum_{i = 1}^p  \left \lVert \boldsymbol{\beta}^i \right \rVert_1 + \lambda_2 \sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2,
+J_{\lambda_1, \lambda_2}(\boldsymbol{\beta}; \mathbf{X} ) = \frac{1}{2} \sum_{i=1}^p \left \lVert \mathbf{X}^i - \mathbf{X}^{\setminus i} \boldsymbol{\beta}^i \right \rVert_2 ^2  + \lambda_1 \sum_{i = 1}^p  \left \lVert \boldsymbol{\beta}^i \right \rVert_1 + \lambda_2 \sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij}\boldsymbol{\beta}^j \right \rVert_2,
 $$ {#eq-cost-fct}
 
-where $\tau_{ij}$ is a permutation exchanging the coefficients
+where <old> $\tau_{ij}$ is a permutation exchanging the coefficients
 $\boldsymbol{\beta}^j_j$ and $\boldsymbol{\beta}^j_i$ and leaves other
-coefficients untouched, $\mathbf{X}^{i}\in \mathbb{R}^n$ denotes the
-$i$-th column of $\mathbf{X}$, $\boldsymbol{\beta}_{i}$ denotes the
-$i$-th row of $\beta$, $\lambda_1$ and $\lambda_2$ are penalization
-parameters. Let us consider
+coefficients untouched, </old> $\mathbf{X}^{i}\in \mathbb{R}^n$ denotes the
+$i$-th column of $\mathbf{X}$, <old> $\boldsymbol{\beta}_{i}$ denotes the
+$i$-th row of $\beta$, </old> $\lambda_1$ and $\lambda_2$ are penalization
+parameters, <edmond> $\boldsymbol \tau_{ij} \in \mathbb R^{(p-1)\times(p-1)}$ is a permutation matrix which permutes the coefficients in the regression vector $\boldsymbol \beta^j$ such as $\left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij}\boldsymbol{\beta}^j \right \rVert_2 = \sqrt{\sum_{k \in \{1, \dots,p \} \backslash \{i,j\}} (\beta^i_k - \beta^j_k)^2 + (\beta^i_j - \beta^j_i)^2  }$, $\beta^i_k$ is to be read as the multiple regression coefficient of $\boldsymbol X^i$ on $\boldsymbol X^k.$</edmond> Let us consider
 
 $$
 \hat{\boldsymbol{\beta}} \in \underset{\boldsymbol{\beta}}{\operatorname{argmin}} J_{\lambda_1, \lambda_2}(\boldsymbol{\beta}, \mathbf{X}).
 $$
 
 The lasso penalty term encourages sparsity and the penalty term
-$\left \lVert \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2$
+$\left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2$
 encourages to fuse regression vectors $\boldsymbol{\beta}^i$ and
 $\boldsymbol{\beta}^j$. These fusions uncover a clustering structure.
 The model is likely to cluster together variables that have the same
 conditional effects on the others. Variables $X^i$ and $X^j$ are
 assigned to the same cluster when
-$\boldsymbol{\beta}^i = \tau_{ij}(\boldsymbol{\beta}^j).$
+<old> $\boldsymbol{\beta}^i = \tau_{ij}(\boldsymbol{\beta}^j).$ </old> <edmond> $\boldsymbol{\beta}^i = \boldsymbol \tau_{ij} \boldsymbol{\beta}^j.$ </edmond> 
 
 <old> Let us illustrate by an example the effect of the proposed
 approach. If we consider a group of $q$ variables whose regression
@@ -268,7 +265,7 @@ a group forces equality of all regression coefficients in the group.
 
 <revision> Let us illustrate by an example the effect of the proposed
 approach. Two variables $i$ and $j$ are in the same group when
-$\|\boldsymbol{\beta}^i - \tau_{ij} (\boldsymbol{\beta}^j)\|_2=0$.
+$\|\boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j\|_2=0$.
 Considering a cluster $\mathcal C$ of $q$ variables, it is
 straightforward to show that $\forall (i,j) \in \mathcal C^2$, we have
 $\beta_{ij}=\beta_{\mathcal C}$. Thus the algorithm tend to produce
@@ -279,7 +276,7 @@ Let us illustrate by an example the effect of the proposed approach. If
 we consider a group of $q$ variables whose regression vectors have at
 least $q$ non-zero coefficients and further assume that for each pair of
 group variables $i$ and $j$,
-$\|\boldsymbol{\beta}^i - \tau_{ij} (\boldsymbol{\beta}^j)\|_2=0$. After
+$\|\boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j\|_2=0$. After
 some permutations, we get a $q\times q$ block of non-zeros coefficient
 $\beta_{ij}$ corresponding to the group in the $\boldsymbol{\beta}$
 matrix, where $(i,j)\in \{1,\cdots, q\}^2$. If we consider three
@@ -303,7 +300,7 @@ hierarchical clustering of the variables.
 In practice, if some information about the clustering structure is
 available, the problem can be generalized into:
 
-$$\min_{\boldsymbol{\beta}} \sum_{i=1}^p\frac{1}{2} \left \lVert \mathbf{X}^i - \mathbf{X}^{\setminus i} \boldsymbol{\beta}^i \right \rVert_2 ^2  + \lambda_1 \sum_{i = 1}^p \left \lVert \boldsymbol{\beta}^i \right \rVert_1 + \lambda_2 \sum_{i < j}  w_{ij} \left \lVert \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2,
+$$\min_{\boldsymbol{\beta}} \sum_{i=1}^p\frac{1}{2} \left \lVert \mathbf{X}^i - \mathbf{X}^{\setminus i} \boldsymbol{\beta}^i \right \rVert_2 ^2  + \lambda_1 \sum_{i = 1}^p \left \lVert \boldsymbol{\beta}^i \right \rVert_1 + \lambda_2 \sum_{i < j}  w_{ij} \left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij}\boldsymbol{\beta}^j \right \rVert_2,
 $$ {#eq-cost-fct-general}
 
 where $w_{ij}$ is a positive weight encoding prior knowledge of the
@@ -322,13 +319,12 @@ interpretable clustering structures [@chakraborty2020biconvex].
 
 This section introduces a complete numerical scheme to apply MGLasso in
 practice, using a convex optimization algorithm and a model selection
-procedure. Section [Optimization via CONESTA algorithm] reviews the
+procedure. Section [3.1][Optimization via CONESTA algorithm] reviews the
 principles of the Continuation with Nesterov smoothing in a
 shrinkage-thresholding algorithm (CONESTA, [@hadjselem2018]), the
 optimization algorithm used in practice to solve MGLasso. Section
-[Reformulation of MGLasso for CONESTA algorithm] details a reformulation
-of MGLasso, which enables us to apply CONESTA. Finally, Section [Model
-selection] presents the procedure used to select the regularization
+[3.2][Reformulation of MGLasso for CONESTA algorithm] details a reformulation
+of MGLasso, which enables us to apply CONESTA. Finally, Section [3.3][Model selection] presents the procedure used to select the regularization
 parameters.
 
 ## Optimization via CONESTA algorithm
@@ -457,14 +453,14 @@ convergence speed [@hadjselem2018].
     $\quad$ functions $g(\boldsymbol{\theta}), h(\boldsymbol{\theta}), s(\boldsymbol{\theta})$ \\
     $\quad$ precision $\epsilon$ \\
     $\quad$ penalty parameters $\lambda_1, \lambda_2$ \\
-    $\quad$ decreasing factor $\tau \in (0,1)$ for sequence of precisions
+    $\quad$ decreasing factor $\boldsymbol \tau \in (0,1)$ for sequence of precisions
     
   \STATE \textbf{Output:} \\
     $\quad$ $\boldsymbol{\theta}^{i+1} \in \mathbb{R}^d$
 
   \STATE \textbf{Initializations:} \\
     $\quad \boldsymbol{\theta}^0 \in \mathbb{R}^d$ \\
-    $\quad \epsilon^0 = \tau \operatorname{GAP}_{\mu = 10^{-8}}(\boldsymbol{\theta}^0)$ \\
+    $\quad \epsilon^0 = \boldsymbol \tau \operatorname{GAP}_{\mu = 10^{-8}}(\boldsymbol{\theta}^0)$ \\
     $\quad \mu^0 = \mu_{opt}(\epsilon^0)$
 
   \Repeat
@@ -481,7 +477,7 @@ convergence speed [@hadjselem2018].
     
   \STATE $\boldsymbol{\theta}^{i+1} = \boldsymbol{\theta}_{\operatorname{FISTA}}^k$ \\
   \STATE $\epsilon^i = \operatorname{GAP}_{\mu = \mu_i} \boldsymbol{\theta}^{i+1} + \mu^i \lambda_2 \frac{d}{2}$ \\
-  \STATE $\epsilon^{i+1} = \tau \epsilon^{i}$ \\
+  \STATE $\epsilon^{i+1} = \boldsymbol \tau \epsilon^{i}$ \\
   \STATE $\mu^{i+1} = \mu_{opt}(\epsilon^{i+1})$
   \Until{$\epsilon^i \le \epsilon$}
   
@@ -507,7 +503,7 @@ is a $\mathbb{R}^{[np]\times [p \times (p-1)]}$ block-diagonal matrix
 with $\mathbf{X}^{\setminus i}$ on the $i$-th block. The matrix
 $\boldsymbol D_{ij}$ is a $(p-1)\times p(p-1)$ matrix <old> defined by
 </old> <edmond> chosen so that
-$\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}} = \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j).$
+$\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}} = \boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j.$
 </edmond>
 
 <old>$\boldsymbol D_{ij} (k, l) = \begin{cases} 1, \ \text{if} \ l =(i-1)p+k, \\ -1, \ \text{if} \ l = (j-1)p+k,\\ 0, \ \text{otherwise.} \end{cases}$</old>
@@ -552,7 +548,7 @@ $\mathbf{X}^i$ and $\epsilon_{fuse}$ the threshold for merging clusters.
   \WHILE{$\operatorname{Card}(C) > 1$}
     \STATE Compute $\boldsymbol{\beta}$ using CONESTA solver with warm start from previous iteration \\
     \COMMENT{Clusters update}
-    \STATE Compute pairwises distances $d(i,j)=\left \lVert \boldsymbol{\beta}^i - \tau_{ij}(\boldsymbol{\beta}^j) \right \rVert_2$, $\forall i,j \in \{1, \dots, p\}$ \\
+    \STATE Compute pairwises distances $d(i,j)=\left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j \right \rVert_2$, $\forall i,j \in \{1, \dots, p\}$ \\
     \STATE Determine clusters $C_k (k=1, \dots, K)$ with the rule $(i,j) \in C_k$ iff. $d(i,j) \le \epsilon_{fuse}$
   
     \STATE $\lambda_2 = \lambda_2 \times \nu$
@@ -1317,7 +1313,7 @@ Gaussian graphical model, with an application to the analysis of
 microbial associations in the American Gut Project. The data used are
 count data that have been previously normalized by applying the
 log-centered ratio technique as used in [@Kurtz2015]. After some
-filtering steps [@Kurtz2015] on the operational taxonomic units OTUs
+filtering steps [@Kurtz2015] on the operational taxonomic units (OTUs)
 counts (removed if present in less than $37\%$ of the samples) and the
 samples (removed if sequencing depth below 2700), the top OTUs are
 grouped in a dataset composed of $n_1 = 289$ for $127$ OTUs. As a
@@ -1350,8 +1346,8 @@ Empirical correlations in the gut data.
 The average correlations within blocks of variables belonging to the
 same cluster are given below. We observe relatively high levels of
 correlation in small blocks, similar to the simulation models used to
-evaluate the performance of clustering in the [Simulation Experiments]
-section.
+evaluate the performance of clustering in <old>the [Simulation Experiments]</old>
+section <edmond>[4][Simulation Experiments]</edmond>.
 
 ```{r echo = TRUE}
 C <- cor(dta)
@@ -1376,7 +1372,7 @@ We apply MGLasso to the normalised counts to infer a graph and a
 clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
 and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
 clusters) are given below. In each case, the parameter $\lambda_1$ is
-chosen by stability selection (see [Model Selection] section).
+chosen by stability selection (see <old> [Model Selection] section </old> <edmond> [3.3][Model Selection]</edmond>).
 
 ::: {#fig-real-data-mglasso}
 ```{r, out.width="49%", out.height="20%", fig.show='hold',fig.align='center', echo = TRUE}
