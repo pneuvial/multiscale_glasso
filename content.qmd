@@ -16,7 +16,7 @@ author:
     affiliation-url: http://www.math-evry.cnrs.fr/
 date: last-modified
 abstract: >+
-  Gaussian Graphical Models (GGMs) are widely used <old> for exploratory data analysis in various fields such as genomics, ecology, psychometry </old> <edmond> in high-dimensional data analysis to synthesize the interaction between variables. In many applications, such as genomics or image analysis, graphical models relies on sparsity and clustering to reduce the number of parameters and improve performances. In this paper, we explore a slightly different paradigm where clustering is not knowledge-driven but performed simultaneously during the inference task to improve the interpretability and propose multiscale structures.</edmond> <old> In a high-dimensional setting, when the number of variables exceeds the number of observations by several orders of magnitude, the estimation of GGM is a difficult and unstable optimization problem.</old> <old> Clustering of variables or variable selection is often performed prior to GGM estimation.</old> We propose a new method allowing to simultaneously estimate <old>infer a hierarchical clustering structure </old> <edmond> clusters using the convex clustering problem which is a convex relaxation of $k$-means and hierarchical clustering, </edmond> and the graphs describing the structure of conditional independence <old> at each level of the hierarchy </old> <edmond> at multiple levels of granularity exploiting neighborhood selection scheme for undirected graphical models.</edmond> This method <old> is based on solving a convex optimization problem combining a graphical lasso penalty with a fused type lasso penalty </old> <edmond>extends and generalizes the sparse group fused lasso problem to undirected graphical models. We use the Continuation with Nesterov smoothing in a shrinkage-thresholding algorithm (CONESTA) to propose a regularization path of solutions when Lasso penalty is kept constant. The MGLasso approach presented here can be extended to non-Gaussian distributions belonging to the exponential family and mixed graphical models.</edmond> Results on real and synthetic data are presented.
+  Gaussian Graphical Models (GGMs) are widely used <old> for exploratory data analysis in various fields such as genomics, ecology, psychometry </old> <edmond> in high-dimensional data analysis to synthesize the interaction between variables. In many applications, such as genomics or image analysis, graphical models relies on sparsity and clustering to reduce the dimensionalty and improve performances. In this paper, we explore a slightly different paradigm where clustering is not knowledge-driven but performed simultaneously to the inference task. The goal is to improve the interpretability and propose multiscale structures.</edmond> <old> In a high-dimensional setting, when the number of variables exceeds the number of observations by several orders of magnitude, the estimation of GGM is a difficult and unstable optimization problem.</old> <old> Clustering of variables or variable selection is often performed prior to GGM estimation.</old> The proposed method infers <old>a hierarchical clustering structure </old> <edmond> clusters through a  convex clustering approach, which is a relaxation of $k$-means and hierarchical clustering.</edmond> It a simultaneously infers the graph describing the structure of conditional independence <old> at each level of the hierarchy </old> <edmond> at multiple levels of granularity, exploiting neighborhood selection scheme for undirected graphical models.</edmond> This method <old> is based on solving a convex optimization problem combining a graphical lasso penalty with a fused type lasso penalty </old> <edmond>extends and generalizes the sparse group fused lasso problem to undirected graphical models. We use continuation with Nesterov smoothing in a shrinkage-thresholding algorithm (CONESTA) to propose a regularization path of solutions when Lasso penalty is kept constant. </edmond> Results on real and synthetic data are presented.
 citation:
   type: article-journal
   container-title: "Computo"
@@ -26,6 +26,9 @@ github: https://github.com/desanou/multiscale_glasso
 bibliography: references.bib
 repo: "multiscale_glasso"
 editor: 
+  markdown: 
+    wrap: 72
+editor_options: 
   markdown: 
     wrap: 72
 ---
@@ -39,7 +42,7 @@ License](https://i.creativecommons.org/l/by/4.0/80x15.png)](http://creativecommo
 
 ```{=html}
 <style>
-old {color: silver}
+old {color: silver; display: true}
 revision { color: Orange }
 genevieve { color: Cyan }
 edmond { color: Red }
@@ -80,18 +83,18 @@ between variables [@Dempster1972] and allowing efficient algorithms
 [@Meinshausen2006]. See, for instance, [@Fan2016] for a review about
 sparse graphical models inference.
 
-In GGMs, it is well known (see, e.g., [@Lauritzen1996]) that inferring the
-graphical model or equivalently the Conditional Independence Graph (CIG)
-boils down to inferring the support of the precision matrix
+In GGMs, it is well known (see, e.g., [@Lauritzen1996]) that inferring
+the graphical model or equivalently the Conditional Independence Graph
+(CIG) boils down to inferring the support of the precision matrix
 $\mathbf{\Omega}$ (the inverse of the variance-covariance matrix). To do
 so, several $\ell_1$ penalized methods have been proposed in the
 literature to learn the CIG of GGMs. For instance, the neighborhood
 selection [@Meinshausen2006] (MB) based on a nodewise regression
 approach via the least absolute shrinkage and selection operator (Lasso,
-[@tibshirani1996]) is a popular method. Each variable is regressed on the
-others, taking advantage of the link between the so-obtained regression
-coefficients and partial correlations. More precisely, for all
-$1 \le i \le p$, the following problem is solved:
+[@tibshirani1996]) is a popular method. Each variable is regressed on
+the others, taking advantage of the link between the so-obtained
+regression coefficients and partial correlations. More precisely, for
+all $1 \le i \le p$, the following problem is solved:
 
 $$
 \hat{\boldsymbol{\beta}^i}(\lambda) = \underset{\boldsymbol{\beta}^i \in \mathbb{R}^{p-1}}{\operatorname{argmin}} \frac{1}{n} \left \lVert \mathbf{X}^i - \mathbf{X}^{\setminus i} \boldsymbol{\beta}^i \right \rVert_2 ^2 + \lambda \left \lVert \boldsymbol{\beta}^i \right \rVert_1.
@@ -141,9 +144,10 @@ are groups of functionally related genes known in advance. The inference
 is achieved by optimizing a penalized maximum likelihood that estimates
 a sparse network at both gene and group levels. Our work is also part of
 this dynamic. We introduce a penalty term allowing parsimonious networks
-to be built at different <old> hierarchical </old> clustering levels <edmond> that can be hierarchical under some conditions </edmond>. The main
-difference with the procedure of [@Cheng2017] is that we do not require
-prior knowledge of the group structure, which makes the problem
+to be built at different <old> hierarchical </old> clustering levels
+<old> that can be hierarchical under some conditions </old>. The
+main difference with the procedure of [@Cheng2017] is that we do not
+require prior knowledge of the group structure, which makes the problem
 significantly more complex. In addition, our method has the advantage of
 proposing CIGs at more than two levels of granularity.
 
@@ -151,56 +155,116 @@ We introduce the Multiscale Graphical Lasso (MGLasso), a novel method to
 estimate simultaneously a hierarchical clustering structure, and
 graphical models depicting the conditional independence structure
 between clusters of variables at each level of the hierarchy. <old> The
-procedure is based on a convex optimization problem  with a hybrid
-penalty term combining a graphical Lasso and a group-fused Lasso 
+procedure is based on a convex optimization problem with a hybrid
+penalty term combining a graphical Lasso and a group-fused Lasso
 penalty. </old>
 
-<edmond> The approach is based on
-neighborhood selection [@Meinshausen2006] and considers an additional
-fused-Lasso type penalty for clustering [@pelckmans2005convex; @Hocking2011; @Lindsten2011]. </edmond>
+<edmond> The approach is based on neighborhood selection
+[@Meinshausen2006] and considers an additional fused-Lasso type penalty
+for clustering [@pelckmans2005convex; @Hocking2011; @Lindsten2011].
+</edmond>
 
 <old> In the spirit of convex clustering, introduced by
-@pelckmans2005convex, @Hocking2011, @Lindsten2011, the clustering path is obtained by spanning the
-entire regularization path.  At each level of the hierarchy, variables in
-the same clusters are represented by a meta-variable; the new CIG is
-estimated between these new meta-variables, leading to a multiscale
-graphical model. Unlike @Yao2019, who introduced convex clustering in
-GGMs, our approach is expected to produce sparse estimations, thanks to
-an additional $\ell_1$ penalty. </old>
+@pelckmans2005convex, @Hocking2011, @Lindsten2011, the clustering path
+is obtained by spanning the entire regularization path. At each level of
+the hierarchy, variables in the same clusters are represented by a
+meta-variable; the new CIG is estimated between these new
+meta-variables, leading to a multiscale graphical model. Unlike
+@Yao2019, who introduced convex clustering in GGMs, our approach is
+expected to produce sparse estimations, thanks to an additional $\ell_1$
+penalty. </old>
 
-<edmond> The convex relaxation of $k$-means and hierarchical agglomerative clustering also known as sum of norms clustering can be formulated as follows. Given $\boldsymbol X = \{ \boldsymbol x_1, \dots, \boldsymbol x_n\} \in \mathbb R^{n \times p}$, @Hocking2011 minimize with respect to the centroids matrix $\boldsymbol \alpha \in \mathbb R^{n \times p}$ the criterion </edmond>
+<edmond> The convex relaxation of $k$-means and hierarchical
+agglomerative clustering also known as sum of norms clustering can be
+formulated as follows. Given
+$\boldsymbol X = \Large( \boldsymbol x_1, \dots, \boldsymbol x_n\Large)^T \in \mathbb R^{n \times p}$,
+@Hocking2011 minimize with respect to the centroids matrix
+$\boldsymbol \alpha \in \mathbb R^{n \times p}$ the criterion </edmond>
 
 $$
 \frac{1}{2} \sum_{i=1}^n \left \lVert \boldsymbol x_i - \boldsymbol  \alpha_i \right \rVert_2^2 + \lambda \sum_{i < j} w_{ij} \left \lVert \boldsymbol  \alpha_i - \boldsymbol  \alpha_j \right \rVert_q
-$$ {#eq-clusterpath}
-<edmond> where $\lambda$ is a sparsity penalization parameter, $\{ w_{ij} \}$ are symmetric positive weights, $\boldsymbol  \alpha_i \in \mathbb R^p$ is the centroid to which observation $\boldsymbol x_i$ is assigned to, and $\left \lVert . \right \rVert_q$ is the $\ell_q$-norm on $\mathbb R^p$ with $q \ge 1.$ The regularization path of solutions to problem in @eq-clusterpath can lead to a tree structure i.e hierarchy under some conditions [@chi2015splitting; @chiquet2017fast]. </edmond>
+$$ {#eq-clusterpath} <edmond> where $\lambda$ is a sparsity penalization
+parameter, $\{ w_{ij} \}$ are symmetric positive weights,
+$\boldsymbol \alpha_i \in \mathbb R^p$ is the centroid to which
+observation $\boldsymbol x_i$ is assigned to, and
+$\left \lVert . \right \rVert_q$ is the $\ell_q$-norm on $\mathbb R^p$
+with $q \ge 1.$ The regularization path of solutions to problem in
+@eq-clusterpath can lead to a tree structure i.e hierarchy under some
+conditions [@chi2015splitting; @chiquet2017fast]. </edmond>
 
-<edmond>
-The use of fusion penalties in the inference of Gaussian graphical models is not new. Some prior works on learning sparse GGMs with a fusion penalty term have focused on the penalized likelihood. Among them a line of works [@danaher2014joint; @yang2015fused] infer multiple graphs accross several classes while assuming the observations belong to different known clusters in order to share characterics between the infered graphs. Another line of research [@Honorio2009; @Yao2019; @lin2020estimation] has investigated fusion penalties for enforcing local constancy in the nodes of the infered network. Variables belonging to the same clusters are thus more likely to share the same neighborhood. These ordinary likelihood-based models are known to be computationally challenging compared to pseudo-likelihoods approximations. The unpublised manuscript of @ganguly2014 introduced a fusion-like penalty in the neighborhood selection framework. However the problem is solved in a node-wise regression fashion where the $p$ regressions problems are not combined. 
-Note that fusion penalties have also been used in simple regression problems like [@tibshirani2005sparsity],  and
-in multivariate regression analysis (multitask learning) with multiple outcomes (see e.g. the works of @chen2010graph; @degras2021sparse; @dondelinger2020joint; @hallac2015network; @chu2021adaptive among others). The defined fusion penalties either encourage fusion between predictors in simple regression or fusion between outcomes that share similar model coefficients in multitask learning. Fusions can be formulated in a general form assuming no order on the differences as in convex clustering problem (see e.g. [@Hoefling2010; @petry2011pairwise]), following a total variation scheme [@rudin1992nonlinear] or assuming the availability of a prior information about clusters (see e.g. [@hallac2015network]).
-An extension of these works to the pseudo-likelihood inference of gaussian graphical models can be ill-suited in term of interpretability. Indeed, the set of outcomes being identical to the set of predictors it might be tricky to define the fusion term between the regression vectors.
-A term-wise difference in the vectors without reordering coefficients would imply comparing coefficients that do not correspond to the same predictor. An alternative would be to only keep in the fusion penalty the common set of predictors between pairs of outcomes as presented by [@Yao2019] for a likelihood penalized problem with only fusion penalty. In the MGLasso, we consider reordering the coefficients in order to match common predictors coefficients and symmetric coefficients. This enforces the grouping property by encouraging variables belonging to the same cluster to have the same neighborhood and to belong to each other neighborhood.
-MGLasso exploits the multitask learning framework for GGMs inference coupled with a convex clustering problem over the nodes to simultaneously infer multiscale networks and clusters. To the best of our knowledge, this is the first attempt in the litterature of undirected GGMs. Namely we use the novel fusion term $\sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j \right \rVert_2$ coupled with a sparsity penalty on the vectors. The matrix $\boldsymbol \tau_{ij}$ is a permutation matrix that reorder coefficients in $\boldsymbol{\beta}^j$. MGLasso can also be seen as a sort of sparse group fused Lasso for graphical models and can be straightforwardly extended to probability distributions belonging to the exponential family [@yang2012graphical]. 
-The MGLasso algorithm is implemented in path-algorithm way in the R package mglasso available at  <https://CRAN.R-project.org/package=mglasso>.
-</edmond>
+<edmond> The use of fusion penalties in the inference of Gaussian
+graphical models is not new. Some prior works on learning sparse GGMs
+with a fusion penalty term have focused on the penalized likelihood.
+Among them a line of works [@danaher2014joint; @yang2015fused] infer
+multiple graphs accross several classes while assuming the observations
+belong to different known clusters in order to share characterics
+between the infered graphs. Another line of research [@Honorio2009;
+@Yao2019; @lin2020estimation] has investigated fusion penalties for
+enforcing local constancy in the nodes of the infered network. Variables
+belonging to the same clusters are thus more likely to share the same
+neighborhood. These ordinary likelihood-based models are known to be
+computationally challenging compared to pseudo-likelihoods
+approximations. The unpublised manuscript of @ganguly2014 introduced a
+fusion-like penalty in the neighborhood selection framework. However the
+problem is solved in a node-wise regression fashion where the $p$
+regressions problems are not combined. Note that fusion penalties have
+also been used in simple regression problems like
+[@tibshirani2005sparsity], and in multivariate regression analysis
+(multitask learning) with multiple outcomes (see e.g. the works of
+@chen2010graph; @degras2021sparse; @dondelinger2020joint;
+@hallac2015network; @chu2021adaptive among others). The defined fusion
+penalties either encourage fusion between predictors in simple
+regression or fusion between outcomes that share similar model
+coefficients in multitask learning. Fusions can be formulated in a
+general form assuming no order on the differences as in convex
+clustering problem (see e.g. [@Hoefling2010; @petry2011pairwise]),
+following a total variation scheme [@rudin1992nonlinear] or assuming the
+availability of a prior information about clusters (see e.g.
+[@hallac2015network]). An extension of these works to the
+pseudo-likelihood inference of gaussian graphical models can be
+ill-suited in term of interpretability. Indeed, the set of outcomes
+being identical to the set of predictors it might be tricky to define
+the fusion term between the regression vectors. A term-wise difference
+in the vectors without reordering coefficients would imply comparing
+coefficients that do not correspond to the same predictor. An
+alternative would be to only keep in the fusion penalty the common set
+of predictors between pairs of outcomes as presented by [@Yao2019] for a
+likelihood penalized problem with only fusion penalty. In the MGLasso,
+we consider reordering the coefficients in order to match common
+predictors coefficients and symmetric coefficients. This enforces the
+grouping property by encouraging variables belonging to the same cluster
+to have the same neighborhood and to belong to each other neighborhood.
+MGLasso exploits the multitask learning framework for GGMs inference
+coupled with a convex clustering problem over the nodes to
+simultaneously infer multiscale networks and clusters. To the best of
+our knowledge, this is the first attempt in the litterature of
+undirected GGMs. Namely we use the novel fusion term
+$\sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j \right \rVert_2$
+coupled with a sparsity penalty on the vectors. The matrix
+$\boldsymbol \tau_{ij}$ is a permutation matrix that reorder
+coefficients in $\boldsymbol{\beta}^j$. MGLasso can also be seen as a
+sort of sparse group fused Lasso for graphical models and can be
+straightforwardly extended to probability distributions belonging to the
+exponential family [@yang2012graphical]. The MGLasso algorithm is
+implemented in path-algorithm way in the R package mglasso available at
+<https://CRAN.R-project.org/package=mglasso>. </edmond>
 
 The remainder of this paper is organized as follows. In section
-[2][Multiscale Graphical Lasso], we formally introduce the Multiscale
+[2](#multiscale-graphical-lasso), we formally introduce the Multiscale
 Graphical Lasso based on a convex estimation problem and an optimization
 algorithm based on the continuation of Nesterov's smoothing technique
-[@hadjselem2018]. Section [4][Simulation experiments] presents numerical
-results on simulated and real data.
+[@hadjselem2018]. Section [4](#simulation-experiments) presents
+numerical results on simulated and real data.
 
-# Multiscale Graphical Lasso
+# Multiscale Graphical Lasso {#multiscale-graphical-lasso}
 
-<old> The proposed method aims at inferring a graphical Gaussian model while
-hierarchically grouping variables. It infers conditional independence
-between different groups of variables. The approach is based on
-neighborhood selection [@Meinshausen2006] and considers an additional
-fused-Lasso type penalty for convex clustering. In the spirit of hierarchical
-convex clustering, the hierarchical structure is recovered by spanning
-the regularization path. </old>
+<old> The proposed method aims at inferring a graphical Gaussian model
+while hierarchically grouping variables. It infers conditional
+independence between different groups of variables. The approach is
+based on neighborhood selection [@Meinshausen2006] and considers an
+additional fused-Lasso type penalty for convex clustering. In the spirit
+of hierarchical convex clustering, the hierarchical structure is
+recovered by spanning the regularization path. </old>
 
 Let $X = (X^1, \dots, X^p)^T \in \mathbb R^p$ be a $p$-dimensional
 Gaussian random vector, with mean vector $\mu$ and covariance matrix
@@ -218,8 +282,13 @@ variables $i$ and $j$. Considering the linear model
 $X^i = \sum_{j\neq i} \beta^i_j X_j + \epsilon_i$ where $\epsilon_i$ is
 a Gaussian centered random variable, we have
 $\beta^i_j = -\frac{\Omega_{ij}}{\Omega_{ii}}$. We define the regression
-matrix <old> $\boldsymbol{\beta} := [{\boldsymbol{\beta}^1}^T, \ldots, {\boldsymbol{\beta}^p}^T]^T \in \mathbb{R}^{p \times (p-1)}$</old> <edmond> $\boldsymbol{\beta} := [{\boldsymbol{\beta}^1}, \ldots, {\boldsymbol{\beta}^p}] \in \mathbb{R}^{(p-1) \times p},$ </edmond>
-whose <old> rows </old> <edmond> columns </edmond> are the regression vectors for each <edmond> one </edmond>  of the $p$ <edmond> multiple </edmond> regressions.
+matrix <old>
+$\boldsymbol{\beta} := [{\boldsymbol{\beta}^1}^T, \ldots, {\boldsymbol{\beta}^p}^T]^T \in \mathbb{R}^{p \times (p-1)}$</old>
+<edmond>
+$\boldsymbol{\beta} := [{\boldsymbol{\beta}^1}, \ldots, {\boldsymbol{\beta}^p}] \in \mathbb{R}^{(p-1) \times p},$
+</edmond> whose <old> rows </old> <edmond> columns </edmond> are the
+regression vectors for each <edmond> one </edmond> of the $p$ <edmond>
+multiple </edmond> regressions.
 
 Let the $n \times p$-dimensional matrix $\mathbf{X}$ contain $n$
 independent observations of $X$. We propose to minimize the following
@@ -231,10 +300,16 @@ $$ {#eq-cost-fct}
 
 where <old> $\tau_{ij}$ is a permutation exchanging the coefficients
 $\boldsymbol{\beta}^j_j$ and $\boldsymbol{\beta}^j_i$ and leaves other
-coefficients untouched, </old> $\mathbf{X}^{i}\in \mathbb{R}^n$ denotes the
-$i$-th column of $\mathbf{X}$, <old> $\boldsymbol{\beta}_{i}$ denotes the
-$i$-th row of $\beta$, </old> $\lambda_1$ and $\lambda_2$ are penalization
-parameters, <edmond> $\boldsymbol \tau_{ij} \in \mathbb R^{(p-1)\times(p-1)}$ is a permutation matrix which permutes the coefficients in the regression vector $\boldsymbol \beta^j$ such as $\left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij}\boldsymbol{\beta}^j \right \rVert_2 = \sqrt{\sum_{k \in \{1, \dots,p \} \backslash \{i,j\}} (\beta^i_k - \beta^j_k)^2 + (\beta^i_j - \beta^j_i)^2  }$, $\beta^i_k$ is to be read as the multiple regression coefficient of $\boldsymbol X^i$ on $\boldsymbol X^k.$</edmond> Let us consider
+coefficients untouched, </old> $\mathbf{X}^{i}\in \mathbb{R}^n$ denotes
+the $i$-th column of $\mathbf{X}$, <old> $\boldsymbol{\beta}_{i}$
+denotes the $i$-th row of $\beta$, </old> $\lambda_1$ and $\lambda_2$
+are penalization parameters, <edmond>
+$\boldsymbol \tau_{ij} \in \mathbb R^{(p-1)\times(p-1)}$ is a
+permutation matrix which permutes the coefficients in the regression
+vector $\boldsymbol \beta^j$ such as
+$\left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij}\boldsymbol{\beta}^j \right \rVert_2 = \sqrt{\sum_{k \in \{1, \dots,p \} \backslash \{i,j\}} (\beta^i_k - \beta^j_k)^2 + (\beta^i_j - \beta^j_i)^2 }$,
+$\beta^i_k$ is to be read as the multiple regression coefficient of
+$\boldsymbol X^i$ on $\boldsymbol X^k.$</edmond> Let us consider
 
 $$
 \hat{\boldsymbol{\beta}} \in \underset{\boldsymbol{\beta}}{\operatorname{argmin}} J_{\lambda_1, \lambda_2}(\boldsymbol{\beta}, \mathbf{X}).
@@ -246,8 +321,11 @@ encourages to fuse regression vectors $\boldsymbol{\beta}^i$ and
 $\boldsymbol{\beta}^j$. These fusions uncover a clustering structure.
 The model is likely to cluster together variables that have the same
 conditional effects on the others. Variables $X^i$ and $X^j$ are
-assigned to the same cluster when
-<old> $\boldsymbol{\beta}^i = \tau_{ij}(\boldsymbol{\beta}^j).$ </old> <edmond> $\boldsymbol{\beta}^i = \boldsymbol \tau_{ij} \boldsymbol{\beta}^j.$ </edmond> 
+assigned to the same cluster when <old>
+$\boldsymbol{\beta}^i = \tau_{ij}(\boldsymbol{\beta}^j).$ </old>
+<edmond>
+$\boldsymbol{\beta}^i = \boldsymbol \tau_{ij} \boldsymbol{\beta}^j.$
+</edmond>
 
 <old> Let us illustrate by an example the effect of the proposed
 approach. If we consider a group of $q$ variables whose regression
@@ -276,14 +354,15 @@ Let us illustrate by an example the effect of the proposed approach. If
 we consider a group of $q$ variables whose regression vectors have at
 least $q$ non-zero coefficients and further assume that for each pair of
 group variables $i$ and $j$,
-$\|\boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j\|_2=0$. After
-some permutations, we get a $q\times q$ block of non-zeros coefficient
-$\beta_{ij}$ corresponding to the group in the $\boldsymbol{\beta}$
-matrix, where $(i,j)\in \{1,\cdots, q\}^2$. If we consider three
-different indices $i,j,k \ \in \{1,\cdots, q\}^3$, it is straightforward
-to show that the six coefficients indexed by $(i,j,k)$ are all equal.
-Thus the distance constraints between vectors $\boldsymbol{\beta}^i$ of
-a group forces equality of all regression coefficients in the group.
+$\|\boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j\|_2=0$.
+After some permutations, we get a $q\times q$ block of non-zeros
+coefficient $\beta_{ij}$ corresponding to the group in the
+$\boldsymbol{\beta}$ matrix, where $(i,j)\in \{1,\cdots, q\}^2$. If we
+consider three different indices $i,j,k \ \in \{1,\cdots, q\}^3$, it is
+straightforward to show that the six coefficients indexed by $(i,j,k)$
+are all equal. Thus the distance constraints between vectors
+$\boldsymbol{\beta}^i$ of a group forces equality of all regression
+coefficients in the group.
 
 The greater the regularization weight $\lambda_2$, the larger groups
 become. This is the core principle of the convex relaxation of
@@ -313,16 +392,34 @@ interpretable clustering structures [@chakraborty2020biconvex].
 <edmond> assume that </edmond> $w_{ij} = 1$ <edmond> for simplicity.
 </edmond>
 
-<edmond>As a neighborhood selection approach based on pseudo-likelihood, the MGLasso focus on learning the graph structure and relevant clusters. However a precision matrix can be deduced from the graph by supposing a scaled precision matrix whose diagonal elements are set to $1$ and using $\beta^i_j = -\Omega_{ij}/\Omega_{ii}$ to find corresponding precision coefficients. Otherwise one can fit a penalized full likelihood problem with constraints on the known edges and clusters of the graphs (see e.g. [@hastie2009elements] section $17.3.1$) </edmond>
+<edmond>As a neighborhood selection approach based on pseudo-likelihood,
+the MGLasso focus on learning the graph structure and relevant clusters.
+However a precision matrix can be deduced from the graph by supposing a
+scaled precision matrix whose diagonal elements are set to $1$ and using
+$\beta^i_j = -\Omega_{ij}/\Omega_{ii}$ to find corresponding precision
+coefficients. Otherwise one can fit a penalized full likelihood problem
+with constraints on the known edges and clusters of the graphs (see e.g.
+[@hastie2009elements] section $17.3.1$) </edmond>
 
 ## Local constancy and symmetry
 
-<edmond> We succintly show the link between the MGLasso model and the local constancy notion introduced by @Honorio2009 and derived a sort of local constancy definition in the sense of the MGLasso. We start by recalling the [@Honorio2009] formulation. They introcuded a gaussian graphical model in which the locality information ie known interactions in a dataset are taken in account as a prior for learning the graph $G$ structure. If the node $X^1$ is independent (or dependent) of node $X^2$, a local neighbor $X^{1'}$ of $X^1$ is more likely to be independent or (dependent) of $X^2.$
+<edmond> We succintly show the link between the MGLasso model and the
+local constancy notion introduced by @Honorio2009 and derived a sort of
+local constancy definition in the sense of the MGLasso. We start by
+recalling the [@Honorio2009] formulation. They introcuded a gaussian
+graphical model in which the locality information ie known interactions
+in a dataset are taken in account as a prior for learning the graph $G$
+structure. If the node $X^1$ is independent (or dependent) of node
+$X^2$, a local neighbor $X^{1'}$ of $X^1$ is more likely to be
+independent or (dependent) of $X^2.$
 
-<edmond> Denote $G_{local}$ the domain or prior knowledge graph [@ganguly2014] and $E_{local}$ the associated set of edges. As a remark, the local edges doesn't necessarily belong to $E$, the graph $G$ set of edges. An illustration of the local constancy is given in @fig-local-cst. 
+<edmond> Denote $G_{local}$ the domain or prior knowledge graph
+[@ganguly2014] and $E_{local}$ the associated set of edges. As a remark,
+the local edges doesn't necessarily belong to $E$, the graph $G$ set of
+edges. An illustration of the local constancy is given in
+@fig-local-cst.
 
 ::: {#fig-local-cst}
-
 ```{r, engine = 'tikz'}
 \begin{tikzpicture}	[scale=1]
       \tikzstyle{every edge}=[-,>=stealth, shorten >=1pt,auto,thin,draw]
@@ -341,24 +438,42 @@ interpretable clustering structures [@chakraborty2020biconvex].
 \end{tikzpicture}
 ```
 
-<edmond> Illustration of local constant interactions. The prior knowledge on the neighborhood structure is represented by dashed lines. $X^1$ and $X^2$ are local neighbors and mutually connected to $X^4$ in the true graph (with non-dashed lines). The interaction between $\{X^1, X^2\}$ and $X^4$ is locally constant. The edge $(X^2, X^3)$ is not locally constant as the local neighbor $X^1$ is not connected to $X^3.$
+<edmond> Illustration of local constant interactions. The prior
+knowledge on the neighborhood structure is represented by dashed lines.
+$X^1$ and $X^2$ are local neighbors and mutually connected to $X^4$ in
+the true graph (with non-dashed lines). The interaction between
+$\{X^1, X^2\}$ and $X^4$ is locally constant. The edge $(X^2, X^3)$ is
+not locally constant as the local neighbor $X^1$ is not connected to
+$X^3.$
 :::
 
-<edmond> Local constancy thus encourages the search of dependencies between clusters of variables, instead of variables taken individually. [@Honorio2009] enforced that by using the following penalty on the precision matrix in addition to the Lasso penalty: 
-$$
+<edmond> Local constancy thus encourages the search of dependencies
+between clusters of variables, instead of variables taken individually.
+[@Honorio2009] enforced that by using the following penalty on the
+precision matrix in addition to the Lasso penalty: $$
 P_{\lambda_2}(\boldsymbol \Omega)  = \lambda_2 \left \lVert \boldsymbol  D \oslash \boldsymbol \Omega \right \rVert_1
 $$
 
-where $D$ is a $m \times p$ matrix, with $m$ the number of local neigbors and $\oslash$ the diagonal excluded matrix product [@ganguly2014]. The $k$-th row $D_k,. = e_i - e_j$ where $(X^i,X^j)$ are local neighbors and  $e_t$ a canonical basis vector in $\R^p$ with the $t$-th element set to $1$. For example, the difference matrix corresponding to @fig-local-cst is 
-$$
+where $D$ is a $m \times p$ matrix, with $m$ the number of local
+neigbors and $\oslash$ the diagonal excluded matrix product
+[@ganguly2014]. The $k$-th row $D_k,. = e_i - e_j$ where $(X^i,X^j)$ are
+local neighbors and $e_t$ a canonical basis vector in $\R^p$ with the
+$t$-th element set to $1$. For example, the difference matrix
+corresponding to @fig-local-cst is $$
 \boldsymbol D = 
 \begin{pmatrix}
 1 & -1 & 0 & 0 \\
 0 & 1 & -1 & 0 \\
 0 & 0 & 1 & -1
 \end{pmatrix}
-$$
-<edmond> In the MGLasso model with unitary weights, ie all $w_{ij} = 1$, implicitely all nodes are supposed to be local neighbors. Indeed, the fusion penalty include all the pairwise differences between the $p$ regression vectors. The local graph $G_{local}$ is hence the complete graph where all the nodes are connected. This type of assumption might be relevant when no locality information is available. For a model with $4$ variables, the local graph is given in @fig-local-cst-mglasso.
+$$ <edmond> In the MGLasso model with unitary weights, ie all
+$w_{ij} = 1$, implicitely all nodes are supposed to be local neighbors.
+Indeed, the fusion penalty include all the pairwise differences between
+the $p$ regression vectors. The local graph $G_{local}$ is hence the
+complete graph where all the nodes are connected. This type of
+assumption might be relevant when no locality information is available.
+For a model with $4$ variables, the local graph is given in
+@fig-local-cst-mglasso.
 
 ::: {#fig-local-cst-mglasso}
 ```{r, engine = 'tikz'}
@@ -379,34 +494,42 @@ $$
 \end{tikzpicture}
 ```
 
-
-<edmond> Illustration of locality graph in the MGLasso model with $4$ variables. All the nodes are expected to be local neighbors. The pairwises differences includes all the existing pairs of variables.
+<edmond> Illustration of locality graph in the MGLasso model with $4$
+variables. All the nodes are expected to be local neighbors. The
+pairwises differences includes all the existing pairs of variables.
 :::
 
-
-<edmond> The local constancy is enforced at the scale of the whole variable neighborhood instead of neighbors taken individually in [@Honorio2009], by using the group fused penalty term on the regression vectors,
-$$
+<edmond> The local constancy is enforced at the scale of the whole
+variable neighborhood instead of neighbors taken individually in
+[@Honorio2009], by using the group fused penalty term on the regression
+vectors, $$
 P_{\lambda_2}(\boldsymbol \beta^1, \dots, \boldsymbol \beta^p) =  \lambda_2 \sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j \right \rVert_2.
 $$
 
+<edmond> Let $ne(X^1)$ be the markov blanket or neighborhood of node
+$X^1.$ A local neighbor $X^{1'}$ of $X^1$ is more likely to have the
+same markov blanket as node $X^1$ in the MGLasso.
 
-<edmond> Let $ne(X^1)$ be the markov blanket or neighborhood of node $X^1.$ A local neighbor $X^{1'}$ of $X^1$ is more likely to have the same markov blanket as node $X^1$ in the MGLasso.
-
-<edmond> One might notice that when local neighbors are neighbors in the estimated graph $\hat G$, the MGLasso model is likely to produce clustering structures where all the variables belonging to the same cluster are mutually connected in term of conditional dependence. The permutation $\boldsymbol \tau_{ij}$ encourages a symmetry structure.
+<edmond> One might notice that when local neighbors are neighbors in the
+estimated graph $\hat G$, the MGLasso model is likely to produce
+clustering structures where all the variables belonging to the same
+cluster are mutually connected in term of conditional dependence. The
+permutation $\boldsymbol \tau_{ij}$ encourages a symmetry structure.
 
 # Numerical scheme
 
 This section introduces a complete numerical scheme to apply MGLasso in
 practice, using a convex optimization algorithm and a model selection
-procedure. Section [3.1][Optimization via CONESTA algorithm] reviews the
-principles of the Continuation with Nesterov smoothing in a
+procedure. Section [3.1](#optimization-via-conesta-algorithm) reviews
+the principles of the Continuation with Nesterov smoothing in a
 shrinkage-thresholding algorithm (CONESTA, [@hadjselem2018]), the
 optimization algorithm used in practice to solve MGLasso. Section
-[3.2][Reformulation of MGLasso for CONESTA algorithm] details a reformulation
-of MGLasso, which enables us to apply CONESTA. Finally, Section [3.3][Model selection] presents the procedure used to select the regularization
-parameters.
+[3.2](#reformulation-of-mglasso-for-conesta-algorithm) details a
+reformulation of MGLasso, which enables us to apply CONESTA. Finally,
+Section [3.3](#model-selection) presents the procedure used to select
+the regularization parameters.
 
-## Optimization via CONESTA algorithm
+## Optimization via CONESTA algorithm {#optimization-via-conesta-algorithm}
 
 The optimization problem for Multiscale Graphical Lasso is convex but
 not straightforward to solve using classical algorithms because of the
@@ -419,14 +542,12 @@ regression problems with structured sparsity such as group structures.
 The CONESTA solver, initially introduced for neuro-imaging problems,
 addresses a general class of convex optimization problems which includes
 group-wise penalties. <old> admitting loss functions of the form: </old>
-<edmond> The algorithm solves problems in the form </edmond>
-<old> $$f(\boldsymbol{\theta} ) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),$$</old>
+<edmond> The algorithm solves problems in the form </edmond> <old>
+$$f(\boldsymbol{\theta} ) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),$$</old>
 
-<edmond> 
-$$
+<edmond> $$
 \operatorname{minimize} \quad f(\boldsymbol{\theta}) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),
-$$ {#eq-conesta-criterion} 
-</edmond>
+$$ {#eq-conesta-criterion} </edmond>
 
 <edmond> with parameters vector $\boldsymbol{\theta}\in \mathbb{R}^d$
 where $\lambda_1$ and $\lambda_2$ are penalty parameters.<edmond>
@@ -482,18 +603,19 @@ non-smooth $\ell_{1,2}$-norm penalty <old> with unknown proximal
 gradient </old>, can be approximated by a smooth function with known
 <old> proximal </old> gradient computed using Nesterov's smoothing
 [@nesterov2005smooth]. Given a <edmond> smoothness </edmond> parameter
-$\mu>0$, let us define the smooth approximation
-$$ 
+$\mu>0$, let us define the smooth approximation $$ 
 s_{\mu}(\boldsymbol{\theta}) = \max_{\boldsymbol{\alpha} \in \mathcal{K}} \left \{ \boldsymbol{\alpha}^T \mathbf{A} \boldsymbol{\theta} - \frac{\mu}{2} \| \boldsymbol{\alpha} \|_2^2 \right \},
-$$ where $\mathcal{K}$ is <edmond> the cartesian product </edmond> of $\ell_2$-unit balls, <edmond> $\mathbf{A}$ is the vertical concatenation
+$$ where $\mathcal{K}$ is <edmond> the cartesian product </edmond> of
+$\ell_2$-unit balls, <edmond> $\mathbf{A}$ is the vertical concatenation
 of the matrices $\mathbf{A}_\phi$ and $\boldsymbol{\alpha}$ is an
 auxiliary variable resulting from the dual reformulation of
 $s(\boldsymbol{\theta})$ </edmond>. Note that
 $\lim_{\mu \rightarrow 0} s_{\mu}(\boldsymbol{\theta}) = s(\boldsymbol{\theta}).$
-<edmond> A Fast Iterative Shrinkage-Thresholding Algorithm <edmond> (FISTA, [@Beck2009]) step can
-then be applied after computing the gradient of the smooth part <edmond>
-i.e. $g(\boldsymbol{\theta}) + \lambda_2 s_{\mu}(\boldsymbol{\theta})$ </edmond>
-of the approximated criterion.
+<edmond> A Fast Iterative Shrinkage-Thresholding Algorithm <edmond>
+(FISTA, [@Beck2009]) step can then be applied after computing the
+gradient of the smooth part <edmond> i.e.
+$g(\boldsymbol{\theta}) + \lambda_2 s_{\mu}(\boldsymbol{\theta})$
+</edmond> of the approximated criterion.
 
 <edmond> The main ingredient of CONESTA remains in the the determination
 of the optimal smoothness parameter using the duality gap, which
@@ -505,11 +627,9 @@ $\epsilon.$ Namely, $\mu^k = \mu_{opt}(\epsilon^k).$ The smoothness
 parameter decreases as one get closer to $\boldsymbol{\theta} ^\star$,
 the solution of the problem defined in @eq-conesta-criterion. Since
 $\boldsymbol{\theta} ^\star$ is unknown, the approximation of the
-distance to the minimum is achieved via the duality gap. Indeed 
-$$
+distance to the minimum is achieved via the duality gap. Indeed $$
 \operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k) \ge f_{\mu^k}(\boldsymbol{\theta}^k) - f(\boldsymbol{\theta}^\star) \ge 0.
-$$ 
-We refer the reader to the seminal paper for more details on the
+$$ We refer the reader to the seminal paper for more details on the
 formulation of $\operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k).$ The
 CONESTA routine is spelled out in the algorithm CONESTA solver where
 $L(g + \lambda_2 s_{\mu})$ is the Lipschitz constant of
@@ -566,7 +686,7 @@ convergence speed [@hadjselem2018].
 ```
 :::
 
-## Reformulation of MGLasso for CONESTA algorithm
+## Reformulation of MGLasso for CONESTA algorithm {#reformulation-of-mglasso-for-conesta-algorithm}
 
 To apply CONESTA, it is necessary to reformulate the MGLasso problem in
 order to comply with the form of loss function required by CONESTA. The
@@ -639,7 +759,7 @@ $\mathbf{X}^i$ and $\epsilon_{fuse}$ the threshold for merging clusters.
 ```
 :::
 
-## Model selection
+## Model selection {#model-selection}
 
 A crucial question for practical applications is the definition of a
 rule to select the penalty parameters ($\lambda_1, \lambda_2$). This
@@ -690,17 +810,18 @@ $$
 
 where $\beta$ is the threshold chosen for the instability level.
 
-# Simulation experiments
+# Simulation experiments {#simulation-experiments}
 
 In this section, we conduct a simulation study to evaluate the
 performance of the MGLasso method, both in terms of clustering and
 support recovery. Receiver Operating Characteristic (ROC) curves are
-used to evaluate the adequacy of the inferred graphs with the <old> reality </old> <edmond> ground truth </edmond>
-for the MGLasso and GLasso <old> methods </old> <edmond> in its neighborhood selection version</edmond> in the Erdös-Renyi, Scale-free, and
-Stochastic Block Models frameworks. The Adjusted Rand indices are used
-to compare the partitions obtained with MGLasso, hierarchical
-agglomerative clustering, and K-means clustering in a stochastic block
-model framework.
+used to evaluate the adequacy of the inferred graphs with the <old>
+reality </old> <edmond> ground truth </edmond> for the MGLasso and
+GLasso <old> methods </old> <edmond> in its neighborhood selection
+version</edmond> in the Erdös-Renyi, Scale-free, and Stochastic Block
+Models frameworks. The Adjusted Rand indices are used to compare the
+partitions obtained with MGLasso, hierarchical agglomerative clustering,
+and K-means clustering in a stochastic block model framework.
 
 ## Synthetic data models
 
@@ -1425,8 +1546,9 @@ Empirical correlations in the gut data.
 The average correlations within blocks of variables belonging to the
 same cluster are given below. We observe relatively high levels of
 correlation in small blocks, similar to the simulation models used to
-evaluate the performance of clustering in <old>the [Simulation Experiments]</old>
-section <edmond>[4][Simulation Experiments]</edmond>.
+evaluate the performance of clustering in <old>the [Simulation
+Experiments](#simulation-experiments)</old> section
+<edmond>[4](#simulation-experiments)</edmond>.
 
 ```{r echo = TRUE}
 C <- cor(dta)
@@ -1451,14 +1573,17 @@ We apply MGLasso to the normalised counts to infer a graph and a
 clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
 and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
 clusters) are given below. In each case, the parameter $\lambda_1$ is
-chosen by stability selection (see <old> [Model Selection] section </old> <edmond> [3.3][Model Selection]</edmond>).
+chosen by stability selection (see <old> [Model
+Selection](#model-selection) section </old> <edmond>
+[3.3](#model-selection)</edmond>).
 
 ::: {#fig-real-data-mglasso}
 ```{r, out.width="49%", out.height="20%", fig.show='hold',fig.align='center', echo = TRUE}
 knitr::include_graphics(c("figures/mglasso_tv0.png","figures/mglasso_full_graph_tv5.png"))
 ```
 
-<edmond> Adjacency matrices of </edmond> infered graphs using MGLasso for different values of total variation penalty.
+<edmond> Adjacency matrices of </edmond> infered graphs using MGLasso
+for different values of total variation penalty.
 :::
 
 The variables were reordered according to the clustering partition
@@ -1467,11 +1592,17 @@ $\lambda_2$ reduces the number of clusters and leads to a shrinking
 effect on the estimates. The adjacency matrix of the neighborhood
 selection equivalent to setting $\lambda_2$ to $0$ is given in
 @fig-real-data-mglasso (up). In @fig-real-data-mglasso (down), the
-deduced partition is composed of $80$ clusters.<edmond> In order to represent these graphs as adjacency matrices, the regression vectors are concatenated in a matrix which diagonal elements are set to zero. Note that in the MB approach of estimating a graph, it is possible to obtain a vector for which the coefficients are all equal to zero. A zero column in the adjacency matrix might correspond to a column in the precision matrix for which only the diagonal coefficient is non-zero. </edmond>A confusion matrix
-comparing the edges deduced by MGLasso with $\lambda_2 = 5$ and
-neighborhood selection is given below. Adding a total variation
-parameter increases the merging effect, resulting in a larger number of
-edges in the graph.
+deduced partition is composed of $80$ clusters.<edmond> In order to
+represent these graphs as adjacency matrices, the regression vectors are
+concatenated in a matrix which diagonal elements are set to zero. Note
+that in the MB approach of estimating a graph, it is possible to obtain
+a vector for which the coefficients are all equal to zero. A zero column
+in the adjacency matrix might correspond to a column in the precision
+matrix for which only the diagonal coefficient is non-zero. </edmond>A
+confusion matrix comparing the edges deduced by MGLasso with
+$\lambda_2 = 5$ and neighborhood selection is given below. Adding a
+total variation parameter increases the merging effect, resulting in a
+larger number of edges in the graph.
 
 |                           |           | Neighborhood selection |       |
 |---------------------------|-----------|:----------------------:|-------|
@@ -1502,8 +1633,8 @@ by studying the theoretical properties of the method in terms of
 statistical guarantees for the MGLasso estimator. <edmond> Moreover the
 node-wise regression approach on which our method is based can be
 extended to a broader family of non-Gaussian distributions belonging to
-the exponential family as outlined by @yang2012graphical. </edmond>
-
+the exponential family as outlined by @yang2012graphical. 
+Our MGLasso approach can be easily extended to non-Gaussian distributions belonging to the exponential family and mixed graphical models.</edmond>
 # Session information {.appendix .unnumbered}
 
 ```{r session-info, echo = TRUE}
