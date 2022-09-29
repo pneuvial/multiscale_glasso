@@ -315,6 +315,85 @@ interpretable clustering structures [@chakraborty2020biconvex].
 
 <edmond>As a neighborhood selection approach based on pseudo-likelihood, the MGLasso focus on learning the graph structure and relevant clusters. However a precision matrix can be deduced from the graph by supposing a scaled precision matrix whose diagonal elements are set to $1$ and using $\beta^i_j = -\Omega_{ij}/\Omega_{ii}$ to find corresponding precision coefficients. Otherwise one can fit a penalized full likelihood problem with constraints on the known edges and clusters of the graphs (see e.g. [@hastie2009elements] section $17.3.1$) </edmond>
 
+## Local constancy and symmetry
+
+<edmond> We succintly show the link between the MGLasso model and the local constancy notion introduced by @Honorio2009 and derived a sort of local constancy definition in the sense of the MGLasso. We start by recalling the [@Honorio2009] formulation. They introcuded a gaussian graphical model in which the locality information ie known interactions in a dataset are taken in account as a prior for learning the graph $G$ structure. If the node $X^1$ is independent (or dependent) of node $X^2$, a local neighbor $X^{1'}$ of $X^1$ is more likely to be independent or (dependent) of $X^2.$
+
+<edmond> Denote $G_{local}$ the domain or prior knowledge graph [@ganguly2014] and $E_{local}$ the associated set of edges. As a remark, the local edges doesn't necessarily belong to $E$, the graph $G$ set of edges. An illustration of the local constancy is given in @fig-local-cst. 
+
+::: {#fig-local-cst}
+
+```{r, engine = 'tikz'}
+\begin{tikzpicture}	[scale=1]
+      \tikzstyle{every edge}=[-,>=stealth, shorten >=1pt,auto,thin,draw]
+      \tikzstyle{every node}=[scale=0.6,circle,draw=black,transform shape,fill=white,font=\Large]
+
+		\node (X1) at (0*1.5, 0*1.5) {$X^1$};
+		\node (X2) at (1.5*1.5, 0*1.5) {$X^2$};
+		\node (X3) at (3*1.5, 0*1.5) {$X^3$};
+		\node (X4) at (4.5*1.5, 0*1.5) {$X^4$};
+		\path (X1) edge [dashed] (X2)
+        (X2) edge [dashed] (X3)
+        (X3) edge [dashed] (X4)
+        (X1) edge [bend right = 25] (X4)
+        (X2) edge [bend right = 25] (X4)
+        (X2) edge [bend left = 35] (X3);
+\end{tikzpicture}
+```
+
+<edmond> Illustration of local constant interactions. The prior knowledge on the neighborhood structure is represented by dashed lines. $X^1$ and $X^2$ are local neighbors and mutually connected to $X^4$ in the true graph (with non-dashed lines). The interaction between $\{X^1, X^2\}$ and $X^4$ is locally constant. The edge $(X^2, X^3)$ is not locally constant as the local neighbor $X^1$ is not connected to $X^3.$
+:::
+
+<edmond> Local constancy thus encourages the search of dependencies between clusters of variables, instead of variables taken individually. [@Honorio2009] enforced that by using the following penalty on the precision matrix in addition to the Lasso penalty: 
+$$
+P_{\lambda_2}(\boldsymbol \Omega)  = \lambda_2 \left \lVert \boldsymbol  D \oslash \boldsymbol \Omega \right \rVert_1
+$$
+
+where $D$ is a $m \times p$ matrix, with $m$ the number of local neigbors and $\oslash$ the diagonal excluded matrix product [@ganguly2014]. The $k$-th row $D_k,. = e_i - e_j$ where $(X^i,X^j)$ are local neighbors and  $e_t$ a canonical basis vector in $\R^p$ with the $t$-th element set to $1$. For example, the difference matrix corresponding to @fig-local-cst is 
+$$
+\boldsymbol D = 
+\begin{pmatrix}
+1 & -1 & 0 & 0 \\
+0 & 1 & -1 & 0 \\
+0 & 0 & 1 & -1
+\end{pmatrix}
+$$
+<edmond> In the MGLasso model with unitary weights, ie all $w_{ij} = 1$, implicitely all nodes are supposed to be local neighbors. Indeed, the fusion penalty include all the pairwise differences between the $p$ regression vectors. The local graph $G_{local}$ is hence the complete graph where all the nodes are connected. This type of assumption might be relevant when no locality information is available. For a model with $4$ variables, the local graph is given in @fig-local-cst-mglasso.
+
+::: {#fig-local-cst-mglasso}
+```{r, engine = 'tikz'}
+    \begin{tikzpicture}	[scale=1]
+      \tikzstyle{every edge}=[-,>=stealth,shorten >=1pt,auto,thin,draw]
+      \tikzstyle{every node}=[scale=0.6,circle,draw=black,transform shape,fill=white,font=\Large]
+		\node (X1) at (0*1.5, 0*1.5) {$X^1$};
+		\node (X2) at (1.5*1.5, 0*1.5) {$X^2$};
+		\node (X3) at (3*1.5, 0*1.5) {$X^3$};
+		\node (X4) at (4.5*1.5, 0*1.5) {$X^4$};
+		\path (X1) edge [dashed] (X2)
+        (X2) edge [dashed] (X3)
+        (X3) edge [dashed] (X4)
+        (X1) edge [dashed, bend right = 25] (X4)
+        (X1) edge [dashed, bend right = 25] (X3)
+        (X2) edge [dashed, bend left = 25] (X4)
+        (X2) edge [dashed, bend left = 25] (X3);
+\end{tikzpicture}
+```
+
+
+<edmond> Illustration of locality graph in the MGLasso model with $4$ variables. All the nodes are expected to be local neighbors. The pairwises differences includes all the existing pairs of variables.
+:::
+
+
+<edmond> The local constancy is enforced at the scale of the whole variable neighborhood instead of neighbors taken individually in [@Honorio2009], by using the group fused penalty term on the regression vectors,
+$$
+P_{\lambda_2}(\boldsymbol \beta^1, \dots, \boldsymbol \beta^p) =  \lambda_2 \sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j \right \rVert_2.
+$$
+
+
+<edmond> Let $ne(X^1)$ be the markov blanket or neighborhood of node $X^1.$ A local neighbor $X^{1'}$ of $X^1$ is more likely to have the same markov blanket as node $X^1$ in the MGLasso.
+
+<edmond> One might notice that when local neighbors are neighbors in the estimated graph $\hat G$, the MGLasso model is likely to produce clustering structures where all the variables belonging to the same cluster are mutually connected in term of conditional dependence. The permutation $\boldsymbol \tau_{ij}$ encourages a symmetry structure.
+
 # Numerical scheme
 
 This section introduces a complete numerical scheme to apply MGLasso in
@@ -411,7 +490,7 @@ of the matrices $\mathbf{A}_\phi$ and $\boldsymbol{\alpha}$ is an
 auxiliary variable resulting from the dual reformulation of
 $s(\boldsymbol{\theta})$ </edmond>. Note that
 $\lim_{\mu \rightarrow 0} s_{\mu}(\boldsymbol{\theta}) = s(\boldsymbol{\theta}).$
-<edmond> A Fast Iterative Shrinkage-Thresholding Algorithm <edmond> (FISTA, [@Beck2009] step can
+<edmond> A Fast Iterative Shrinkage-Thresholding Algorithm <edmond> (FISTA, [@Beck2009]) step can
 then be applied after computing the gradient of the smooth part <edmond>
 i.e. $g(\boldsymbol{\theta}) + \lambda_2 s_{\mu}(\boldsymbol{\theta})$ </edmond>
 of the approximated criterion.
