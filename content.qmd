@@ -177,7 +177,7 @@ penalty. </old>
 <edmond> The convex relaxation of $k$-means and hierarchical
 agglomerative clustering also known as sum of norms clustering can be
 formulated as follows. Given
-$\boldsymbol X = {\Large(} \boldsymbol x_1, \dots, \boldsymbol x_n {\Large)}^T \in \mathbb R^{n \times p}$,
+$\boldsymbol X = {\Large(} \boldsymbol x_1^T, \dots, \boldsymbol x_n^T {\Large)}^T \in \mathbb R^{n \times p}$,
 @Hocking2011 minimize with respect to the centroids matrix
 $\boldsymbol \alpha \in \mathbb R^{n \times p}$ the criterion </edmond>
 
@@ -192,19 +192,19 @@ with $q \ge 1.$ The regularization path of solutions to problem in
 @eq-clusterpath can lead to a tree structure i.e hierarchy under some
 conditions [@chi2015splitting; @chiquet2017fast]. </edmond>
 
-<edmond> The use of fusion penalties in the inference of Gaussian
-graphical models is not new. Some prior works on learning sparse GGMs
-with a fusion penalty term have focused on the penalized likelihood.
-Among them a line of works [@danaher2014joint; @yang2015fused] infer
+<edmond> The use of fusion penalties  Gaussian
+graphical model inference is a well studied area. Some prior works on learning sparse GGMs
+with a fusion penalty term have focused on  penalized likelihood.
+Among those a line of works [@danaher2014joint; @yang2015fused] infers
 multiple graphs accross several classes while assuming the observations
 belong to different known clusters in order to share characterics
 between the infered graphs. Another line of research [@Honorio2009;
-@Yao2019; @lin2020estimation] has investigated fusion penalties for
+@Yao2019; @lin2020estimation]  investigates fusion penalties for
 enforcing local constancy in the nodes of the infered network. Variables
 belonging to the same clusters are thus more likely to share the same
 neighborhood. These ordinary likelihood-based models are known to be
 computationally challenging compared to pseudo-likelihoods
-approximations. The unpublised manuscript of @ganguly2014 introduced a
+approximations. The unpublised manuscript of @ganguly2014 introduces a
 fusion-like penalty in the neighborhood selection framework. However the
 problem is solved in a node-wise regression fashion where the $p$
 regressions problems are not combined. Note that fusion penalties have
@@ -216,12 +216,12 @@ also been used in simple regression problems like
 penalties either encourage fusion between predictors in simple
 regression or fusion between outcomes that share similar model
 coefficients in multitask learning. Fusions can be formulated in a
-general form assuming no order on the differences as in convex
-clustering problem (see e.g. [@Hoefling2010; @petry2011pairwise]),
+general form assuming no order on the variables as in convex
+clustering (see e.g. [@Hoefling2010; @petry2011pairwise]),
 following a total variation scheme [@rudin1992nonlinear] or assuming the
 availability of a prior information about clusters (see e.g.
 [@hallac2015network]). An extension of these works to the
-pseudo-likelihood inference of gaussian graphical models can be
+pseudo-likelihood inference of Gaussian graphical models can be
 ill-suited in term of interpretability. Indeed, the set of outcomes
 being identical to the set of predictors it might be tricky to define
 the fusion term between the regression vectors. A term-wise difference
@@ -406,7 +406,7 @@ with constraints on the known edges and clusters of the graphs (see e.g.
 <edmond> We succintly show the link between the MGLasso model and the
 local constancy notion introduced by @Honorio2009 and derived a sort of
 local constancy definition in the sense of the MGLasso. We start by
-recalling the [@Honorio2009] formulation. They introcuded a gaussian
+recalling the [@Honorio2009] formulation. They introcuded a Gaussian
 graphical model in which the locality information ie known interactions
 in a dataset are taken in account as a prior for learning the graph $G$
 structure. If the node $X^1$ is independent (or dependent) of node
