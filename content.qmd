@@ -177,7 +177,7 @@ penalty. </old>
 <edmond> The convex relaxation of $k$-means and hierarchical
 agglomerative clustering also known as sum of norms clustering can be
 formulated as follows. Given
-$\boldsymbol X = \Large( \boldsymbol x_1, \dots, \boldsymbol x_n\Large)^T \in \mathbb R^{n \times p}$,
+$\boldsymbol X = {\Large(} \boldsymbol x_1, \dots, \boldsymbol x_n {\Large)}^T \in \mathbb R^{n \times p}$,
 @Hocking2011 minimize with respect to the centroids matrix
 $\boldsymbol \alpha \in \mathbb R^{n \times p}$ the criterion </edmond>
 
