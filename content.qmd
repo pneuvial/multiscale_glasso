@@ -164,8 +164,6 @@ penalty. </old>
 for clustering [@pelckmans2005convex; @Hocking2011; @Lindsten2011].
 </edmond>
 
-
-
 <old> In the spirit of convex clustering, introduced by
 @pelckmans2005convex, @Hocking2011, @Lindsten2011, the clustering path
 is obtained by spanning the entire regularization path. At each level of
@@ -1575,8 +1573,7 @@ We apply MGLasso to the normalised counts to infer a graph and a
 clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
 and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
 clusters) are given below. In each case, the parameter $\lambda_1$ is
-chosen by stability selection (see <old> [Model
-Selection](#model-selection) Section </old> <edmond>
+chosen by stability selection (see <old> [Model Selection](#model-selection) Section </old> <edmond>
 [3.3](#model-selection)</edmond>).
 
 ::: {#fig-real-data-mglasso}
