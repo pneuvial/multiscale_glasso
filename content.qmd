@@ -163,8 +163,6 @@ penalty. </old>
 for clustering [@pelckmans2005convex; @Hocking2011; @Lindsten2011].
 </edmond>
 
-
-
 <old> In the spirit of convex clustering, introduced by
 @pelckmans2005convex, @Hocking2011, @Lindsten2011, the clustering path
 is obtained by spanning the entire regularization path. At each level of
@@ -503,7 +501,8 @@ pairwises differences includes all the existing pairs of variables.
 <edmond> The local constancy is enforced at the scale of the whole
 variable neighborhood instead of neighbors taken individually in
 [@Honorio2009], by using the group fused penalty term on the regression
-vectors, $$
+vectors, 
+$$
 P_{\lambda_2}(\boldsymbol \beta^1, \dots, \boldsymbol \beta^p) =  \lambda_2 \sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j \right \rVert_2.
 $$
 
@@ -543,12 +542,11 @@ regression problems with structured sparsity such as group structures.
 The CONESTA solver, initially introduced for neuro-imaging problems,
 addresses a general class of convex optimization problems which includes
 group-wise penalties. <old> admitting loss functions of the form: </old>
-<edmond> The algorithm solves problems in the form </edmond> <old>
-$$f(\boldsymbol{\theta} ) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),$$</old>
+<edmond> The algorithm solves problems in the form </edmond> 
 
-<edmond> $$
+$$
 \operatorname{minimize} \quad f(\boldsymbol{\theta}) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),
-$$ {#eq-conesta-criterion} </edmond>
+$$ {#eq-conesta-criterion} 
 
 <edmond> with parameters vector $\boldsymbol{\theta}\in \mathbb{R}^d$
 where $\lambda_1$ and $\lambda_2$ are penalty parameters.<edmond>
@@ -628,14 +626,16 @@ $\epsilon.$ Namely, $\mu^k = \mu_{opt}(\epsilon^k).$ The smoothness
 parameter decreases as one get closer to $\boldsymbol{\theta} ^\star$,
 the solution of the problem defined in @eq-conesta-criterion. Since
 $\boldsymbol{\theta} ^\star$ is unknown, the approximation of the
-distance to the minimum is achieved via the duality gap. Indeed $$
-\operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k) \ge f_{\mu^k}(\boldsymbol{\theta}^k) - f(\boldsymbol{\theta}^\star) \ge 0.
-$$ We refer the reader to the seminal paper for more details on the
+distance to the minimum is achieved via the duality gap. Indeed 
+$$ 
+\operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k) \ge f_{\mu^k}(\boldsymbol{\theta}^k) - f(\boldsymbol{\theta}^\star) \ge 0. 
+$$ 
+We refer the reader to the seminal paper for more details on the
 formulation of $\operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k).$ The
 CONESTA routine is spelled out in the algorithm CONESTA solver where
 $L(g + \lambda_2 s_{\mu})$ is the Lipschitz constant of
-$\nabla(g + \lambda_2 s_{\mu})$.</edmond> <old> At each iteration of the
-CONESTA algoithm, the smoothing parameter $\mu$ is updated dynamically
+$\nabla(g + \lambda_2 s_{\mu}),$ $k$ is the iteration counter for the inner FISTA updates and $i$ is the iteration counter for CONESTA updates.</edmond> <old> At each iteration of the
+CONESTA algorithm, the smoothing parameter $\mu$ is updated dynamically
 using the duality gap, and a new approximation is computed.</old> The
 CONESTA <old> algorithm enjoys </old> a linear convergence rate, and was
 shown empirically to outperform other computational options for
@@ -1574,8 +1574,7 @@ We apply MGLasso to the normalised counts to infer a graph and a
 clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
 and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
 clusters) are given below. In each case, the parameter $\lambda_1$ is
-chosen by stability selection (see <old> [Model
-Selection](#model-selection) Section </old> <edmond>
+chosen by stability selection (see <old> [Model Selection](#model-selection) Section </old> <edmond>
 [3.3](#model-selection)</edmond>).
 
 ::: {#fig-real-data-mglasso}
