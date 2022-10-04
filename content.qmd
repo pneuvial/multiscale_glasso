@@ -164,6 +164,8 @@ penalty. </old>
 for clustering [@pelckmans2005convex; @Hocking2011; @Lindsten2011].
 </edmond>
 
+
+
 <old> In the spirit of convex clustering, introduced by
 @pelckmans2005convex, @Hocking2011, @Lindsten2011, the clustering path
 is obtained by spanning the entire regularization path. At each level of
@@ -249,7 +251,7 @@ exponential family [@yang2012graphical]. The MGLasso algorithm is
 implemented in path-algorithm way in the R package mglasso available at
 <https://CRAN.R-project.org/package=mglasso>. </edmond>
 
-The remainder of this paper is organized as follows. In section
+The remainder of this paper is organized as follows. In Section
 [2](#multiscale-graphical-lasso), we formally introduce the Multiscale
 Graphical Lasso based on a convex estimation problem and an optimization
 algorithm based on the continuation of Nesterov's smoothing technique
@@ -399,7 +401,7 @@ scaled precision matrix whose diagonal elements are set to $1$ and using
 $\beta^i_j = -\Omega_{ij}/\Omega_{ii}$ to find corresponding precision
 coefficients. Otherwise one can fit a penalized full likelihood problem
 with constraints on the known edges and clusters of the graphs (see e.g.
-[@hastie2009elements] section $17.3.1$) </edmond>
+[@hastie2009elements] Section $17.3.1$) </edmond>
 
 ## Local constancy and symmetry
 
@@ -518,7 +520,7 @@ permutation $\boldsymbol \tau_{ij}$ encourages a symmetry structure.
 
 # Numerical scheme
 
-This section introduces a complete numerical scheme to apply MGLasso in
+This Section introduces a complete numerical scheme to apply MGLasso in
 practice, using a convex optimization algorithm and a model selection
 procedure. Section [3.1](#optimization-via-conesta-algorithm) reviews
 the principles of the Continuation with Nesterov smoothing in a
@@ -812,7 +814,7 @@ where $\beta$ is the threshold chosen for the instability level.
 
 # Simulation experiments {#simulation-experiments}
 
-In this section, we conduct a simulation study to evaluate the
+In this Section, we conduct a simulation study to evaluate the
 performance of the MGLasso method, both in terms of clustering and
 support recovery. Receiver Operating Characteristic (ROC) curves are
 used to evaluate the adequacy of the inferred graphs with the <old>
@@ -1547,7 +1549,7 @@ The average correlations within blocks of variables belonging to the
 same cluster are given below. We observe relatively high levels of
 correlation in small blocks, similar to the simulation models used to
 evaluate the performance of clustering in <old>the [Simulation
-Experiments](#simulation-experiments)</old> section
+Experiments](#simulation-experiments)</old> Section
 <edmond>[4](#simulation-experiments)</edmond>.
 
 ```{r echo = TRUE}
@@ -1574,7 +1576,7 @@ clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
 and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
 clusters) are given below. In each case, the parameter $\lambda_1$ is
 chosen by stability selection (see <old> [Model
-Selection](#model-selection) section </old> <edmond>
+Selection](#model-selection) Section </old> <edmond>
 [3.3](#model-selection)</edmond>).
 
 ::: {#fig-real-data-mglasso}
