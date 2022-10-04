@@ -16,7 +16,7 @@ author:
     affiliation-url: http://www.math-evry.cnrs.fr/
 date: last-modified
 abstract: >+
-  Gaussian Graphical Models (GGMs) are widely used <old> for exploratory data analysis in various fields such as genomics, ecology, psychometry </old> <edmond> in high-dimensional data analysis to synthesize the interaction between variables. In many applications, such as genomics or image analysis, graphical models relies on sparsity and clustering to reduce the dimensionalty and improve performances. In this paper, we explore a slightly different paradigm where clustering is not knowledge-driven but performed simultaneously to the inference task. The goal is to improve the interpretability and propose multiscale structures.</edmond> <old> In a high-dimensional setting, when the number of variables exceeds the number of observations by several orders of magnitude, the estimation of GGM is a difficult and unstable optimization problem.</old> <old> Clustering of variables or variable selection is often performed prior to GGM estimation.</old> The proposed method infers <old>a hierarchical clustering structure </old> <edmond> clusters through a  convex clustering approach, which is a relaxation of $k$-means and hierarchical clustering.</edmond> It a simultaneously infers the graph describing the structure of conditional independence <old> at each level of the hierarchy </old> <edmond> at multiple levels of granularity, exploiting neighborhood selection scheme for undirected graphical models.</edmond> This method <old> is based on solving a convex optimization problem combining a graphical lasso penalty with a fused type lasso penalty </old> <edmond>extends and generalizes the sparse group fused lasso problem to undirected graphical models. We use continuation with Nesterov smoothing in a shrinkage-thresholding algorithm (CONESTA) to propose a regularization path of solutions when Lasso penalty is kept constant. </edmond> Results on real and synthetic data are presented.
+  Gaussian Graphical Models (GGMs) are widely used <old> for exploratory data analysis in various fields such as genomics, ecology, psychometry </old> <edmond> in high-dimensional data analysis to synthesize the interaction between variables. In many applications, such as genomics or image analysis, graphical models relies on sparsity and clustering to reduce the dimensionalty and improve performances. In this paper, we explore a slightly different paradigm where clustering is not knowledge-driven but performed simultaneously to the inference task. The goal is to improve the interpretability and propose multiscale structures.</edmond> <old> In a high-dimensional setting, when the number of variables exceeds the number of observations by several orders of magnitude, the estimation of GGM is a difficult and unstable optimization problem.</old> <old> Clustering of variables or variable selection is often performed prior to GGM estimation.</old> The proposed method infers <old>a hierarchical clustering structure </old> <edmond> clusters through a  convex clustering approach, which is a relaxation of $k$-means and hierarchical clustering.</edmond> The proposed algorithm  simultaneously infers the graph describing the structure of conditional independence <old> at each level of the hierarchy </old> <edmond> at multiple levels of granularity, exploiting neighborhood selection scheme for undirected graphical models.</edmond> It <old> is based on solving a convex optimization problem combining a graphical lasso penalty with a fused type lasso penalty </old> <edmond>extends and generalizes the sparse group fused lasso problem to undirected graphical models. We use continuation with Nesterov smoothing in a shrinkage-thresholding algorithm (CONESTA) to propose a regularization path of solutions when Lasso penalty is kept constant. </edmond> Results on real and synthetic data are presented.
 citation:
   type: article-journal
   container-title: "Computo"
@@ -83,7 +83,7 @@ between variables [@Dempster1972] and allowing efficient algorithms
 [@Meinshausen2006]. See, for instance, [@Fan2016] for a review about
 sparse graphical models inference.
 
-In GGMs, it is well known (see, e.g., [@Lauritzen1996]) that inferring
+In GGMs, it is well known [@Lauritzen1996] that inferring
 the graphical model or equivalently the Conditional Independence Graph
 (CIG) boils down to inferring the support of the precision matrix
 $\mathbf{\Omega}$ (the inverse of the variance-covariance matrix). To do
@@ -139,8 +139,7 @@ between the groups of variables, i.e., between the meta-variables
 representative of the group structure. A recent work introducing
 inference of graphical models on multiple grouping levels is
 [@Cheng2017]. They proposed inferring the CIG of gene data on two levels
-corresponding to genes and pathways, respectively. Note that pathways
-are groups of functionally related genes known in advance. The inference
+corresponding to genes and pathways, respectively. Note that pathways are considered as  groups of functionally related genes known in advance. The inference
 is achieved by optimizing a penalized maximum likelihood that estimates
 a sparse network at both gene and group levels. Our work is also part of
 this dynamic. We introduce a penalty term allowing parsimonious networks
