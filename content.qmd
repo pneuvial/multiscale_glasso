@@ -95,16 +95,17 @@ approach via the least absolute shrinkage and selection operator
 regression coefficients and partial correlations. 
 
 <!--
-More precisely, for
-all $1 \le i \le p$, the following problem is solved:
+<revision> Given $\boldsymbol X \in \mathbb R^{n \times p}$ a $p$-multivariate gaussian dataset with $n$ observations, </revision>, <old> More precisely, for
+all $1 \le i \le p$,</old> the following problem is solved for
+all $1 \le i \le p$ :
 
 $$
 \hat{\boldsymbol{\beta}^i}(\lambda) = \underset{\boldsymbol{\beta}^i \in \mathbb{R}^{p-1}}{\operatorname{argmin}} \frac{1}{n} \left \lVert \mathbf{X}^i - \mathbf{X}^{\setminus i} \boldsymbol{\beta}^i \right \rVert_2 ^2 + \lambda \left \lVert \boldsymbol{\beta}^i \right \rVert_1.
 $$ {#eq-neighborhood}
 
 In @eq-neighborhood, $\lambda$ is a non negative regularization
-parameter and $\mathbf{X}^{\setminus i}$ denotes the matrix $\mathbf{X}$
-deprived of column $i.$ The MB method defined by the estimation problem
+parameter, $\mathbf{X}^{\setminus i}$ denotes the matrix $\mathbf{X}$
+deprived of column $i$ <revision> and $\boldsymbol{\beta}^i$ is the vector of regression coefficients.</revision> The MB method defined by the estimation problem
 <edmond> in </edmond> @eq-neighborhood -->
 
 The MB method has generated a long line of work
