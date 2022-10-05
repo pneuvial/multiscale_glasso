@@ -283,7 +283,7 @@ additional fused-Lasso type penalty for convex clustering. In the spirit
 of hierarchical convex clustering, the hierarchical structure is
 recovered by spanning the regularization path. </old>
 
-Let $X = (X^1, \dots, X^p)^T \in \mathbb R^p$ be a $p$-dimensional
+Let $X = (X^1, \dots, X^p)^T$ be a $p$-dimensional
 Gaussian random vector, with mean vector $\mu$ and covariance matrix
 $\mathbf \Sigma$. The conditional independence structure of $X$ is
 characterized by a graph $G = (V, E)$, where $V = \{1,\ldots p\}$ is the
@@ -425,10 +425,7 @@ with constraints on the known edges and clusters of the graphs
 
 <edmond> We succintly show the link between the MGLasso model and the
 local constancy notion introduced by @Honorio2009 and derived a sort of
-local constancy definition in the sense of the MGLasso. We start by
-recalling the [@Honorio2009] formulation. They introcuded a Gaussian
-graphical model in which the locality information ie known interactions
-in a dataset are taken in account as a prior for learning the graph $G$
+local constancy definition in the sense of the MGLasso. @Honorio2009  introcuded a Gaussian graphical model in which the locality information ie known interactions in a dataset are taken in account as a prior for learning the graph $G$
 structure. If the node $X^1$ is independent (or dependent) of node
 $X^2$, a local neighbor $X^{1'}$ of $X^1$ is more likely to be
 independent or (dependent) of $X^2.$
@@ -461,7 +458,7 @@ edges. An illustration of the local constancy is given in
 <edmond> Illustration of local constant interactions. The prior
 knowledge on the neighborhood structure is represented by dashed lines.
 $X^1$ and $X^2$ are local neighbors and mutually connected to $X^4$ in
-the true graph (with non-dashed lines). The interaction between
+the true graph (with solid lines). The interaction between
 $\{X^1, X^2\}$ and $X^4$ is locally constant. The edge $(X^2, X^3)$ is
 not locally constant as the local neighbor $X^1$ is not connected to
 $X^3.$
@@ -469,8 +466,9 @@ $X^3.$
 
 <edmond> Local constancy thus encourages the search of dependencies
 between clusters of variables, instead of variables taken individually.
-[@Honorio2009] enforced that by using the following penalty on the
-precision matrix in addition to the Lasso penalty: $$
+@Honorio2009 enforced that by using the following penalty on the
+precision matrix in addition to the Lasso penalty: 
+$$
 P_{\lambda_2}(\boldsymbol \Omega)  = \lambda_2 \left \lVert \boldsymbol  D \oslash \boldsymbol \Omega \right \rVert_1
 $$
 
@@ -479,15 +477,18 @@ neigbors and $\oslash$ the diagonal excluded matrix product
 [@ganguly2014]. The $k$-th row $D_k,. = e_i - e_j$ where $(X^i,X^j)$ are
 local neighbors and $e_t$ a canonical basis vector in $\R^p$ with the
 $t$-th element set to $1$. For example, the difference matrix
-corresponding to @fig-local-cst is $$
+corresponding to @fig-local-cst is 
+
+$$
 \boldsymbol D = 
 \begin{pmatrix}
 1 & -1 & 0 & 0 \\
 0 & 1 & -1 & 0 \\
 0 & 0 & 1 & -1
 \end{pmatrix}
-$$ <edmond> In the MGLasso model with unitary weights, ie all
-$w_{ij} = 1$, implicitely all nodes are supposed to be local neighbors.
+$$ 
+<edmond> 
+In the MGLasso model with unitary weights, i.e. all $w_{ij} = 1$, implicitely all nodes are supposed to be local neighbors.
 Indeed, the fusion penalty include all the pairwise differences between
 the $p$ regression vectors. The local graph $G_{local}$ is hence the
 complete graph where all the nodes are connected. This type of
