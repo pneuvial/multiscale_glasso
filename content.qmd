@@ -825,10 +825,10 @@ $$
 $$ StARS selects the optimal penalty parameter as follows
 
 $$
-\hat \lambda = \max_k\left\{ \lambda_1^{(k)}: \hat D(\lambda_1^{(k)}) \le \beta, k\in\{1,\ldots,K\} \right \},
+\hat \lambda = \max_k\left\{ \lambda_1^{(k)}: \hat D(\lambda_1^{(k)}) \le \upsilon, k\in\{1,\ldots,K\} \right \},
 $$
 
-where $\beta$ is the threshold chosen for the instability level.
+where $\upsilon$ is the threshold chosen for the instability level.
 
 # Simulation experiments {#simulation-experiments}
 
@@ -1421,8 +1421,7 @@ $\rho \in \{ 0.1, 0.3 \}$; the vector of cluster proportions is fixed at
 $\mathbf \pi = (1/5, \dots, 1/5)$. We then simulate $100$ Gaussian data
 sets for each simulation configuration ($\rho$, $n/p$ fixed).The optimal
 sparsity penalty for MGLasso is chosen by the Stability Approach to
-Regularization Selection (StARS) method [@Liu2010], and we vary the
-parameter $\lambda_2.$
+Regularization Selection (StARS) method [@Liu2010]. <revision>In practice, we estimate some sort of stability parameter in a sample of graphs simulated via the Stochastic block model. This estimation of edge variability is then used as the threshold for StARS method. </revision> <old> and </old> We vary the parameter $\lambda_2.$
 
 ```{r eval=FALSE, echo=TRUE, include=TRUE}
 # Launch simulations ------------------------------------------------------
@@ -1593,8 +1592,7 @@ We apply MGLasso to the normalised counts to infer a graph and a
 clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
 and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
 clusters) are given below. In each case, the parameter $\lambda_1$ is
-chosen by stability selection (see <old> [Model Selection](#model-selection) Section </old> <edmond>
-[3.3](#model-selection)</edmond>).
+chosen by stability selection. <revision> The hyperparameter of the StARS approach is set to $0.01.$ which might select the Lasso penalty that leads to the sparsest and most stable graph between subsamples </revision> (see <old> [Model Selection](#model-selection) </old> Section <edmond> [3.3](#model-selection)</edmond>)
 
 ::: {#fig-real-data-mglasso}
 ```{r, out.width="49%", out.height="20%", fig.show='hold',fig.align='center', echo = TRUE}
