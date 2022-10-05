@@ -522,7 +522,7 @@ pairwises differences includes all the existing pairs of variables.
 
 <edmond> The local constancy is enforced at the scale of the whole
 variable neighborhood instead of neighbors taken individually in
-[@Honorio2009], by using the group fused penalty term on the regression
+@Honorio2009, by using the group fused penalty term on the regression
 vectors, 
 $$
 P_{\lambda_2}(\boldsymbol \beta^1, \dots, \boldsymbol \beta^p) =  \lambda_2 \sum_{i < j} \left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j \right \rVert_2.
