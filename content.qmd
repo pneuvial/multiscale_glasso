@@ -1210,6 +1210,8 @@ roc_dtf_erdos <- rbind(roc_dt20, roc_dt40, roc_dt80)
 ```{r roc_erdos, message=FALSE, echo = TRUE}
 load("./data/roc_dtf_erdos.RData")
 
+roc_dtf_erdos <- dplyr::filter(roc_dtf_erdos, tv != 6.67)
+
 ggplot(roc_dtf_erdos, aes(x     = fpr, 
                           y     = tpr, 
                           color = method )) + 
@@ -1298,6 +1300,8 @@ save(roc_dtf_sfree,
 ```{r roc_scale_free , message=FALSE, echo = TRUE}
 load("./data/roc_dtf_sfree.RData")
 
+roc_dtf_sfree <- dplyr::filter(roc_dtf_sfree, tv != 6.67)
+
 ggplot(roc_dtf_sfree, aes(x     = fpr, 
                           y     = tpr, 
                           color = method )) + 
@@ -1379,6 +1383,8 @@ save(roc_dtf_sbm,
 ::: {#fig-roc-sbm}
 ```{r roc_sbm , message=FALSE, echo = TRUE}
 load("./data/roc_dtf_sbm.RData")
+
+roc_dtf_sbm <- dplyr::filter(roc_dtf_sbm, tv != 6.67)
 
 ggplot(roc_dtf_sbm, aes(x     = fpr, 
                           y     = tpr, 
