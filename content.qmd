@@ -80,7 +80,7 @@ variables interact, compared to the total number of possible
 interactions. This assumption has been shown to provide both statistical
 and computational advantages by simplifying the structure of dependence
 between variables [@Dempster1972] and allowing efficient algorithms
-[@Meinshausen2006]. See for instance @Fan2016 for a review about
+[@Meinshausen2006]. See for instance the work @Fan2016 for a review about
 sparse graphical models inference.
 
 In GGMs, it is well known [@Lauritzen1996] that inferring
@@ -419,7 +419,8 @@ scaled precision matrix whose diagonal elements are set to $1$ and using
 $\beta^i_j = -\Omega_{ij}/\Omega_{ii}$ to find corresponding precision
 coefficients. Otherwise one can fit a penalized full likelihood problem
 with constraints on the known edges and clusters of the graphs 
-[Section $17.3.1$ in @hastie2009elements] </edmond>
+[Section $17.3.1$ in @hastie2009elements] 
+</edmond>
 
 ## Local constancy and symmetry
 
@@ -532,23 +533,19 @@ $$
 $X^1.$ A local neighbor $X^{1'}$ of $X^1$ is more likely to have the
 same markov blanket as node $X^1$ in the MGLasso.
 
-<edmond> One might notice that when local neighbors are neighbors in the
-estimated graph $\hat G$, the MGLasso model is likely to produce
+<edmond> Notice that when the estimation of $\hat G$ retrieves a local set of neighbors, the MGLasso algorithm is likely to produce
 clustering structures where all the variables belonging to the same
 cluster are mutually connected in term of conditional dependence. The
-permutation $\boldsymbol \tau_{ij}$ encourages a symmetry structure.
+permutation $\boldsymbol \tau_{ij}$ encourages a symmetrical structure.
 
 # Numerical scheme
 
-This Section introduces a complete numerical scheme to apply MGLasso in
-practice, using a convex optimization algorithm and a model selection
+This Section introduces a complete numerical scheme of MGLasso via  convex optimization and a model selection
 procedure. Section [3.1](#optimization-via-conesta-algorithm) reviews
 the principles of the Continuation with Nesterov smoothing in a
-shrinkage-thresholding algorithm (CONESTA, [@hadjselem2018]), the
-optimization algorithm used in practice to solve MGLasso. Section
-[3.2](#reformulation-of-mglasso-for-conesta-algorithm) details a
-reformulation of MGLasso, which enables us to apply CONESTA. Finally,
-Section [3.3](#model-selection) presents the procedure used to select
+shrinkage-thresholding algorithm [CONESTA, @hadjselem2018], which is the optimization algorithm used to optimize the  MGLasso criterion. Section [3.2](#reformulation-of-mglasso-for-conesta-algorithm) details a
+reformulation of MGLasso, which eases the use of CONESTA. Finally,
+Section [3.3](#model-selection) presents the procedure for selecting
 the regularization parameters.
 
 ## Optimization via CONESTA algorithm {#optimization-via-conesta-algorithm}
@@ -558,7 +555,7 @@ not straightforward to solve using classical algorithms because of the
 fused-lasso type penalty, which is non-separable and admits no
 closed-form solution for the proximal gradient. We rely on the
 Continuation with Nesterov smoothing in a shrinkage-thresholding
-algorithm (CONESTA, @hadjselem2018), dedicated to high-dimensional
+algorithm [@hadjselem2018], dedicated to high-dimensional
 regression problems with structured sparsity such as group structures.
 
 The CONESTA solver, initially introduced for neuro-imaging problems,
@@ -567,11 +564,11 @@ group-wise penalties. <old> admitting loss functions of the form: </old>
 <edmond> The algorithm solves problems in the form </edmond> 
 
 $$
-\operatorname{minimize} \quad f(\boldsymbol{\theta}) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),
+\operatorname{minimize \ w.r.t. } \boldsymbol{\theta} \quad f(\boldsymbol{\theta}) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),
 $$ {#eq-conesta-criterion} 
 
-<edmond> with parameters vector $\boldsymbol{\theta}\in \mathbb{R}^d$
-where $\lambda_1$ and $\lambda_2$ are penalty parameters.<edmond>
+<edmond> where  $\boldsymbol{\theta}\in \mathbb{R}^d$
+and  $\lambda_1$ and $\lambda_2$ are penalty parameters.<edmond>
 
 <old> where $\lambda_1$ and $\lambda_2$ are penalty weights, and
 $\boldsymbol{\theta}\in \mathbb{R}^d$ is a $d$-dimensional vector of
@@ -612,11 +609,10 @@ $\boldsymbol{\theta}$ defined by
 $\boldsymbol{\theta}_\phi = (\theta_i)_{i\in\phi}$. Finally,
 $\mathbf{D}_\phi$ are linear operators. \<\old\>
 
-<edmond> When $\mathbf{A}_\phi$ is the identity operator such as
-$\mathbf{A}_\phi \boldsymbol{\theta}_\phi = \boldsymbol{\theta}_\phi$,
+<edmond> When $\mathbf{A}_\phi$ is the identity operator, 
 the penalty function $s$ is the overlapping group-lasso and
 $m = \operatorname{Card}(\phi)$. When it is a discrete derivative
-operator, therefore $s$ is a total variation penalty and $m$ can be seen
+operator,  $s$ is a total variation penalty and $m$ can be seen
 as the number of neighborhood relationships.</edmond>
 
 <old> The main ingredient of CONESTA is the approximation of </old> The
