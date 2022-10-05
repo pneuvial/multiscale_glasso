@@ -801,7 +801,7 @@ Criterion (EBIC) [@foygel2010extended], and Rotation Information
 Criterion [@zhao2012huge].
 
 In this paper, we focused on the StARS stability selection approach
-proposed by @Liu2010. The method uses $k$ subsamples of data to estimate
+proposed by @Liu2010 <revision> as suggested by some preliminary tests where we compared the EBIC, the BIC criterion calibrated with slope heuristics \citep{baudry2012slope}, the Rotation Invariant Criterion implemented in the Huge package \citep{zhao2012huge}, the GGMSelect procedure \citep{giraud2012graph}, cross-validation and STARS with very stable graphs (hyperparameter set to $0.1$) versus STARS with completely unstable graphs (hyperparameter set to $0.5$) between subsamples.</revision> . The method uses $k$ subsamples of data to estimate
 the associated graphs for a given range of $\lambda_1$ values. For each
 value, a global instability of the graph edges is computed. The optimal
 value of $\lambda_1$ is chosen so as to minimize the instability, as
