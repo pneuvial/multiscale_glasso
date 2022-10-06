@@ -620,16 +620,18 @@ non-smooth $\ell_{1,2}$-norm penalty <old> with unknown proximal
 gradient </old>, can be approximated by a smooth function with known
 <old> proximal </old> gradient computed using Nesterov's smoothing
 [@nesterov2005smooth]. Given a <edmond> smoothness </edmond> parameter
-$\mu>0$, let us define the smooth approximation $$ 
+$\mu>0$, let us define the smooth approximation 
+$$ 
 s_{\mu}(\boldsymbol{\theta}) = \max_{\boldsymbol{\alpha} \in \mathcal{K}} \left \{ \boldsymbol{\alpha}^T \mathbf{A} \boldsymbol{\theta} - \frac{\mu}{2} \| \boldsymbol{\alpha} \|_2^2 \right \},
-$$ where $\mathcal{K}$ is <edmond> the cartesian product </edmond> of
-$\ell_2$-unit balls, <edmond> $\mathbf{A}$ is the vertical concatenation
+$$ 
+where $\mathcal{K}$ is <edmond> the cartesian product </edmond> of
+$\ell_2$-unit balls,<edmond> $\mathbf{A}$ is the vertical concatenation
 of the matrices $\mathbf{A}_\phi$ and $\boldsymbol{\alpha}$ is an
 auxiliary variable resulting from the dual reformulation of
 $s(\boldsymbol{\theta})$ </edmond>. Note that
 $\lim_{\mu \rightarrow 0} s_{\mu}(\boldsymbol{\theta}) = s(\boldsymbol{\theta}).$
 <edmond> A Fast Iterative Shrinkage-Thresholding Algorithm <edmond>
-(FISTA, [@Beck2009]) step can then be applied after computing the
+[FISTA, @Beck2009] step can then be applied after computing the
 gradient of the smooth part <edmond> i.e.
 $g(\boldsymbol{\theta}) + \lambda_2 s_{\mu}(\boldsymbol{\theta})$
 </edmond> of the approximated criterion.
