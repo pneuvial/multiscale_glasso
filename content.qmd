@@ -80,7 +80,7 @@ variables interact, compared to the total number of possible
 interactions. This assumption has been shown to provide both statistical
 and computational advantages by simplifying the structure of dependence
 between variables [@Dempster1972] and allowing efficient algorithms
-[@Meinshausen2006]. See for instance @Fan2016 for a review about
+[@Meinshausen2006]. See for instance the work @Fan2016 for a review about
 sparse graphical models inference.
 
 In GGMs, it is well known [@Lauritzen1996] that inferring
@@ -419,7 +419,8 @@ scaled precision matrix whose diagonal elements are set to $1$ and using
 $\beta^i_j = -\Omega_{ij}/\Omega_{ii}$ to find corresponding precision
 coefficients. Otherwise one can fit a penalized full likelihood problem
 with constraints on the known edges and clusters of the graphs 
-[Section $17.3.1$ in @hastie2009elements] </edmond>
+[Section $17.3.1$ in @hastie2009elements] 
+</edmond>
 
 ## Local constancy and symmetry
 
@@ -532,23 +533,19 @@ $$
 $X^1.$ A local neighbor $X^{1'}$ of $X^1$ is more likely to have the
 same markov blanket as node $X^1$ in the MGLasso.
 
-<edmond> One might notice that when local neighbors are neighbors in the
-estimated graph $\hat G$, the MGLasso model is likely to produce
+<edmond> Notice that when the estimation of $\hat G$ retrieves a local set of neighbors, the MGLasso algorithm is likely to produce
 clustering structures where all the variables belonging to the same
 cluster are mutually connected in term of conditional dependence. The
-permutation $\boldsymbol \tau_{ij}$ encourages a symmetry structure.
+permutation $\boldsymbol \tau_{ij}$ encourages a symmetrical structure.
 
 # Numerical scheme
 
-This Section introduces a complete numerical scheme to apply MGLasso in
-practice, using a convex optimization algorithm and a model selection
+This Section introduces a complete numerical scheme of MGLasso via  convex optimization and a model selection
 procedure. Section [3.1](#optimization-via-conesta-algorithm) reviews
 the principles of the Continuation with Nesterov smoothing in a
-shrinkage-thresholding algorithm (CONESTA, [@hadjselem2018]), the
-optimization algorithm used in practice to solve MGLasso. Section
-[3.2](#reformulation-of-mglasso-for-conesta-algorithm) details a
-reformulation of MGLasso, which enables us to apply CONESTA. Finally,
-Section [3.3](#model-selection) presents the procedure used to select
+shrinkage-thresholding algorithm [CONESTA, @hadjselem2018], which is the optimization algorithm used to optimize the  MGLasso criterion. Section [3.2](#reformulation-of-mglasso-for-conesta-algorithm) details a
+reformulation of MGLasso, which eases the use of CONESTA. Finally,
+Section [3.3](#model-selection) presents the procedure for selecting
 the regularization parameters.
 
 ## Optimization via CONESTA algorithm {#optimization-via-conesta-algorithm}
@@ -558,7 +555,7 @@ not straightforward to solve using classical algorithms because of the
 fused-lasso type penalty, which is non-separable and admits no
 closed-form solution for the proximal gradient. We rely on the
 Continuation with Nesterov smoothing in a shrinkage-thresholding
-algorithm (CONESTA, @hadjselem2018), dedicated to high-dimensional
+algorithm [@hadjselem2018], dedicated to high-dimensional
 regression problems with structured sparsity such as group structures.
 
 The CONESTA solver, initially introduced for neuro-imaging problems,
@@ -567,11 +564,11 @@ group-wise penalties. <old> admitting loss functions of the form: </old>
 <edmond> The algorithm solves problems in the form </edmond> 
 
 $$
-\operatorname{minimize} \quad f(\boldsymbol{\theta}) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),
+\operatorname{minimize \ w.r.t. } \boldsymbol{\theta} \quad f(\boldsymbol{\theta}) = g(\boldsymbol{\theta}) + \lambda_1 h(\boldsymbol{\theta}) + \lambda_2 s(\boldsymbol{\theta}),
 $$ {#eq-conesta-criterion} 
 
-<edmond> with parameters vector $\boldsymbol{\theta}\in \mathbb{R}^d$
-where $\lambda_1$ and $\lambda_2$ are penalty parameters.<edmond>
+<edmond> where  $\boldsymbol{\theta}\in \mathbb{R}^d$
+and  $\lambda_1$ and $\lambda_2$ are penalty parameters.<edmond>
 
 <old> where $\lambda_1$ and $\lambda_2$ are penalty weights, and
 $\boldsymbol{\theta}\in \mathbb{R}^d$ is a $d$-dimensional vector of
@@ -612,11 +609,10 @@ $\boldsymbol{\theta}$ defined by
 $\boldsymbol{\theta}_\phi = (\theta_i)_{i\in\phi}$. Finally,
 $\mathbf{D}_\phi$ are linear operators. \<\old\>
 
-<edmond> When $\mathbf{A}_\phi$ is the identity operator such as
-$\mathbf{A}_\phi \boldsymbol{\theta}_\phi = \boldsymbol{\theta}_\phi$,
+<edmond> When $\mathbf{A}_\phi$ is the identity operator, 
 the penalty function $s$ is the overlapping group-lasso and
 $m = \operatorname{Card}(\phi)$. When it is a discrete derivative
-operator, therefore $s$ is a total variation penalty and $m$ can be seen
+operator,  $s$ is a total variation penalty and $m$ can be seen
 as the number of neighborhood relationships.</edmond>
 
 <old> The main ingredient of CONESTA is the approximation of </old> The
@@ -624,16 +620,18 @@ non-smooth $\ell_{1,2}$-norm penalty <old> with unknown proximal
 gradient </old>, can be approximated by a smooth function with known
 <old> proximal </old> gradient computed using Nesterov's smoothing
 [@nesterov2005smooth]. Given a <edmond> smoothness </edmond> parameter
-$\mu>0$, let us define the smooth approximation $$ 
+$\mu>0$, let us define the smooth approximation 
+$$ 
 s_{\mu}(\boldsymbol{\theta}) = \max_{\boldsymbol{\alpha} \in \mathcal{K}} \left \{ \boldsymbol{\alpha}^T \mathbf{A} \boldsymbol{\theta} - \frac{\mu}{2} \| \boldsymbol{\alpha} \|_2^2 \right \},
-$$ where $\mathcal{K}$ is <edmond> the cartesian product </edmond> of
-$\ell_2$-unit balls, <edmond> $\mathbf{A}$ is the vertical concatenation
+$$ 
+where $\mathcal{K}$ is <edmond> the cartesian product </edmond> of
+$\ell_2$-unit balls,<edmond> $\mathbf{A}$ is the vertical concatenation
 of the matrices $\mathbf{A}_\phi$ and $\boldsymbol{\alpha}$ is an
 auxiliary variable resulting from the dual reformulation of
 $s(\boldsymbol{\theta})$ </edmond>. Note that
 $\lim_{\mu \rightarrow 0} s_{\mu}(\boldsymbol{\theta}) = s(\boldsymbol{\theta}).$
 <edmond> A Fast Iterative Shrinkage-Thresholding Algorithm <edmond>
-(FISTA, [@Beck2009]) step can then be applied after computing the
+[FISTA, @Beck2009] step can then be applied after computing the
 gradient of the smooth part <edmond> i.e.
 $g(\boldsymbol{\theta}) + \lambda_2 s_{\mu}(\boldsymbol{\theta})$
 </edmond> of the approximated criterion.
@@ -653,13 +651,13 @@ $$
 \operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k) \ge f_{\mu^k}(\boldsymbol{\theta}^k) - f(\boldsymbol{\theta}^\star) \ge 0. 
 $$ 
 We refer the reader to the seminal paper for more details on the
-formulation of $\operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k).$ The
+formulation of $\operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k).$ <old> The
 CONESTA routine is spelled out in the algorithm CONESTA solver where
 $L(g + \lambda_2 s_{\mu})$ is the Lipschitz constant of
-$\nabla(g + \lambda_2 s_{\mu}),$ $k$ is the iteration counter for the inner FISTA updates and $i$ is the iteration counter for CONESTA updates.</edmond> <old> At each iteration of the
+$\nabla(g + \lambda_2 s_{\mu}),$ $k$ is the iteration counter for the inner FISTA updates and $i$ is the iteration counter for CONESTA updates.</old> </edmond> <old> At each iteration of the
 CONESTA algorithm, the smoothing parameter $\mu$ is updated dynamically
-using the duality gap, and a new approximation is computed.</old> The
-CONESTA <old> algorithm enjoys </old> a linear convergence rate, and was
+using the duality gap, and a new approximation is computed.</old> 
+CONESTA enjoys <old> algorithm enjoys </old> a linear convergence rate, and was
 shown empirically to outperform other computational options for
 structured-sparsity problems such as ADMM and inexact FISTA in terms of
 convergence speed [@hadjselem2018].
@@ -690,7 +688,8 @@ convergence speed [@hadjselem2018].
     \COMMENT{FISTA}
     \STATE $k=2$ \COMMENT{new iterator}
     \STATE $\boldsymbol{\theta}_{\operatorname{FISTA}}^1 = \boldsymbol{\theta}_{\operatorname{FISTA}}^0 = \boldsymbol{\theta}^i$ \COMMENT{Initial parameters value}
-    \STATE $t_{\mu} = \frac{1}{L(g + \lambda_2 s_{\mu})}$ \COMMENT{Compute stepsize}
+    \STATE $t_{\mu} = \frac{1}{L(g + \lambda_2 s_{\mu})}$ \COMMENT{Compute stepsize with
+$L(g + \lambda_2 s_{\mu})$ the Lipschitz constant of $\nabla(g + \lambda_2 s_{\mu})$}
     
     \Repeat
       \STATE $\boldsymbol{z} = \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} + \frac{k-2}{k+1}(\boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} - \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-2})$
@@ -711,9 +710,7 @@ convergence speed [@hadjselem2018].
 
 ## Reformulation of MGLasso for CONESTA algorithm {#reformulation-of-mglasso-for-conesta-algorithm}
 
-To apply CONESTA, it is necessary to reformulate the MGLasso problem in
-order to comply with the form of loss function required by CONESTA. The
-objective of MGLasso can indeed be written as
+Using CONESTA for solving the MGLasso problem requires a reformulation in order to comply with the form of loss function required by CONESTA. The objective of MGLasso can  be written as
 
 $$
 \operatorname{argmin} \frac{1}{2} ||\mathbf{Y} - \tilde{\mathbf{X}} \tilde{\boldsymbol{\beta}}||_2^2 + \lambda_1 ||\tilde{\boldsymbol{\beta}}||_1 + \lambda_2 \sum_{i<j} ||\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}}||_2,
@@ -794,16 +791,15 @@ model selection, while the clustering parameter $\lambda_2$ varies
 across a grid of values, in order to obtain graphs with different levels
 of granularity. The problem of model selection in graphical models is
 difficult in the high dimensional case where the number of samples is
-small compared to the number of variables, as classical AIC and BIC
-criteria tend to perform poorly [@Liu2010]. Alternative criteria have
+small compared to the number of variables, as classical Akaike information criterion [AIC, @akaike1998information] and Bayesian information criterion [BIC, @schwarz1978estimating] tend to perform poorly [@Liu2010]. <old> Alternative criteria have
 been proposed in the literature, such as cross-validation
 [@bien2011sparse], GGMSelect [@giraud2012graph], stability selection
 [@meinshausen2010stability; @Liu2010], Extended Bayesian Information
 Criterion (EBIC) [@foygel2010extended], and Rotation Information
-Criterion [@zhao2012huge].
+Criterion [@zhao2012huge].</old>
 
 In this paper, we focused on the StARS stability selection approach
-proposed by @Liu2010. The method uses $k$ subsamples of data to estimate
+proposed by @Liu2010 <revision> as suggested by some preliminary tests where we compared the Extended BIC [EBIC, @foygel2010extended], the BIC calibrated with slope heuristics [@baudry2012slope], the Rotation invariant criterion implemented in the Huge package [@zhao2012huge], the GGMSelect procedure [@giraud2012graph], cross-validation [@bien2011sparse] and StARS.</revision> The method uses $k$ subsamples of data to estimate
 the associated graphs for a given range of $\lambda_1$ values. For each
 value, a global instability of the graph edges is computed. The optimal
 value of $\lambda_1$ is chosen so as to minimize the instability, as
@@ -828,10 +824,10 @@ $$
 $$ StARS selects the optimal penalty parameter as follows
 
 $$
-\hat \lambda = \max_k\left\{ \lambda_1^{(k)}: \hat D(\lambda_1^{(k)}) \le \beta, k\in\{1,\ldots,K\} \right \},
+\hat \lambda = \max_k\left\{ \lambda_1^{(k)}: \hat D(\lambda_1^{(k)}) \le \upsilon, k\in\{1,\ldots,K\} \right \},
 $$
 
-where $\beta$ is the threshold chosen for the instability level.
+where $\upsilon$ is the threshold chosen for the instability level.
 
 # Simulation experiments {#simulation-experiments}
 
@@ -861,7 +857,7 @@ generated from the three different models. The difficulty level of the
 problem is controlled by varying the ratio $\frac{n}{p}$ with $p$ fixed
 at $40$: $\frac{n}{p}\in \{0.5,1,2\}$.
 
-### Stochastic Block-Model
+### Stochastic Block Model
 
 We construct a block-diagonal precision matrix $\mathbf{\Omega}$ as
 follows. First, we generate the support of $\mathbf{\Omega}$ as shown in
@@ -1031,7 +1027,7 @@ Matrix::image(as(gsbm, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")   
 ```
 
-Adjacency matrix of a stochastic block model with 5 blocks.
+Adjacency matrix of a stochastic block model defined by $K=5$ classes with identical prior probabilities set to $\pi = 1/K$, inter-classes connection probability $\alpha_{kl}=0.75, k \neq l$, intra-classes connection probability $\alpha_{ll}=0.01$ and $p=40$ vertices.
 :::
 
 ### Erdös-Renyi Model
@@ -1050,7 +1046,7 @@ Matrix::image(as(gerdos, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")
 ```
 
-Adjacency matrix of an Erdös-Renyi model.
+Adjacency matrix of an Erdös-Renyi model with probability of connection $\alpha = 0.1$ and $p=40$ vertices.
 :::
 
 ### Scale-free Model
@@ -1073,7 +1069,7 @@ Matrix::image(as(gsfree, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")
 ```
 
-Adjacency matrix of a Scale-free model.
+Adjacency matrix of a Scale-free model with $40$ edges and $p=40$ nodes.
 :::
 
 ## Support recovery
@@ -1213,6 +1209,8 @@ roc_dtf_erdos <- rbind(roc_dt20, roc_dt40, roc_dt80)
 ```{r roc_erdos, message=FALSE, echo = TRUE}
 load("./data/roc_dtf_erdos.RData")
 
+roc_dtf_erdos <- dplyr::filter(roc_dtf_erdos, tv != 6.67)
+
 ggplot(roc_dtf_erdos, aes(x     = fpr, 
                           y     = tpr, 
                           color = method )) + 
@@ -1225,8 +1223,7 @@ ggplot(roc_dtf_erdos, aes(x     = fpr,
   scale_colour_manual(values = ghibli_palette("MarnieMedium1")[5:6])
 ```
 
-ROC curves for the Erdös-Renyi model comparing MGLasso and GLasso
-methods.
+Mean ROC curves for MGLasso and GLasso graph inference in the Erdös-Renyi model. We vary the fusion penalty parameter of MGLasso $\lambda_2 \in \{0, 3.33, 10\}$ alongside the ratio $\frac{n}{p}\in \{0.5,1,2\}$. Within each panel, the ROC curve shows the True positive rate (y-axis) vs the False positive rate (x-axis) for both MGLasso (blue) and GLasso (brown). Since GLasso does not have a fusion penalty, its ROC curves are replicated for panels belonging to the same row. We also plot the random classifier (dotted grey line). The results have been averaged over $50$ simulated datasets and suggest that MGLasso performs no worse than GLasso. For $\lambda_2 = 0$, the MGLasso approach is equivalent to GLasso in its neighborhood selection version.
 :::
 
 ```{r eval = FALSE, echo = TRUE}
@@ -1301,6 +1298,8 @@ save(roc_dtf_sfree,
 ```{r roc_scale_free , message=FALSE, echo = TRUE}
 load("./data/roc_dtf_sfree.RData")
 
+roc_dtf_sfree <- dplyr::filter(roc_dtf_sfree, tv != 6.67)
+
 ggplot(roc_dtf_sfree, aes(x     = fpr, 
                           y     = tpr, 
                           color = method )) + 
@@ -1313,8 +1312,7 @@ ggplot(roc_dtf_sfree, aes(x     = fpr,
   scale_colour_manual(values = ghibli_palette("MarnieMedium1")[5:6])
 ```
 
-ROC curves for the Scale-free model comparing MGLasso and GLasso
-methods.
+Mean ROC curves for MGLasso and GLasso graph inference in the Scale-free model. We vary the fusion penalty parameter of MGLasso $\lambda_2 \in \{0, 3.33, 10\}$ alongside the ratio $\frac{n}{p}\in \{0.5,1,2\}$. Within each panel, the ROC curve shows the True positive rate (y-axis) vs the False positive rate (x-axis) for both MGLasso (blue) and GLasso (brown). Since GLasso does not have a fusion penalty, its ROC curves are replicated for panels belonging to the same row. We also plot the random classifier (dotted grey line). The results have been averaged over $50$ simulated datasets and suggest that MGLasso performs no worse than GLasso. For $\lambda_2 = 0$, the MGLasso approach is equivalent to Glasso in its neighborhood selection version.
 :::
 
 ```{r eval = FALSE, echo = TRUE}
@@ -1383,6 +1381,8 @@ save(roc_dtf_sbm,
 ```{r roc_sbm , message=FALSE, echo = TRUE}
 load("./data/roc_dtf_sbm.RData")
 
+roc_dtf_sbm <- dplyr::filter(roc_dtf_sbm, tv != 6.67)
+
 ggplot(roc_dtf_sbm, aes(x     = fpr, 
                           y     = tpr, 
                           color = method )) + 
@@ -1395,18 +1395,17 @@ ggplot(roc_dtf_sbm, aes(x     = fpr,
   scale_colour_manual(values = ghibli_palette("MarnieMedium1")[5:6])
 ```
 
-ROC curves for the Stochastic Block model comparing MGLasso and GLasso
-methods.
+Mean ROC curves for MGLasso and GLasso graph inference in the stochastic block model. We vary the fusion penalty parameter of MGLasso $\lambda_2 \in \{0, 3.33, 10\}$ alongside the ratio $\frac{n}{p}\in \{0.5,1,2\}$. Within each panel, the ROC curve shows the True positive rate (y-axis) vs the False positive rate (x-axis) for both MGLasso (blue) and GLasso (brown). Since GLasso does not have a fusion penalty, its ROC curves are replicated for panels belonging to the same row. We also plot the random classifier (dotted grey line). The results have been averaged over $50$ simulated datasets and suggest that MGLasso performs no worse than GLasso. For $\lambda_2 = 0$, the MGLasso approach is equivalent to Glasso in its neighborhood selection version.
 :::
 
 Based on these empirical results, we first observe that, in all the
 considered simulation models, MGLasso improves over GLasso in terms of
 support recovery in the high-dimensional setting where $p<n$. In
-addition, in the absence of a total variation penalty, i.e.,
+addition, in the absence of afusionpenalty, i.e.,
 $\lambda_2 = 0$, MGLasso performs no worse than GLasso in each of the
 $3$ models. However, for $\lambda_2>0$, increasing penalty value does
 not seem to significantly improve the support recovery performances for
-the MGLasso, as we observe similar results for $\lambda_2=3.3,6.6,10$.
+the MGLasso, as we observe similar results for $\lambda_2=3.3,10$.
 Preliminary analyses show that, as $\lambda_2$ increases, the estimates
 of the regression vectors are shrunk towards $0$. This shrinkage effect
 of group-fused penalty terms was also observed in [@chu2021adaptive].
@@ -1424,8 +1423,7 @@ $\rho \in \{ 0.1, 0.3 \}$; the vector of cluster proportions is fixed at
 $\mathbf \pi = (1/5, \dots, 1/5)$. We then simulate $100$ Gaussian data
 sets for each simulation configuration ($\rho$, $n/p$ fixed).The optimal
 sparsity penalty for MGLasso is chosen by the Stability Approach to
-Regularization Selection (StARS) method [@Liu2010], and we vary the
-parameter $\lambda_2.$
+Regularization Selection (StARS) method [@Liu2010]. <revision>In practice, we estimate some sort of stability parameter in a sample of graphs simulated via the stochastic block model. This estimation of edge variability is then used as the threshold for StARS method. </revision> <old> and </old> We vary the parameter $\lambda_2.$
 
 ```{r eval=FALSE, echo=TRUE, include=TRUE}
 # Launch simulations ------------------------------------------------------
@@ -1504,9 +1502,7 @@ plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.25, np_
          main = "")
 ```
 
-Adjusted Rand Indices for the HAC, k-means and MGLasso methods.
-Performances are observed for 4 different number of clusters in a low
-correlation context.
+Boxplots of Adjusted Rand Indices for the stochastic block model with $5$ classes and $p=40$ variables for a correlation level $\rho=0.3$. The number of estimated clusters $\{5,10,15,20\}$ vary alongside the ratio $\frac{n}{p}\in \{0.5,1,2\}$. Within each panel, the boxplots of ARI between true partition (with $5$ classes) and estimated clustering partitions on $100$ simulated datasets for $k$-means (blue), hierarchical agglomerative clustering (yellow) and MGLasso (brown) methods are plotted against the ratio $\frac{n}{p}.$  The cluster assignments of MGLasso are computed from the distance between estimated regression vectors, for a given value of $\lambda_2.$ Missing boxplots for MGLasso thus mean computed partitions in the grid of values of $\lambda_2$ do not yield the fixed number of clusters. The higher the ARI values, the better the estimated clustering partition is.
 :::
 
 ::: {#fig-ari-high-cor}
@@ -1516,9 +1512,7 @@ plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.95, np_
          main = "")
 ```
 
-Adjusted Rand Indices for the HAC, k-means and MGLasso methods.
-Performances are observed for 4 different number of clusters in a high
-correlation context.
+Boxplots of Adjusted Rand Indices for the stochastic block model with $5$ classes and $p=40$ variables for a correlation level $\rho=0.3$. The number of estimated clusters $\{5,10,15,20\}$ vary alongside the ratio $\frac{n}{p}\in \{0.5,1,2\}$. Within each panel, the boxplots of ARI between true partition (with $5$ classes) and estimated clustering partitions on $100$ simulated datasets for $k$-means (blue), hierarchical agglomerative clustering (yellow) and MGLasso (brown) methods are plotted against the ratio $\frac{n}{p}.$  The cluster assignments of MGLasso are computed from the distance between estimated regression vectors, for a given value of $\lambda_2.$ Missing boxplots for MGLasso thus mean computed partitions in the grid of values of $\lambda_2$ do not yield the fixed number of clusters. The higher the ARI values, the better the estimated clustering partition is.
 :::
 
 The results shown in @fig-ari-low-cor and @fig-ari-high-cor demonstrate
@@ -1596,8 +1590,7 @@ We apply MGLasso to the normalised counts to infer a graph and a
 clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
 and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
 clusters) are given below. In each case, the parameter $\lambda_1$ is
-chosen by stability selection (see <old> [Model Selection](#model-selection) Section </old> <edmond>
-[3.3](#model-selection)</edmond>).
+chosen by stability selection. <revision> The hyperparameter of the StARS approach is set to $0.01.$ which might select the Lasso penalty that leads to the sparsest and most stable graph between subsamples </revision> (see <old> [Model Selection](#model-selection) </old> Section <edmond> [3.3](#model-selection)</edmond>)
 
 ::: {#fig-real-data-mglasso}
 ```{r, out.width="49%", out.height="20%", fig.show='hold',fig.align='center', echo = TRUE}
@@ -1605,7 +1598,7 @@ knitr::include_graphics(c("figures/mglasso_tv0.png","figures/mglasso_full_graph_
 ```
 
 <edmond> Adjacency matrices of </edmond> infered graphs using MGLasso
-for different values of total variation penalty.
+for different values offusionpenalty.
 :::
 
 The variables were reordered according to the clustering partition
