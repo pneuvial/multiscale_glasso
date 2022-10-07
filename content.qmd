@@ -59,11 +59,14 @@ knitr::opts_chunk$set(tidy = FALSE,fig.show='hold',fig.align='center')
 options(htmltools.dir.version = FALSE)
 
 library(ggplot2)
+library(igraph)
 library(simone)
 library(SpiecEasi)
 library(huge)
 library(Matrix)
 library(ghibli)
+library(phyloseq)
+library(ggrepel)
 ```
 
 # Introduction
@@ -1533,74 +1536,169 @@ log-centered ratio technique as used in [@Kurtz2015]. After some
 filtering steps [@Kurtz2015] on the operational taxonomic units (OTUs)
 counts (removed if present in less than $37\%$ of the samples) and the
 samples (removed if sequencing depth below 2700), the top OTUs are
-grouped in a dataset composed of $n_1 = 289$ for $127$ OTUs. As a
-preliminary analysis, we perform a hierarchical agglomerative clustering
+grouped in a dataset composed of $n_1 = 289$ for $127$ OTUs. <revision> The filtered dataset is available in the SpiecEasi R package available on Github. </revision> 
+<old>
+As a preliminary analysis, we perform a hierarchical agglomerative clustering
 (HAC) on the OTUs, which allows us to identify four significant groups.
 The correlation matrix of the dataset is given in @fig-emp-cor;
 variables have been rearranged according to the HAC partition.
+<!-- ::: {#fig-emp-cor} -->
+<!-- ```{r eval = FALSE} -->
+<!-- data(amgut1.filt, package = "SpiecEasi") -->
+<!-- dta <- amgut1.filt -->
+<!-- dta <- t(SpiecEasi::clr(dta + 1 , 1)) -->
 
-::: {#fig-emp-cor}
-```{r echo = TRUE}
-data(amgut1.filt, package = "SpiecEasi")
-dta <- amgut1.filt
-dta <- t(SpiecEasi::clr(dta + 1 , 1))
+<!-- S <- cor(dta) -->
+<!-- hclust_dta <- hclust(dist(t(dta)), method = "ward.D") -->
+<!-- hclust_dta <- hclust(as.dist(1-S^2), method = "ward.D") -->
 
-S <- cor(dta)
-hclust_dta <- hclust(dist(t(dta)), method = "ward.D")
-hclust_dta <- hclust(as.dist(1-S^2), method = "ward.D")
+<!-- cut_dta <- stats::cutree(hclust_dta, 4) -->
 
-cut_dta <- stats::cutree(hclust_dta, 4)
-
-Matrix::image(as(S[order(cut_dta), order(cut_dta)],
-         "sparseMatrix"), 
-      sub = "", xlab = "", ylab = "",
-      colorkey = FALSE)
-```
-
-Empirical correlations in the gut data.
-:::
-
+<!-- Matrix::image(as(S[order(cut_dta), order(cut_dta)], -->
+<!--          "sparseMatrix"),  -->
+<!--       sub = "", xlab = "", ylab = "", -->
+<!--       colorkey = FALSE) -->
+<!-- ``` -->
+<!-- Empirical correlations in the gut data. -->
+<!-- ::: -->
+<old>
 The average correlations within blocks of variables belonging to the
 same cluster are given below. We observe relatively high levels of
 correlation in small blocks, similar to the simulation models used to
 evaluate the performance of clustering in <old>the [Simulation
 Experiments](#simulation-experiments)</old> Section
 <edmond>[4](#simulation-experiments)</edmond>.
+<!-- ```{r} -->
+<!-- C <- cor(dta) -->
+<!-- diag(C) <- 0 -->
+<!-- clusters <- cut_dta -->
 
-```{r echo = TRUE}
-C <- cor(dta)
-diag(C) <- 0
-clusters <- cut_dta
+<!-- seq_p <- 1:length(clusters) -->
+<!-- L <- split(seq_p, factor(clusters)) -->
 
-seq_p <- 1:length(clusters)
-L <- split(seq_p, factor(clusters))
+<!-- mat <- t(sapply(L, -->
+<!--                 FUN = function(v) { -->
+<!--                   summary(as.vector(C[v,v])) -->
+<!--                 })) -->
 
-mat <- t(sapply(L,
-                FUN = function(v) {
-                  summary(as.vector(C[v,v]))
-                }))
-
-out <- data.frame(Cluster = 1:4, "Mean correlation" = round(mat[, "Mean"], 3))
-knitr::kable(out)
-```
-
-<!-- : my table caption {#tbl-mylabel} -->
-
+<!-- out <- data.frame(Cluster = 1:4, "Mean correlation" = round(mat[, "Mean"], 3)) -->
+<!-- knitr::kable(out) -->
+<!-- ``` -->
 We apply MGLasso to the normalised counts to infer a graph and a
-clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
+clustering structure. <old> The graphs obtained by MGLasso for $\lambda_2 = 0$
 and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
-clusters) are given below. In each case, the parameter $\lambda_1$ is
-chosen by stability selection. <revision> The hyperparameter of the StARS approach is set to $0.01.$ which might select the Lasso penalty that leads to the sparsest and most stable graph between subsamples </revision> (see <old> [Model Selection](#model-selection) </old> Section <edmond> [3.3](#model-selection)</edmond>)
+clusters) are given below. In each case,</old> The parameter $\lambda_1$ is
+chosen by stability selection. <revision> The hyperparameter of the StARS approach is set to $0.05$ which might select the Lasso penalty that leads to a sparse and stable graph between subsampled graphs. <revision> The grid of values taken by the fusion parameter $\lambda_2$ is set to $[0, 20].$ The generated clustering path of solutions for parameter $\lambda_2$ is given in @fig-clusterpath We project the data and the predicted $\hat{\boldsymbol X}$ computed from the estimated multiple regression vectors at each $\lambda_2$ on the two principal components of the data. Note that the path is not always agglomerative. An extensive study should be carried on finding the weights for which MGLasso can be guranteed to produce agglomerative paths. However these splits between clusters ensure an optimal solution.
 
-::: {#fig-real-data-mglasso}
-```{r, out.width="49%", out.height="20%", fig.show='hold',fig.align='center', echo = TRUE}
-knitr::include_graphics(c("figures/mglasso_tv0.png","figures/mglasso_full_graph_tv5.png"))
+::: {#fig-clusterpath}
+
+```{r}
+#| message: false
+#| warning: false
+path_data <- "./data/"
+load(paste0(path_data, "mgl_amgut_rev_l2_seq0to1_20val.RData"))
+load(paste0(path_data, "amgut1.filt.phy.rda"))
+load(paste0(path_data, "amgut1.filt.rda"))
+amgut1.filt <- t(clr(amgut1.filt + 1 , 1))
+
+plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL) {
+  ## Initialisations
+  p <- ncol(X)
+  df.paths <- data.frame(x=c(),y=c(), group=c())
+  nlevel <- length(mglasso_res)
+
+  ## Principal component analysis
+  svdX <- svd(X)                ## singular value decomposition
+  pc <- svdX$u[,1:2,drop=FALSE] ## singular vectors
+
+  for (j in 1:nlevel) {
+    Beta <- mglasso_res[[j]]$selected_Theta
+    Xpred <- sapply(1:p, function(i){X %*% Beta[i,]})
+    pcs <- t(pc)%*%Xpred
+    x <- pcs[1,]
+    y <- pcs[2,]
+    df <- data.frame(x=pcs[1,], y=pcs[2,], group=1:p)
+    df.paths <- rbind(df.paths,df)
+  }
+
+  X_data <- as.data.frame(t(X)%*%pc) ## PCA projections (scores)
+  colnames(X_data) <- c("x","y")
+  ifelse(is.null(colnames_),
+         X_data$Name <- colnames(X),
+         X_data$Name <- colnames_)
+  data_plot <- ggplot(data=df.paths,aes(x=x,y=y))
+  data_plot <- data_plot + geom_path(aes(group=group),colour='grey30',alpha=0.5)
+  data_plot <- data_plot + geom_text_repel(data=X_data, aes(x=x,y=y,label=Name), max.overlaps = 20)
+  data_plot <- data_plot + geom_point(data=X_data,aes(x=x,y=y),size=1.5)
+  data_plot <- data_plot + xlab('Principal Component 1') + ylab('Principal Component 2')
+  data_plot + theme_bw()
+}
+
+plot_clusterpath(amgut1.filt, mgl_amgut_rev)
 ```
 
-<edmond> Adjacency matrices of </edmond> infered graphs using MGLasso
-for different values offusionpenalty.
+Clustering path of the MGLasso convex clustering solutions using $127$ OTUS by plotting the original data and predicted data onto the two principal components of original data.
 :::
 
+
+<!-- ::: {#fig-real-data-mglasso} -->
+<!-- ```{r, out.width="49%", out.height="20%", fig.show='hold',fig.align='center', echo = TRUE} -->
+<!-- knitr::include_graphics(c("figures/mglasso_tv0.png","figures/mglasso_full_graph_tv5.png")) -->
+<!-- ``` -->
+<!-- ::: -->
+
+The fusion threshold has been set to $0.001.$
+<!-- ::: {#fig-real-data-mglasso} -->
+<!-- ```{r} -->
+<!-- ig.mgl.tv0 <- adj2igraph(mgl_amgut_rev$`1`$selected_Theta,  -->
+<!--                          vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
+<!-- E(ig.mgl.tv0)$weight <- abs(E(ig.mgl.tv0)$weight)  -->
+
+<!-- #get taxa table and add add new column for clusters -->
+<!-- clusters <- as.character(1:ncol(mgl_amgut_rev$`1`$selected_Theta)) -->
+<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
+<!-- taxas <- cbind(clusters, taxas) -->
+
+<!-- plot_network(ig.mgl.tv0, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
+<!-- ``` -->
+<!-- Inferred graph for no fusion penalty.  -->
+<!-- ::: -->
+
+Comparison of results with taxanomic classes of Rank3
+
+:::{#fig-compare-taxa-clusters}
+
+```{r}
+#| layout-ncol: 2
+
+ig.mgl.tv0 <- adj2igraph(mgl_amgut_rev$`1`$selected_Theta, 
+                         vertex.attr = list(name=taxa_names(amgut1.filt.phy)))
+E(ig.mgl.tv0)$weight <- abs(E(ig.mgl.tv0)$weight) 
+
+clusters <- as.character(mgl_amgut_rev$`1`$clusters)
+taxas <- amgut1.filt.phy@tax_table@.Data
+taxas <- cbind(clusters, taxas)
+
+plot_network(ig.mgl.tv0, taxas, type = "taxa", layout.method = layout_with_fr, color = "Rank3")
+
+
+ig.mgl.tv1 <- adj2igraph(mgl_amgut_rev$`20`$selected_Theta)
+E(ig.mgl.tv1)$weight <- abs(E(ig.mgl.tv1)$weight) 
+
+#get taxa table and add add new column for clusters
+clusters <- as.character(mgl_amgut_rev$`20`$clusters)
+taxas <- amgut1.filt.phy@tax_table@.Data
+taxas <- cbind(clusters, taxas)
+
+plot_network(ig.mgl.tv0, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters")
+```
+
+Taxa classes and MGLasso classes
+:::
+
+The rand index between the MGLasso partition in ... clusters and the Rank 3 taxonomic classification is `r mclust::adjustedRandIndex(taxas[,"clusters"], taxas[,"Rank3"])`
+
+<old>
 The variables were reordered according to the clustering partition
 obtained from the distances between the regression vectors. Increasing
 $\lambda_2$ reduces the number of clusters and leads to a shrinking
@@ -1619,11 +1717,11 @@ $\lambda_2 = 5$ and neighborhood selection is given below. Adding a
 total variation parameter increases the merging effect, resulting in a
 larger number of edges in the graph.
 
-|                           |           | Neighborhood selection |       |
-|---------------------------|-----------|:----------------------:|-------|
-| MGLasso ($\lambda_2 = 5$) |           |       non-edges        | edges |
-|                           | non-edges |         15678          | 0     |
-|                           | edges     |          288           | 163   |
+<!-- |                           |           | Neighborhood selection |       | -->
+<!-- |---------------------------|-----------|:----------------------:|-------| -->
+<!-- | MGLasso ($\lambda_2 = 5$) |           |       non-edges        | edges | -->
+<!-- |                           | non-edges |         15678          | 0     | -->
+<!-- |                           | edges     |          288           | 163   | -->
 
 <!-- : my table caption {#tbl-mylabel} -->
 
