@@ -26,3 +26,5 @@ dependencies:
   - r-mass
   - r-igraph
   - r-testthat
+  - r-BiocManager
+  - r-igraph
