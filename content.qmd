@@ -654,13 +654,13 @@ $$
 \operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k) \ge f_{\mu^k}(\boldsymbol{\theta}^k) - f(\boldsymbol{\theta}^\star) \ge 0. 
 $$ 
 We refer the reader to the seminal paper for more details on the
-formulation of $\operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k).$ <old> The
+formulation of $\operatorname{GAP}_{\mu^k}(\boldsymbol{\theta}^k).$ The
 CONESTA routine is spelled out in the algorithm CONESTA solver where
 $L(g + \lambda_2 s_{\mu})$ is the Lipschitz constant of
-$\nabla(g + \lambda_2 s_{\mu}),$ $k$ is the iteration counter for the inner FISTA updates and $i$ is the iteration counter for CONESTA updates.</old> </edmond> <old> At each iteration of the
+$\nabla(g + \lambda_2 s_{\mu}),$ $k$ is the iteration counter for the inner FISTA updates and $i$ is the iteration counter for CONESTA updates.</edmond> <old> At each iteration of the
 CONESTA algorithm, the smoothing parameter $\mu$ is updated dynamically
-using the duality gap, and a new approximation is computed.</old> 
-CONESTA enjoys <old> algorithm enjoys </old> a linear convergence rate, and was
+using the duality gap, and a new approximation is computed.</old> The
+CONESTA <old> algorithm enjoys </old> a linear convergence rate, and was
 shown empirically to outperform other computational options for
 structured-sparsity problems such as ADMM and inexact FISTA in terms of
 convergence speed [@hadjselem2018].
@@ -691,8 +691,7 @@ convergence speed [@hadjselem2018].
     \COMMENT{FISTA}
     \STATE $k=2$ \COMMENT{new iterator}
     \STATE $\boldsymbol{\theta}_{\operatorname{FISTA}}^1 = \boldsymbol{\theta}_{\operatorname{FISTA}}^0 = \boldsymbol{\theta}^i$ \COMMENT{Initial parameters value}
-    \STATE $t_{\mu} = \frac{1}{L(g + \lambda_2 s_{\mu})}$ \COMMENT{Compute stepsize with
-$L(g + \lambda_2 s_{\mu})$ the Lipschitz constant of $\nabla(g + \lambda_2 s_{\mu})$}
+    \STATE $t_{\mu} = \frac{1}{L(g + \lambda_2 s_{\mu})}$ \COMMENT{Compute stepsize}
     
     \Repeat
       \STATE $\boldsymbol{z} = \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} + \frac{k-2}{k+1}(\boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} - \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-2})$
@@ -713,7 +712,9 @@ $L(g + \lambda_2 s_{\mu})$ the Lipschitz constant of $\nabla(g + \lambda_2 s_{\m
 
 ## Reformulation of MGLasso for CONESTA algorithm {#reformulation-of-mglasso-for-conesta-algorithm}
 
-Using CONESTA for solving the MGLasso problem requires a reformulation in order to comply with the form of loss function required by CONESTA. The objective of MGLasso can  be written as
+To apply CONESTA, it is necessary to reformulate the MGLasso problem in
+order to comply with the form of loss function required by CONESTA. The
+objective of MGLasso can indeed be written as
 
 $$
 \operatorname{argmin} \frac{1}{2} ||\mathbf{Y} - \tilde{\mathbf{X}} \tilde{\boldsymbol{\beta}}||_2^2 + \lambda_1 ||\tilde{\boldsymbol{\beta}}||_1 + \lambda_2 \sum_{i<j} ||\boldsymbol D_{ij} \tilde{\boldsymbol{\beta}}||_2,
@@ -1526,7 +1527,9 @@ practice. For the higher levels (5 clusters), the performances of
 MGLasso deteriorate. As expected, the three compared methods also
 deteriorate as the level of correlation inside clusters decreases.
 
-# Analysis of microbial associations data
+# Applications 
+<revision> To illustrate the proposed simultaneous graph and clusters inference approach, we applied MGLasso to a microbial association data to study the multiscale structures between operational taxonomic units, as well as methylation and transcriptomic samples extracted from the Evolutionary and functional impact of EPIgenetic variation in forest TREEs project [@maury2019epigenetics]</revision>
+## Analysis of microbial associations data
 
 We finally illustrate our new method of inferring the multiscale
 Gaussian graphical model, with an application to the analysis of
