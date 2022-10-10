@@ -188,7 +188,6 @@ expand_beta <- function(beta_level, clusters){
 
 #' extracts meta-variables graphs 
 extract_meta <- function(full_graph, clusters) {
-  clusters <- sort(clusters)
   p <- length(clusters)
   
   meta_groups <- split(1:p, clusters)

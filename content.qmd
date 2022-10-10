@@ -1014,10 +1014,22 @@ sim_data <- function(p = 20,
   return(list(X=X, graph=graph, correlation=correlation))
 }
 
-adj_mat <- function(mat) {
+#' symmetrize matrix of regression vectors pxp
+symmetrize <- function(mat, rule = "and"){
   diag(mat) <- 0
+  if (rule == "and"){
+    mat <- sign(mat) * pmin(abs(mat),t(abs(mat)))
+  }else{ ## or rule
+    mat <- pmax(mat,t(mat)) - pmax(-mat,-t(mat)) 
+  }
+  return(mat)
+}
+
+adj_mat <- function(mat, sym_rule = "and") {
+  mat <- symmetrize(as.matrix(mat), rule = sym_rule)
   mat[ abs(mat) < 1e-10] <- 0
   mat[mat != 0] <- 1
+  mat <- as(mat, "sparseMatrix")
   return(mat)
 }
 
@@ -1110,6 +1122,8 @@ and @fig-roc-sbm by varying $\frac{n}{p}\in \{0.5,1,2\}$.
 path_checks <- "./rscripts/mglasso_functions/"
 source(paste0(path_checks, "simulate.R"))
 source(paste0(path_checks, "plot.R"))
+source(paste0(path_checks, "clustering.R"))
+source(paste0(path_checks, "cost.R"))
 ```
 
 ```{r  eval = FALSE, echo = TRUE, include=TRUE}
@@ -1528,10 +1542,14 @@ MGLasso deteriorate. As expected, the three compared methods also
 deteriorate as the level of correlation inside clusters decreases.
 
 # Applications 
-<revision> To illustrate the proposed simultaneous graph and clusters inference approach, we applied MGLasso to a microbial association data to study the multiscale structures between operational taxonomic units, as well as methylation and transcriptomic samples extracted from the Evolutionary and functional impact of EPIgenetic variation in forest TREEs project [@maury2019epigenetics]</revision>
-## Analysis of microbial associations data
+<revision> To illustrate the proposed simultaneous graphs and clusters inference approach, we present analyses where the MGLasso model is applied to microbial association data for the study of multiscale networks between operational taxonomic units and to transcriptomic and methylation genotypes for multi-omics data integration. 
 
-We finally illustrate our new method of inferring the multiscale
+## Application to microbial associations in gut data
+
+<revision>
+We analyze microbial associations in human gut microbiome data acquired from the round $1$ of the American Gut Project (AGP, @mcdonald2018american) for $p = 127$ operational taxonomic units (OTUs) and $n = 289$ individuals samples. The counts of microbial OTUs is an indicator of the abundance of underlying microbial populations. Here, we investigate the network and clustering structures of the OTUs for different levels of granularity on the processed data included in the SpiecEasi R package (see @Kurtz2015 for details). The data is first normalized to have unit-sum per samples and for removing biases. Then, a centered log-ratio [clr, @aitchison1982statistical] transformation with an added unit pseudo-count is applied to come back to an unconstrained Euclidean space. For fitting the MGLasso model, we select the Lasso penalty parameter $\lambda_1$ via the StARS approach with threshold $\upsilon = 0.05$ and vary the fusion penalty $\lambda_2$ in the interval $[0, 20]$ with irregular steps. The CPU time taken for $20$ values of $\lambda_2$ is about $8$ hours with parallel evaluations on a computation cluster with as many cores as $\lambda_2$ values. The maximal number of iterations is set to $10000$ and the solver precision to $0.01$.
+
+<old>We finally illustrate our new method of inferring the multiscale
 Gaussian graphical model, with an application to the analysis of
 microbial associations in the American Gut Project. The data used are
 count data that have been previously normalized by applying the
@@ -1539,7 +1557,7 @@ log-centered ratio technique as used in [@Kurtz2015]. After some
 filtering steps [@Kurtz2015] on the operational taxonomic units (OTUs)
 counts (removed if present in less than $37\%$ of the samples) and the
 samples (removed if sequencing depth below 2700), the top OTUs are
-grouped in a dataset composed of $n_1 = 289$ for $127$ OTUs. <revision> The filtered dataset is available in the SpiecEasi R package available on Github. </revision> 
+grouped in a dataset composed of $n = 289$ for $127$ OTUs.
 <old>
 As a preliminary analysis, we perform a hierarchical agglomerative clustering
 (HAC) on the OTUs, which allows us to identify four significant groups.
@@ -1587,11 +1605,14 @@ Experiments](#simulation-experiments)</old> Section
 <!-- out <- data.frame(Cluster = 1:4, "Mean correlation" = round(mat[, "Mean"], 3)) -->
 <!-- knitr::kable(out) -->
 <!-- ``` -->
-We apply MGLasso to the normalised counts to infer a graph and a
-clustering structure. <old> The graphs obtained by MGLasso for $\lambda_2 = 0$
+<old> We apply MGLasso to the normalised counts to infer a graph and a
+clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
 and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$
-clusters) are given below. In each case,</old> The parameter $\lambda_1$ is
-chosen by stability selection. <revision> The hyperparameter of the StARS approach is set to $0.05$ which might select the Lasso penalty that leads to a sparse and stable graph between subsampled graphs. <revision> The grid of values taken by the fusion parameter $\lambda_2$ is set to $[0, 20].$ The generated clustering path of solutions for parameter $\lambda_2$ is given in @fig-clusterpath We project the data and the predicted $\hat{\boldsymbol X}$ computed from the estimated multiple regression vectors at each $\lambda_2$ on the two principal components of the data. Note that the path is not always agglomerative. An extensive study should be carried on finding the weights for which MGLasso can be guranteed to produce agglomerative paths. However these splits between clusters ensure an optimal solution.
+clusters) are given below. In each case, The parameter $\lambda_1$ is
+chosen by stability selection. The hyperparameter of the StARS approach is set to $0.05$ which might select the Lasso penalty that leads to a sparse and stable graph between subsampled graphs. The grid of values taken by the fusion parameter $\lambda_2$ is set to $[0, 20].$ 
+
+<revision>
+Using these settings, we compute a clustering path of the solutions and estimated graphs for $5$ values of $\lambda_2$ corresponding to $5$ different clusters partitions. The @fig-clusterpath shows how the predicted $\hat{\boldsymbol X}$ evolve through $\lambda_2.$ The $\hat{\boldsymbol X}$ are computed from estimated centroids $\hat{\boldsymbol \beta}$ and projected onto the two principal components of the original data. The path is not always agglomerative but the clusters splits observed ensure optimal solutions.
 
 ::: {#fig-clusterpath}
 
@@ -1600,6 +1621,8 @@ chosen by stability selection. <revision> The hyperparameter of the StARS approa
 #| warning: false
 path_data <- "./data/"
 load(paste0(path_data, "mgl_amgut_rev_l2_seq0to1_20val.RData"))
+load(paste0(path_data, "mgl_amgut_rev_l2_seq1to20_20val.RData"))
+load(paste0(path_data, "mgl_amgut_rev_l2_seq0to4_20val.RData"))
 load(paste0(path_data, "amgut1.filt.phy.rda"))
 load(paste0(path_data, "amgut1.filt.rda"))
 amgut1.filt <- t(clr(amgut1.filt + 1 , 1))
@@ -1637,12 +1660,11 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL) {
   data_plot + theme_bw()
 }
 
-plot_clusterpath(amgut1.filt, mgl_amgut_rev)
+plot_clusterpath(amgut1.filt, c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3))
 ```
 
-Clustering path of the MGLasso convex clustering solutions using $127$ OTUS by plotting the original data and predicted data onto the two principal components of original data.
+Clustering path of the MGLasso convex clustering solutions on microbiome data with $127$ OTUs. The predicted and original data are projected onto the two principal components of original data while the fusion penalty vary. As $\lambda_2$ increases, it reaches a value for which all the estimated centroids are equal, thus the branches of the path converge to a unique point in the center of the graph.
 :::
-
 
 <!-- ::: {#fig-real-data-mglasso} -->
 <!-- ```{r, out.width="49%", out.height="20%", fig.show='hold',fig.align='center', echo = TRUE} -->
@@ -1650,7 +1672,9 @@ Clustering path of the MGLasso convex clustering solutions using $127$ OTUS by p
 <!-- ``` -->
 <!-- ::: -->
 
-The fusion threshold has been set to $0.001.$
+<revision>
+The @fig-meta-graphs displays graphs and clusters for different levels of granularity: $127$, $63$, $31$, $15$ and $2$ clusters. For computing the clusters' assignment of nodes, the fusion threshold has been set to $\epsilon_{fuse} = 0.001$. Variables which belong do the same cluster share the same neighborhood thus the neighboring information is summarized into a single one variable, representative of the group. The subfigures show graphs at multiple levels of granularity which are built on the meta-variables or representative variables.
+
 <!-- ::: {#fig-real-data-mglasso} -->
 <!-- ```{r} -->
 <!-- ig.mgl.tv0 <- adj2igraph(mgl_amgut_rev$`1`$selected_Theta,  -->
@@ -1667,39 +1691,206 @@ The fusion threshold has been set to $0.001.$
 <!-- Inferred graph for no fusion penalty.  -->
 <!-- ::: -->
 
-Comparison of results with taxanomic classes of Rank3
+<!-- :::{#fig-compare-taxa-clusters} -->
+<!-- ```{r} -->
+<!-- #| layout-ncol: 2 -->
+<!-- #| layout-nrow: 3 -->
+<!-- #| fig-cap: -->
+<!-- #|   - "127 clusters graph"  -->
+<!-- #|   - "63 clusters graph" -->
+<!-- #|   - "31 clusters graph" -->
+<!-- #|   - "15 clusters graph" -->
+<!-- #|   - "2 clusters graph" -->
 
-:::{#fig-compare-taxa-clusters}
+<!-- get_clusters_mgl <- function(beta_mgl, fuse_thresh = 1e-3, p) { -->
+<!--   p <- ncol(beta_mgl) -->
 
+<!--   clusters <- 1:p -->
+<!--   diffs <- dist_beta(beta_mgl, distance = "euclidean") ## Update distance matrix -->
+<!--   pairs_to_merge <- which(diffs <= fuse_thresh, arr.ind = TRUE) -->
+
+<!--   if(nrow(pairs_to_merge) != 0) -->
+<!--     clusters <- merge_clusters(pairs_to_merge, clusters)  # merge clusters -->
+
+<!--   return(clusters) -->
+<!-- } -->
+
+<!-- all_clusters_partition <- lapply(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), function(x) get_clusters_mgl(x$selected_Theta)) -->
+<!-- all_num_clusters <- unlist(lapply(all_clusters_partition, function(x) length(unique(x)))) -->
+<!-- # less_than_22_clusters <- which(all_num_clusters <= 22 & all_num_clusters != 1) -->
+<!-- #  -->
+<!-- # rand_indices <- NULL -->
+<!-- # for(clmgl in less_than_22_clusters){ -->
+<!-- #   for(clrank in 2:8){ -->
+<!-- #     rand_index <- mclust::adjustedRandIndex(all_clusters_partition[[clmgl]], taxas[,clrank]) -->
+<!-- #     rand_indices <- append(rand_indices, rand_index) -->
+<!-- #   } -->
+<!-- # } -->
+<!-- # max(rand_indices) -->
+
+<!-- ind <- which(all_num_clusters == 127)[1] -->
+<!-- clusters <- as.character(all_clusters_partition[[ind]]) -->
+<!-- ig.mgl.tv <- adj2igraph(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta, vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
+<!-- E(ig.mgl.tv)$weight <- abs(E(ig.mgl.tv)$weight)  -->
+<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
+<!-- taxas <- cbind(clusters, taxas) -->
+<!-- plot_network(ig.mgl.tv, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
+
+<!-- ind <- which(all_num_clusters == 63)[1] -->
+<!-- clusters <- as.character(all_clusters_partition[[ind]]) -->
+<!-- ig.mgl.tv <- adj2igraph(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta, vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
+<!-- E(ig.mgl.tv)$weight <- abs(E(ig.mgl.tv)$weight)  -->
+<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
+<!-- taxas <- cbind(clusters, taxas) -->
+<!-- plot_network(ig.mgl.tv, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
+
+<!-- ind <- which(all_num_clusters == 31)[1] -->
+<!-- clusters <- as.character(all_clusters_partition[[ind]]) -->
+<!-- ig.mgl.tv <- adj2igraph(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta, vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
+<!-- E(ig.mgl.tv)$weight <- abs(E(ig.mgl.tv)$weight)  -->
+<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
+<!-- taxas <- cbind(clusters, taxas) -->
+<!-- plot_network(ig.mgl.tv, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
+
+<!-- ind <- which(all_num_clusters == 15)[1] -->
+<!-- clusters <- as.character(all_clusters_partition[[ind]]) -->
+<!-- ig.mgl.tv <- adj2igraph(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta, vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
+<!-- E(ig.mgl.tv)$weight <- abs(E(ig.mgl.tv)$weight)  -->
+<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
+<!-- taxas <- cbind(clusters, taxas) -->
+<!-- plot_network(ig.mgl.tv, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
+
+<!-- ind <- which(all_num_clusters == 2)[1] -->
+<!-- clusters <- as.character(all_clusters_partition[[ind]]) -->
+<!-- ig.mgl.tv <- adj2igraph(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta, vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
+<!-- E(ig.mgl.tv)$weight <- abs(E(ig.mgl.tv)$weight)  -->
+<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
+<!-- taxas <- cbind(clusters, taxas) -->
+<!-- plot_network(ig.mgl.tv, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
+<!-- ``` -->
+
+<!-- Taxa classes and MGLasso classes -->
+<!-- ::: -->
+
+<!-- #| layout-ncol: 2 -->
+<!-- #| layout-nrow: 3 -->
+
+:::{#fig-meta-graphs}
 ```{r}
-#| layout-ncol: 2
+#| layout: [[1], [1,1], [1,1]]
+#| fig-cap:
+#|   - "127 clusters graph" 
+#|   - "Meta-variables graph with 63 clusters"
+#|   - "Meta-variables graph with 31 clusters"
+#|   - "Meta-variables graph with 15 clusters"
+#|   - "Meta-variables graph with 2 clusters"
 
-ig.mgl.tv0 <- adj2igraph(mgl_amgut_rev$`1`$selected_Theta, 
-                         vertex.attr = list(name=taxa_names(amgut1.filt.phy)))
-E(ig.mgl.tv0)$weight <- abs(E(ig.mgl.tv0)$weight) 
+get_clusters_mgl <- function(beta_mgl, fuse_thresh = 1e-3, p) {
+  p <- ncol(beta_mgl)
+  
+  clusters <- 1:p
+  diffs <- dist_beta(beta_mgl, distance = "euclidean") ## Update distance matrix
+  pairs_to_merge <- which(diffs <= fuse_thresh, arr.ind = TRUE)
+  
+  if(nrow(pairs_to_merge) != 0)
+    clusters <- merge_clusters(pairs_to_merge, clusters)  # merge clusters
+  
+  return(clusters)
+}
 
-clusters <- as.character(mgl_amgut_rev$`1`$clusters)
+all_clusters_partition <- lapply(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), function(x) get_clusters_mgl(x$selected_Theta))
+all_num_clusters <- unlist(lapply(all_clusters_partition, function(x) length(unique(x))))
+
+#' extracts meta-variables graphs 
+extract_meta <- function(full_graph=NULL, clusters) {
+  p <- length(clusters)
+  
+  meta_groups <- split(1:p, clusters)
+  
+  index_meta_vars <- sapply(meta_groups, function(a){
+    return(a[[1]])
+  })
+  
+  #meta_graph <- full_graph[index_meta_vars, index_meta_vars]
+  
+  #return(meta_graph)
+  return(index_meta_vars)
+}
+
+ind <- which(all_num_clusters == 127)[1]
+clusters <- as.character(all_clusters_partition[[ind]])
+vec <- extract_meta(clusters = all_clusters_partition[[ind]])
+metaG <- c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+metaG <- adj2igraph(metaG, vertex.attr = list(name=taxa_names(amgut1.filt.phy)[vec]))
+E(metaG)$weight <- abs(E(metaG)$weight) 
 taxas <- amgut1.filt.phy@tax_table@.Data
 taxas <- cbind(clusters, taxas)
+taxas <- taxas[vec,]
+plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters")
 
-plot_network(ig.mgl.tv0, taxas, type = "taxa", layout.method = layout_with_fr, color = "Rank3")
-
-
-ig.mgl.tv1 <- adj2igraph(mgl_amgut_rev$`20`$selected_Theta)
-E(ig.mgl.tv1)$weight <- abs(E(ig.mgl.tv1)$weight) 
-
-#get taxa table and add add new column for clusters
-clusters <- as.character(mgl_amgut_rev$`20`$clusters)
+ind <- which(all_num_clusters == 63)[1]
+clusters <- as.character(all_clusters_partition[[ind]])
+vec <- extract_meta(clusters = all_clusters_partition[[ind]])
+metaG <- c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+metaG <- adj2igraph(metaG, vertex.attr = list(name=taxa_names(amgut1.filt.phy)[vec]))
+E(metaG)$weight <- abs(E(metaG)$weight) 
 taxas <- amgut1.filt.phy@tax_table@.Data
 taxas <- cbind(clusters, taxas)
+taxas <- taxas[vec,]
+plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters")
 
-plot_network(ig.mgl.tv0, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters")
+ind <- which(all_num_clusters == 31)[1]
+clusters <- as.character(all_clusters_partition[[ind]])
+vec <- extract_meta(clusters = all_clusters_partition[[ind]])
+metaG <- c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+metaG <- adj2igraph(metaG, vertex.attr = list(name=taxa_names(amgut1.filt.phy)[vec]))
+E(metaG)$weight <- abs(E(metaG)$weight) 
+taxas <- amgut1.filt.phy@tax_table@.Data
+taxas <- cbind(clusters, taxas)
+taxas <- taxas[vec,]
+plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_dh, color = "clusters")
+
+ind <- which(all_num_clusters == 15)[1]
+clusters <- as.character(all_clusters_partition[[ind]])
+vec <- extract_meta(clusters = all_clusters_partition[[ind]])
+metaG <- c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+metaG <- adj2igraph(metaG, vertex.attr = list(name=taxa_names(amgut1.filt.phy)[vec]))
+E(metaG)$weight <- abs(E(metaG)$weight) 
+taxas <- amgut1.filt.phy@tax_table@.Data
+taxas <- cbind(clusters, taxas)
+taxas <- taxas[vec,]
+plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_dh, color = "clusters")
+
+ind <- which(all_num_clusters == 2)[1]
+clusters <- as.character(all_clusters_partition[[ind]])
+vec <- extract_meta(clusters = all_clusters_partition[[ind]])
+metaG <- c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+metaG <- adj2igraph(metaG, vertex.attr = list(name=taxa_names(amgut1.filt.phy)[vec]))
+E(metaG)$weight <- abs(E(metaG)$weight) 
+taxas <- amgut1.filt.phy@tax_table@.Data
+taxas <- cbind(clusters, taxas)
+taxas <- taxas[vec,]
+plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_dh, color = "clusters")
 ```
 
-Taxa classes and MGLasso classes
+Estimated graphs at multiple levels of granularity. The first graph shows a network infered when $\lambda_2 =0$. The number of clusters is equal to the number of OTUs. Increasing the fusion penalty allow to uncover graphs built over the representative variable of each cluster. The name of the node is the correponding OTU and the legend panel show the cluster assignment. The number of clusters is computed from the regression vectors with a fixed fusion threshold.
 :::
 
-The rand index between the MGLasso partition in ... clusters and the Rank 3 taxonomic classification is `r mclust::adjustedRandIndex(taxas[,"clusters"], taxas[,"Rank3"])`
+```{r}
+ind <- which(all_num_clusters == 2)[1]
+clusters <- as.character(all_clusters_partition[[ind]])
+taxas <- amgut1.filt.phy@tax_table@.Data
+taxonomic.classification <- taxas[,"Rank2"]
+```
+<revision>
+To assess their relevance, the inferred clusters are compared to known taxonomic ranks (phylum, class, order, family, genera or species). The phylum classification is used. For example, for a clustering partition in $2$ groups, the MGLasso clustering partition is composed of $120$ variables versus $7$ variables. The cluster $2$ has been shown to be exclusively composed of OTUs belonging to the Proteobacteria phylum. The cluster $1$ also contains Proteobacteria OTUs so those identified in cluster $2$ might share more intimate characteristics.
+<!-- A Chisq test of independence showed with a p-value of `r chisq.test(clusters, taxas[,"Rank2"])$p.value` that the two classifications might be related.  -->
+
+```{r}
+tables::as.tabular(table(clusters, taxonomic.classification))
+```
+
+Adjusted Rand indices are not calculated for comparisons as the unitary weights in the convex clustering problem can be suboptimal. The abundance of OTUs belonging to cluster $1$ mainly composed by Bacteroidetes and Firmicutes phyla is seamingly dependent of the abundance of OTUS in cluster $2$ i.e. Proteobacteria phylum.
 
 <old>
 The variables were reordered according to the clustering partition
@@ -1730,6 +1921,101 @@ larger number of edges in the graph.
 
 <!-- @tbl-mylabel -->
 
+## Application to epigenetic and transcriptomic genotypes in poplar  
+
+Next, we investigate interactions between European poplar genotypes for transcriptomic and DNA methylation data extracted from the Evolutionary and functional impact of EPIgenetic variation in forest TREEs project [EPITREE, @maury2019epigenetics]. The analysis is purposefully applied on the samples and not the genes in order to highlight the MGLasso clustering performance and show some potential relationships between DNA methylation and gene expression levels for some genotypes.
+
+<!-- Classic correlation approaches can lead to spurious relationships between variables. Through the gaussian graphical framework of MGLasso, one can focus on the conditional dependency structure which gets rid of confusion effects. We refer to @akalin2020computational for a broader definition of the central dogma of molecular biology (DNA-RNA-proteins). -->
+
+Poplar (_Populus_) is often used as a model tree for the study of drought response. Natural populations of black poplars (_Populus nigra_) have been planted in common gardens in France, Italy and Germany (see @fig-context-epitree) with a control on some environmental variables such as water availability [@sow2018narrow]. The poplar is one of the most endangered species as the result of global climate change and has an economic importance. The drought response can be studied via DNA methylation which is a necessary process in the plant development and response to environmental variations [@amaral2020advances]. It consists in the addition of a Methyl group to a cytosine (C) in the genome and occurs in three contexts (CG, CHG and CHH, where H $\in \{ A, C, T\}$). Methylation can be measured on two regions of the gene. Methylation in promoters is linked to gene silencing and methylation in the body of the gene can be related to tissue specific expression or alternative splicing [@sow2019role]. 
+
+<!-- Epigenetic is the study of heritable changes which are not the result of a modification in the DNA sequence [@plomion2016forest]. Epigenetic marks in forest trees can be studied via  -->
+
+:::{#fig-context-epitree}
+```{r}
+#| layout: [[25,75]]
+#| fig-cap:
+#|   - Black poplar source C. Fischer Wikimedia
+#|   - Map of genotypes
+knitr::include_graphics("./figures/peuplier-noir-Christian-Fischer.jpeg")
+knitr::include_graphics("./figures/carte-genotypes.png")
+```
+
+Black poplar and sampling areas.
+:::
+
+The collected DNA methylation data are proportions and expression data are counts data. Details on the plant material and experimental design can be found in @sow2019role and @chateigner2020gene. The transcriptomic data were measured via RNA-Seq and normalized using Trimmed Mean of M-Values combined with a Best linear unbiased predictor (BLUP) correction as described in @chateigner2020gene. The methylation data were measured through whole-genome bisulfite sequencing (WGBS) and are normalized via the classical logarithmic approach $log_2(x+1)$ where $x$ is the methylation proportion. For each one of the $10$ populations (see @fig-context-epitree), DNA methylation in CG, CHG, CHH contexts for promoters and gene-body and RNA sequencing data are observed on genotypes. A mean measure is computed from two replicates per population. The analysis has been restricted to a set of $150$ target genes which explains the most variability in the omics data and the subsequent number of samples from different omic variables which is $70.$
+
+The MGLasso model is fitted with a fusion penalty values chosen in $[0, 30.94]$ and a Lasso penalty $\lambda_1$ parameter chosen via the StARS approach with threshold $0.05$. In the resulting clustering path (see @fig-clusterpath-poplar), we can identify three distinct and coherent clusters which are samples corresponding to gene expression genotypes, gene-body methylation samples and gene promoter samples. 
+
+:::{#fig-clusterpath-poplar}
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| warning: false
+
+mglasso_genot <- readRDS(paste0(path_data, "mgl_epit_sparse_geno.rds"))
+epit_sparse <- readRDS(paste0(path_data, "epit-spca-select.rds"))
+
+# Shorten columns' names 
+# To do: add colors to cluster path for known groups 
+names_epit <- epit_sparse %>% colnames()
+
+cut_names <- names_epit %>% 
+  sapply(function(x) gsub("log2_rpd.", "", x)) %>% 
+  sapply(function(x) gsub("new_e", "", x)) %>% 
+  as.character()
+
+plot_clusterpath(as.matrix(epit_sparse), mglasso_genot, cut_names)
+```
+
+Clustering path of solutions on DNA methylation and transcriptomic samples. The figure shows $3$ distinct clusters which correspond to omics data of different nature: transcriptomic (right), methylation on promoter (bottom) and methylation on gene-body (top left).
+:::
+
+The results of the MGLasso can also be represented in the expanded way where meta-variables are not computed from clusters. In @fig-graphpath-poplar, a focus is put on the effect of the fusion penalty. Clusters partitions are not presented. The higher the fusion penalty, variables are encouraged to share the same neighborhood structure. Note that, an equivalent graph over meta-variables can be computed after choosing a fusion threshold as in @fig-meta-graphs.
+
+:::{#fig-graphpath-poplar}
+```{r}
+#| layout: [[1], [1,1], [1,1]]
+#| fig-cap:
+#|   - Full graph with $\lambda_2$ = 0
+#|   - Full graph with $\lambda_2$ = 1.63
+#|   - Full graph with $\lambda_2$ = 3.26
+#|   - Full graph with $\lambda_2$ = 4.89
+#|   - Full graph with $\lambda_2$ = 30.94
+
+# Plot adjacency matrices for some levels 
+# Selection based on network interpretability  
+#' symmetrize matrix of regression vectors pxp
+symmetrize <- function(mat, rule = "and"){
+  diag(mat) <- 0
+  if (rule == "and"){
+    mat <- sign(mat) * pmin(abs(mat),t(abs(mat)))
+  }else{ ## or rule
+    mat <- pmax(mat,t(mat)) - pmax(-mat,-t(mat)) 
+  }
+  return(mat)
+}
+
+adj_mat <- function(mat, sym_rule = "and") {
+  mat <- symmetrize(as.matrix(mat), rule = sym_rule)
+  mat[ abs(mat) < 1e-10] <- 0
+  mat[mat != 0] <- 1
+  mat <- as(mat, "sparseMatrix")
+  return(mat)
+}
+
+Matrix::image(adj_mat(mglasso_genot$`1`$selected_Theta), sub = "", xlab = "", ylab = "")
+Matrix::image(adj_mat(mglasso_genot$`2`$selected_Theta), sub = "", xlab = "", ylab = "")
+Matrix::image(adj_mat(mglasso_genot$`3`$selected_Theta), sub = "", xlab = "", ylab = "")
+Matrix::image(adj_mat(mglasso_genot$`4`$selected_Theta), sub = "", xlab = "", ylab = "")
+Matrix::image(adj_mat(mglasso_genot$`20`$selected_Theta), sub = "", xlab = "", ylab = "")
+```
+
+Adjacency matrices for different levels of granularity. The first graph shows the infered network when no fusion penalty is added to the model. The first block of $10 \times 10$ variables correspond to expression samples. The second sparser block of $20 \times 20$ corresponds to DNA methylation measures in the CG context for promoter and gene-body. The following blocks of the same size correspond to CHG and CHH DNA methylation contexts. The bands of edges show a relationship between measures of DNA methylation between the three contexts for the same populations. E.g. the Loire methylation sample in the CG context is likely to be related to the Loire methylation in the CHG and CHH contexts. The graphs also shows some relationships between expression and methylation samples.
+When the fusion penalty increases, the blocks corresponding to the three contexts of methylation merge in first place, then follows the top-left block of expression data. For $\lambda_2 = 30.94$ all the samples are merged into a unique cluster and a complete graph.
+:::
+
 # Conclusion
 
 We proposed a new technique that combines Gaussian Graphical Model
@@ -1751,7 +2037,9 @@ node-wise regression approach on which our method is based can be
 extended to a broader family of non-Gaussian distributions belonging to
 the exponential family as outlined by @yang2012graphical. 
 Our MGLasso approach can be easily extended to non-Gaussian distributions belonging to the exponential family and mixed graphical models.</edmond>
+
 # Session information {.appendix .unnumbered}
+
 
 ```{r session-info, echo = TRUE}
 sessionInfo()
