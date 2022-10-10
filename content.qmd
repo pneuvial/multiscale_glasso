@@ -1426,7 +1426,7 @@ not seem to significantly improve the support recovery performances for
 the MGLasso, as we observe similar results for $\lambda_2=3.3,10$.
 Preliminary analyses show that, as $\lambda_2$ increases, the estimates
 of the regression vectors are shrunk towards $0$. This shrinkage effect
-of group-fused penalty terms was also observed in [@chu2021adaptive].
+of group-fused penalty terms was also observed in [@chu2021adaptive]. <revision> Note that the performances of the MGLasso deterioriates comparatively to GLasso when the intra-clusters edge connection probability of the stochastic block model is high.
 
 ## Clustering
 
