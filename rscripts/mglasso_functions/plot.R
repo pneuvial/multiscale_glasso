@@ -109,6 +109,9 @@ plot_res <- function(dt, crit_, ncluster_, cor_, np_, perfs_threshold_ = 50, met
   if (is.null(method_))
     method_ <- unique(dt$method)
   
+  nclusters.labs <- c("5 clusters", "10 clusters", "15 clusters", "20 clusters")
+  names(nclusters.labs) <- c("5", "10", "15", "20")
+  
   bp_error <- ggplot(
     subset(x      = dt, 
            subset = (crit == crit_ & 
@@ -124,7 +127,7 @@ plot_res <- function(dt, crit_, ncluster_, cor_, np_, perfs_threshold_ = 50, met
         fill = method
     )) + 
     geom_boxplot() + 
-    facet_grid(. ~ ncluster) + 
+    facet_grid(. ~ ncluster, labeller = labeller(ncluster = nclusters.labs)) + 
     ggtitle(main) + 
     xlab("Ratio n/p") + 
     scale_fill_manual(values = rev(ghibli_palette("MarnieMedium1")))
