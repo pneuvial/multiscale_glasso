@@ -130,7 +130,8 @@ plot_res <- function(dt, crit_, ncluster_, cor_, np_, perfs_threshold_ = 50, met
     facet_grid(. ~ ncluster, labeller = labeller(ncluster = nclusters.labs)) + 
     ggtitle(main) + 
     xlab("Ratio n/p") + 
-    scale_fill_manual(values = rev(ghibli_palette("MarnieMedium1")))
+    scale_fill_manual(name = "Method", labels = c("HAC", "K-means", "MGLasso"), 
+                      values = rev(ghibli_palette("MarnieMedium1")))
   
   if(crit_ == "rand"){
     bp_error <- bp_error + 
