@@ -32,14 +32,7 @@ jobs:
           activate-environment: computo
           
       - name: Install additional python dependencies
-        run: | 
-          reticulate::py_install(packages = c("pylearn-parsimony"),
-                         envname = "computo",
-                         method = "conda",
-                         conda = "auto",
-                         python_version = 3.8,
-                         pip = TRUE,
-                         pip_options = 'git+https://github.com/neurospin/pylearn-parsimony.git')
+        run: reticulate::py_install(packages = c("pylearn-parsimony"), envname = "computo", method = "conda", conda = "auto", python_version = 3.8, pip = TRUE, pip_options = 'git+https://github.com/neurospin/pylearn-parsimony.git')
 
       - name: Install additional R dependencies
         run: | 

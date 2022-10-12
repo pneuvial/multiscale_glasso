@@ -303,6 +303,17 @@ Illustration of the permutation between regression coefficients in the MGLasso
 model. 
 :::
 
+<!-- $\hat D(\lambda_1^{(k)}) = \frac{\sum_{s<t} \hat \xi_{st}(\lambda_1^{(k)})}{p \choose 2}.$ -->
+<!-- \begin{equation} -->
+<!--    (\boldsymbol \beta^i,  \textcolor{blue}{\boldsymbol \tau_{ij}} \boldsymbol \beta^j)  =  -->
+<!--    \begin{pmatrix} -->
+<!--         \beta_1^i & \beta_2^i & \dots & \tikzmarknode{a}{\beta_j^i} & \dots \dots & \tikzmarknode{b}{\beta_k^i} & \dots & \beta_p^i\\ -->
+<!--         \\ -->
+<!--         \\ -->
+<!--         \beta_1^j & \beta_2^j & \dots & \tikzmarknode{c}{\beta_k^j} & \dots \dots & \tikzmarknode{d}{\beta_i^j} & \dots & \beta_p^j -->
+<!--     \end{pmatrix} -->
+<!-- \end{equation} -->
+
 In practice, when external information about the clustering structure is
 available, the problem can be generalized into: 
 $$
@@ -881,6 +892,9 @@ source(paste0(path_checks, "simulate.R"))
 source(paste0(path_checks, "plot.R"))
 source(paste0(path_checks, "clustering.R"))
 source(paste0(path_checks, "cost.R"))
+
+testthat::expect_true("pylearn-parsimony" %in% reticulate::py_list_packages()$package)
+tryCatch(conesta_rwrapper(1), finally = "Test result")
 ```
 
 ```{r  eval = FALSE, echo = TRUE, include=TRUE}
