@@ -51,7 +51,7 @@ revision { color: Orange }
 ```
 <!-- Exemple <revision> commentaire </revision> -->
 
-```{r setup, message=FALSE, echo = F}
+```{r setup, message=FALSE, echo = TRUE}
 knitr::opts_chunk$set(tidy = FALSE,fig.show='hold',fig.align='center')
 options(htmltools.dir.version = FALSE)
 
