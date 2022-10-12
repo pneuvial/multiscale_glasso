@@ -897,6 +897,28 @@ testthat::expect_true("pylearn-parsimony" %in% reticulate::py_list_packages()$pa
 tryCatch(conesta_rwrapper(1), finally = "Test result")
 ```
 
+```{r}
+reticulate::use_condaenv("computo", required = TRUE)
+reticulate::py_config()
+n = 30
+K = 2
+p = 4
+rho = 0.85
+blocs <- list()
+for (j in 1:K) {
+ bloc <- matrix(rho, nrow = p/K, ncol = p/K)
+   for(i in 1:(p/K)) { bloc[i,i] <- 1 }
+   blocs[[j]] <- bloc
+   }
+mat.covariance <- Matrix::bdiag(blocs)
+mat.covariance
+set.seed(11)
+X <- mvtnorm::rmvnorm(n, mean = rep(0,p), sigma = as.matrix(mat.covariance))
+X <- scale(X)
+res <- conesta(X, 0.1, 0.1)
+```
+
+
 ```{r  eval = FALSE, echo = TRUE, include=TRUE}
 # The code used to generate the following results is based on R and python
 # libraries/functions. the reticulate package allows to compile python code in
@@ -960,12 +982,12 @@ runtime_roc_config_p40_erdos01 <- system.time(
 )
 
 save(roc_config_p40_erdos01, 
-     file = paste0(path_roc, "roc_config_p40_erdos01.RData"))
+     file = paste0(path_data, "roc_config_p40_erdos01.RData"))
 save(runtime_roc_config_p40_erdos01, 
-     file = paste0(path_roc, "runtime_roc_config_p40_erdos01.RData"))
+     file = paste0(path_data, "runtime_roc_config_p40_erdos01.RData"))
 
 ## Erdos
-load(paste0(path_roc, "roc_config_p40_erdos01.RData")) 
+load(paste0(path_data, "roc_config_p40_erdos01.RData")) 
 dt_full <- roc_config_p40_erdos01
 
 ### Merge in one graph
@@ -1067,12 +1089,12 @@ runtime_roc_config_p40_scalefree <- system.time(
 )
 
 save(roc_config_p40_scalefree, 
-     file = paste0(path_roc, "roc_config_p40_scalefree.RData"))
+     file = paste0(path_data, "roc_config_p40_scalefree.RData"))
 save(runtime_roc_config_p40_scalefree, 
-     file = paste0(path_roc, "runtime_roc_config_p40_scalefree.RData"))
+     file = paste0(path_data, "runtime_roc_config_p40_scalefree.RData"))
 
 ## Scale-free
-load(paste0(path_roc, "roc_config_p40_scalefree.RData")) 
+load(paste0(path_data, "roc_config_p40_scalefree.RData")) 
 dt_full <- roc_config_p40_scalefree
 
 ### Merge in one graph
@@ -1100,7 +1122,7 @@ roc_dtf_sfree <- rbind(roc_dt20, roc_dt40, roc_dt80)
 
 ### Save
 save(roc_dtf_sfree,
-     file = paste0(path_roc, "roc_dtf_sfree.RData"))
+     file = paste0(path_data, "roc_dtf_sfree.RData"))
 ```
 
 ::: {#fig-roc-sfree}
@@ -1170,11 +1192,11 @@ runtime_roc_config_p40_bdiagflip001 <- system.time(
     mc.cores = no_cores)
 )
 save(roc_config_p40_bdiagflip001, 
-     file = paste0(path_roc, "roc_config_p40_bdiagflip001.RData"))
+     file = paste0(path_data, "roc_config_p40_bdiagflip001.RData"))
 save(runtime_roc_config_p40_bdiagflip001, 
-     file = paste0(path_roc, "runtime_roc_config_p40_bdiagflip001.RData"))
+     file = paste0(path_data, "runtime_roc_config_p40_bdiagflip001.RData"))
 
-load(paste0(path_roc, "roc_config_p40_bdiagflip001.RData")) 
+load(paste0(path_data, "roc_config_p40_bdiagflip001.RData")) 
 dt_full <- roc_config_p40_bdiagflip001
 
 ### Merge in one graph
@@ -1201,7 +1223,7 @@ roc_dt80$np <- 2
 roc_dtf_sbm <- rbind(roc_dt20, roc_dt40, roc_dt80)
 
 save(roc_dtf_sbm,
-     file = paste0(path_roc, "roc_dtf_sbm.RData"))
+     file = paste0(path_data, "roc_dtf_sbm.RData"))
 ```
 
 ::: {#fig-roc-sbm}
