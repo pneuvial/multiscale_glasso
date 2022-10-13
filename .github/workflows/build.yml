@@ -35,23 +35,6 @@ jobs:
         run: | 
           conda run -n computo Rscript r-addons.R
           
-      - name: Install additional python dependencies
-        shell: Rscript {0}
-        run: | 
-          library(reticulate)
-          reticulate::py_install(packages = c("pylearn-parsimony"), 
-                          envname = "computo", 
-                          method = "conda", 
-                          conda = "auto", 
-                          python_version = 3.8, 
-                          pip = TRUE, 
-                          pip_options = "git+https://github.com/neurospin/pylearn-parsimony.git")
-          
-          if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::hasFun("restartSession"))
-              rstudioapi::restartSession()
-          
-          reticulate::py_config()
-
       - name: Installing quarto
         uses: quarto-dev/quarto-actions/install-quarto@v1
         
