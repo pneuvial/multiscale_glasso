@@ -49,7 +49,12 @@ revision { color: Orange }
 <!-- Exemple <revision> commentaire </revision> -->
 
 ```{r setup, message=FALSE, echo = TRUE}
-knitr::opts_chunk$set(tidy = FALSE,fig.show='hold',fig.align='center')
+knitr::opts_chunk$set(
+  tidy = TRUE,
+  tidy.opts = list(width.cutoff = 60),
+  fig.show = 'hold',
+  fig.align = 'center'
+)
 options(htmltools.dir.version = FALSE)
 
 library(ggplot2)
@@ -658,25 +663,32 @@ $\alpha_{ll}=0.75$ allows only to have an approximate control.
 
 ::: {#fig-model-sbm}
 ```{r echo = TRUE}
-bloc_diag <- function(n_vars, connectivity_mat, prop_clusters, rho) {
-  
+bloc_diag <- function(n_vars,
+                      connectivity_mat,
+                      prop_clusters,
+                      rho) {
   true_nclusters <- 0
   
-  while (true_nclusters != length(prop_clusters)){ ## To make sure we have the required number of clusters
-    network <- simone::rNetwork(n_vars, connectivity_mat, prop_clusters)
+  while (true_nclusters != length(prop_clusters)) {
+    ## To make sure we have the required number of clusters
+    network <-
+      simone::rNetwork(n_vars, connectivity_mat, prop_clusters)
     true_nclusters <- length(unique(network$clusters))
   }
   
-  precision_mat <- network$A[order(network$clusters), order(network$clusters)]
+  precision_mat <-
+    network$A[order(network$clusters), order(network$clusters)]
   
   eff_clusters <- table(network$clusters)
   
-  b = -rho/(1+rho*(eff_clusters-2) -rho^2*(eff_clusters-1))
-  d = (1+rho*(eff_clusters-2))/(1+rho*(eff_clusters-2) -rho^2*(eff_clusters-1))
+  b = -rho / (1 + rho * (eff_clusters - 2) - rho ^ 2 * (eff_clusters - 1))
+  d = (1 + rho * (eff_clusters - 2)) / (1 + rho * (eff_clusters - 2) -
+                                          rho ^ 2 * (eff_clusters - 1))
   
   
   for (i in 1:length(eff_clusters)) {
-    temp <- precision_mat[which(row.names(precision_mat) == i), which(row.names(precision_mat) == i)]
+    temp <-
+      precision_mat[which(row.names(precision_mat) == i), which(row.names(precision_mat) == i)]
     temp <- as.matrix(temp)
     temp[temp != 0] = b[i]
     diag(temp) = d[i]
@@ -684,7 +696,7 @@ bloc_diag <- function(n_vars, connectivity_mat, prop_clusters, rho) {
   }
   
   flag <- min(svd(precision_mat)$d)
-  if(flag < 0){
+  if (flag < 0) {
     diag(precision_mat) <- 1 - flag
   }
   
@@ -701,111 +713,153 @@ sim_data <- function(p = 20,
                      g,
                      inter_cluster_edge_prob = 0.01,
                      p_erdos = 0.1,
-                     verbose = FALSE){
-  
+                     verbose = FALSE) {
   structure <- match.arg(structure)
   n = round(np_ratio * p)
   
-  switch (structure,
-          erdos = {
-            network <- simone::rNetwork(p, p_erdos, 1)
-            correlation <- solve(network$Theta)
-            X           <- mvtnorm::rmvnorm(n, sigma = correlation)
-            graph <- network$Theta
-            
-            if(verbose) message("Data, precision matrix and graph generated from Erdos structure.")
-          },
+  switch (
+    structure,
+    erdos = {
+      network <- simone::rNetwork(p, p_erdos, 1)
+      correlation <- solve(network$Theta)
+      X           <- mvtnorm::rmvnorm(n, sigma = correlation)
+      graph <- network$Theta
+      
+      if (verbose)
+        message("Data, precision matrix and graph generated from Erdos structure.")
+    },
+    
+    hub = {
+      L = huge::huge.generator(
+        graph = "hub",
+        g = 5,
+        d = p,
+        n = n,
+        verbose = FALSE
+      )
+      
+      X = L$data
+      graph = L$omega
+      correlation = L$sigma
+      
+      if (verbose)
+        message("Data, precision matrix and graph generated from Hub structure.")
+    },
+    
+    scale_free = {
+      L = huge::huge.generator(
+        graph = "scale-free",
+        d = p,
+        n = n,
+        verbose = FALSE
+      ) ## d edges graph
+      
+      X = L$data
+      graph = L$omega
+      correlation = L$sigma
+      
+      if (verbose)
+        message("Data, precision matrix and graph generated from Scale free structure.")
+    },
+    
+    block_diagonal = {
+      if (inter_cluster_edge_prob != 0) {
+        # inter-clusters edges added in the flipped way
+        flag <- TRUE
+        
+        while (flag) {
+          K <- bloc_diag(p, prob_mat, alpha, rho)
           
-          hub = {
-            L = huge::huge.generator(graph = "hub", g = 5, d = p, n = n, verbose = FALSE)
-            
-            X=L$data
-            graph = L$omega
-            correlation = L$sigma
-            
-            if(verbose) message("Data, precision matrix and graph generated from Hub structure.")
-          },
+          target_indices <-
+            which(K[upper.tri(K)] == 0) # Random selection of edges to be set to 1
           
-          scale_free = {
-            L = huge::huge.generator(graph = "scale-free", d = p, n = n, verbose = FALSE) ## d edges graph
-            
-            X=L$data
-            graph = L$omega
-            correlation = L$sigma
-            
-            if(verbose) message("Data, precision matrix and graph generated from Scale free structure.")
-          },
+          select_len <-
+            round(length(target_indices) * inter_cluster_edge_prob)
+          selected_indices <-
+            sample(target_indices, select_len)
           
-          block_diagonal = { 
-            
-            if(inter_cluster_edge_prob != 0) { # inter-clusters edges added in the flipped way
-              flag <- TRUE
-              
-              while(flag) {
-                K <- bloc_diag(p, prob_mat, alpha, rho)
-                
-                target_indices <- which(K[upper.tri(K)] == 0) # Random selection of edges to be set to 1
-                
-                select_len <- round(length(target_indices) * inter_cluster_edge_prob)
-                selected_indices <- sample(target_indices, select_len)
-                
-                precision_level <- unique(K[upper.tri(K)])
-                precision_level <- max(precision_level[precision_level != 0]) 
-                
-                K[upper.tri(K)][selected_indices] <- precision_level
-                K <- as.matrix(Matrix::forceSymmetric(K, uplo = "U"))
-                
-                flag <- any(eigen(K)$values <= 0) # Control of positive definiteness
-              }
-              
-              correlation <- solve(K)
-              graph = K
-              X           <- mvtnorm::rmvnorm(n, sigma = correlation)
-              
-              if(verbose) message("Data, precision matrix and graph generated from block-diagonal 
-                                  structure with inter-clusters edges.")
-            }
-            else { # Only intra-cluster edges while approximately controlling correlation level
-              K <- bloc_diag(p, prob_mat, alpha, rho)
-              correlation <- solve(K)
-              graph = K
-              X           <- mvtnorm::rmvnorm(n, sigma = correlation)
-              
-              if(verbose) message("Data, precision matrix and graph generated from block-diagonal 
-                                  structure with only intra-clusters edges.")
-            }
-          }
+          precision_level <- unique(K[upper.tri(K)])
+          precision_level <-
+            max(precision_level[precision_level != 0])
+          
+          K[upper.tri(K)][selected_indices] <- precision_level
+          K <-
+            as.matrix(Matrix::forceSymmetric(K, uplo = "U"))
+          
+          flag <-
+            any(eigen(K)$values <= 0) # Control of positive definiteness
+        }
+        
+        correlation <- solve(K)
+        graph = K
+        X           <-
+          mvtnorm::rmvnorm(n, sigma = correlation)
+        
+        if (verbose)
+          message(
+            "Data, precision matrix and graph generated from block-diagonal
+                                  structure with inter-clusters edges."
+          )
+      }
+      else {
+        # Only intra-cluster edges while approximately controlling correlation level
+        K <- bloc_diag(p, prob_mat, alpha, rho)
+        correlation <- solve(K)
+        graph = K
+        X           <-
+          mvtnorm::rmvnorm(n, sigma = correlation)
+        
+        if (verbose)
+          message(
+            "Data, precision matrix and graph generated from block-diagonal
+                                  structure with only intra-clusters edges."
+          )
+      }
+    }
   )
-  return(list(X=X, graph=graph, correlation=correlation))
+  return(list(
+    X = X,
+    graph = graph,
+    correlation = correlation
+  ))
 }
 
 #' symmetrize matrix of regression vectors pxp
-symmetrize <- function(mat, rule = "and"){
+symmetrize <- function(mat, rule = "and") {
   diag(mat) <- 0
-  if (rule == "and"){
-    mat <- sign(mat) * pmin(abs(mat),t(abs(mat)))
-  }else{ ## or rule
-    mat <- pmax(mat,t(mat)) - pmax(-mat,-t(mat)) 
+  if (rule == "and") {
+    mat <- sign(mat) * pmin(abs(mat), t(abs(mat)))
+  } else{
+    ## or rule
+    mat <- pmax(mat, t(mat)) - pmax(-mat, -t(mat))
   }
   return(mat)
 }
 
 adj_mat <- function(mat, sym_rule = "and") {
   mat <- symmetrize(as.matrix(mat), rule = sym_rule)
-  mat[ abs(mat) < 1e-10] <- 0
+  mat[abs(mat) < 1e-10] <- 0
   mat[mat != 0] <- 1
   mat <- as(mat, "sparseMatrix")
   return(mat)
 }
 
 set.seed(2020)
-sim_sbm <- sim_data(p = 40, structure = "block_diagonal", 
-                    alpha = rep(1/5, 5), 
-                    prob_mat = diag(0.75, 5), 
-                    rho = 0.2, inter_cluster_edge_prob = 0.01)
+sim_sbm <- sim_data(
+  p = 40,
+  structure = "block_diagonal",
+  alpha = rep(1 / 5, 5),
+  prob_mat = diag(0.75, 5),
+  rho = 0.2,
+  inter_cluster_edge_prob = 0.01
+)
 gsbm <- adj_mat(sim_sbm$graph)
-Matrix::image(as(gsbm, "sparseMatrix"),
-      sub = "", xlab = "", ylab = "")   
+Matrix::image(
+  as(gsbm, "sparseMatrix"),
+  sub = "",
+  xlab = "",
+  ylab = ""
+)   
 ```
 
 Adjacency matrix of a stochastic block model defined by $K=5$ classes with
@@ -893,8 +947,9 @@ source(paste0(path_checks, "plot.R"))
 source(paste0(path_checks, "clustering.R"))
 source(paste0(path_checks, "cost.R"))
 
-# testthat::expect_true("pylearn-parsimony" %in% reticulate::py_list_packages()$package)
-# tryCatch(conesta_rwrapper(1), finally = "Test result")
+# testthat::expect_true("pylearn-parsimony" %in%
+# reticulate::py_list_packages()$package) tryCatch(conesta_rwrapper(1), finally
+# = "Test result")
 ```
 
 ```{r eval=FALSE}
@@ -932,7 +987,8 @@ config <- reticulate::py_config() # Initialize python engine
 # reticulate::use_condaenv() or reticulate::use_virtualenv().
 system2(config$python, c("-m", "pip", "install",
                           shQuote("git+https://github.com/neurospin/pylearn-parsimony.git")))
-# The pylean-parsimony require scipy version 1.7.1. More recent versions generate compilation errors.
+# The pylean-parsimony require scipy version 1.7.1. More recent versions
+# generate compilation errors.
 reticulate::py_install(packages = c("scipy == 1.7.1",
                                      "scikit-learn",
                                       "numpy == 1.22.4",
@@ -1033,16 +1089,30 @@ load("./data/roc_dtf_erdos.RData")
 
 roc_dtf_erdos <- dplyr::filter(roc_dtf_erdos, tv != 6.67)
 
-ggplot(roc_dtf_erdos, aes(x     = 100*fpr, 
-                          y     = 100*tpr, 
-                          color = method )) + 
-  geom_line(size = 0.7) + 
-  facet_grid(np ~ tv, labeller = labeller(np = as_labeller(np.labs, label_parsed), tv = as_labeller(tv.labs, label_parsed))) +
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "grey") +
+ggplot(roc_dtf_erdos, aes(
+  x     = 100 * fpr,
+  y     = 100 * tpr,
+  color = method
+)) +
+  geom_line(size = 0.7) +
+  facet_grid(np ~ tv, labeller = labeller(
+    np = as_labeller(np.labs, label_parsed),
+    tv = as_labeller(tv.labs, label_parsed)
+  )) +
+  geom_abline(
+    intercept = 0,
+    slope = 1,
+    linetype = "dashed",
+    color = "grey"
+  ) +
   xlab("False Positive Rate") +
   ylab("True Positive Rate") +
   ggtitle("") +
-  scale_colour_manual(name = "Method", labels = c("GLasso", "MGLasso"), values = ghibli_palette("MarnieMedium1")[5:6])
+  scale_colour_manual(
+    name = "Method",
+    labels = c("GLasso", "MGLasso"),
+    values = ghibli_palette("MarnieMedium1")[5:6]
+  )
 ```
 
 Mean ROC curves for MGLasso and GLasso graph inference in the Erdös-Renyi model.
@@ -1140,16 +1210,30 @@ load("./data/roc_dtf_sfree.RData")
 
 roc_dtf_sfree <- dplyr::filter(roc_dtf_sfree, tv != 6.67)
 
-ggplot(roc_dtf_sfree, aes(x     = 100*fpr, 
-                          y     = 100*tpr, 
-                          color = method )) + 
-  geom_line() + 
-  facet_grid(np ~ tv, labeller = labeller(np = as_labeller(np.labs, label_parsed), tv = as_labeller(tv.labs, label_parsed))) +
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "grey") +
+ggplot(roc_dtf_sfree, aes(
+  x     = 100 * fpr,
+  y     = 100 * tpr,
+  color = method
+)) +
+  geom_line() +
+  facet_grid(np ~ tv, labeller = labeller(
+    np = as_labeller(np.labs, label_parsed),
+    tv = as_labeller(tv.labs, label_parsed)
+  )) +
+  geom_abline(
+    intercept = 0,
+    slope = 1,
+    linetype = "dashed",
+    color = "grey"
+  ) +
   xlab("False Positive Rate") +
   ylab("True Positive Rate") +
-  ggtitle("") + 
-  scale_colour_manual(name = "Method", labels = c("GLasso", "MGLasso"), values = ghibli_palette("MarnieMedium1")[5:6])
+  ggtitle("") +
+  scale_colour_manual(
+    name = "Method",
+    labels = c("GLasso", "MGLasso"),
+    values = ghibli_palette("MarnieMedium1")[5:6]
+  )
 ```
 
 Mean ROC curves for MGLasso and GLasso graph inference in the Scale-free model.
@@ -1241,16 +1325,30 @@ load("./data/roc_dtf_sbm.RData")
 
 roc_dtf_sbm <- dplyr::filter(roc_dtf_sbm, tv != 6.67)
 
-ggplot(roc_dtf_sbm, aes(x     = 100*fpr, 
-                          y     = 100*tpr, 
-                          color = method )) + 
-  geom_line() + 
-  facet_grid(np ~ tv, labeller = labeller(np = as_labeller(np.labs, label_parsed), tv = as_labeller(tv.labs, label_parsed))) +
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "grey") +
+ggplot(roc_dtf_sbm, aes(
+  x     = 100 * fpr,
+  y     = 100 * tpr,
+  color = method
+)) +
+  geom_line() +
+  facet_grid(np ~ tv, labeller = labeller(
+    np = as_labeller(np.labs, label_parsed),
+    tv = as_labeller(tv.labs, label_parsed)
+  )) +
+  geom_abline(
+    intercept = 0,
+    slope = 1,
+    linetype = "dashed",
+    color = "grey"
+  ) +
   xlab("False Positive Rate") +
   ylab("True Positive Rate") +
   ggtitle("") +
-  scale_colour_manual(name = "Method", labels = c("GLasso", "MGLasso"), values = ghibli_palette("MarnieMedium1")[5:6])
+  scale_colour_manual(
+    name = "Method",
+    labels = c("GLasso", "MGLasso"),
+    values = ghibli_palette("MarnieMedium1")[5:6]
+  )
 ```
 
 Mean ROC curves for MGLasso and GLasso graph inference in the stochastic block
@@ -1318,7 +1416,8 @@ RNGkind("L'Ecuyer-CMRG")
 # For a quicker test: 
 #   #set nl2 to 2 in one_simu_extended
 #   set p = 9 & n = 10
-test <- one_simu_extended(list_ii_rho$`1`, verbose = TRUE, model = "block_diagonal")
+test <-
+  one_simu_extended(list_ii_rho$`1`, verbose = TRUE, model = "block_diagonal")
 
 ## Models ------------------------------------------------------------------
 # After the quicker test: 
@@ -1344,11 +1443,12 @@ save(rand100_config_p40_bdiagflip001_cor025,
 ## Settings ----------------------------------------------------------------
 ### Model -------------------------------------------------------------------
 p         <- 40
-seq_n     <- c(20, 40, 80) 
-alpha     <- rep(1/5, 5)
+seq_n     <- c(20, 40, 80)
+alpha     <- rep(1 / 5, 5)
 seq_rho   <- c(0.95)
 seq_dnsty <- c(0.75)
-type      <- NA     #1 ## unused to do: delete in configs_simu parameters
+type      <-
+  NA     #1 ## unused to do: delete in configs_simu parameters
 ngroup    <- length(alpha)
 pi        <- diag(0.75, ngroup)
 
@@ -1362,7 +1462,8 @@ RNGkind("L'Ecuyer-CMRG")
 # For a quicker test: 
 #   #set nl2 to 2 in one_simu_extended
 #   set p = 9 & n = 10
-test <- one_simu_extended(list_ii_rho$`1`, verbose = TRUE, model = "block_diagonal")
+test <-
+  one_simu_extended(list_ii_rho$`1`, verbose = TRUE, model = "block_diagonal")
 
 ## Models ------------------------------------------------------------------
 # After the quicker test: 
@@ -1392,8 +1493,12 @@ save(rand100_config_p40_bdiagflip001_cor95,
 load(paste0(path_data, "rand100_config_p40_bdiagflip001_cor025.RData")) 
 dt <- rand100_config_p40_bdiagflip001_cor025
 
-# Calculate clusters partitions with thresh_fuse as the required difference threshold for merging two regression vectors
-list_res <- lapply(dt, function(e){get_perf_from_raw("rand", e, thresh_fuse = 1e-6)})
+# Calculate clusters partitions with thresh_fuse as the required difference
+# threshold for merging two regression vectors
+list_res <-
+  lapply(dt, function(e) {
+    get_perf_from_raw("rand", e, thresh_fuse = 1e-6)
+  })
 dt_rand <- do.call(rbind, list_res)
 
 save(dt_rand,
@@ -1411,8 +1516,12 @@ save(dt_rand,
 load(paste0(path_data, "rand100_config_p40_bdiagflip001_cor95.RData")) 
 dt <- rand100_config_p40_bdiagflip001_cor95
 
-# Calculate clusters partitions with thresh_fuse as the required difference threshold for merging two regression vectors
-list_res <- lapply(dt, function(e){get_perf_from_raw("rand", e, thresh_fuse = 1e-6)})
+# Calculate clusters partitions with thresh_fuse as the required difference
+# threshold for merging two regression vectors
+list_res <-
+  lapply(dt, function(e) {
+    get_perf_from_raw("rand", e, thresh_fuse = 1e-6)
+  })
 dt_rand <- do.call(rbind, list_res)
 
 save(dt_rand,
@@ -1425,8 +1534,14 @@ save(dt_rand,
 #| fig-height: 5
 
 load("./data/rand_dt_lower_cor_sbm.RData")
-plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.25, np_ = c(0.5, 1, 2), 
-         main = "")
+plot_res(
+  dt_rand,
+  crit_ = "rand",
+  ncluster_ = c(5, 10, 15, 20),
+  cor_ = 0.25,
+  np_ = c(0.5, 1, 2),
+  main = ""
+)
 ```
 
 Boxplots of Adjusted Rand Indices for the stochastic block model with $5$
@@ -1449,8 +1564,14 @@ the estimated clustering partition is.
 #| fig-height: 5
 
 load("./data/rand_dt_higher_cor_sbm.RData")
-plot_res(dt_rand, crit_ = "rand", ncluster_ = c(5, 10, 15, 20), cor_ = 0.95, np_ = c(0.5, 1, 2),
-         main = "")
+plot_res(
+  dt_rand,
+  crit_ = "rand",
+  ncluster_ = c(5, 10, 15, 20),
+  cor_ = 0.95,
+  np_ = c(0.5, 1, 2),
+  main = ""
+)
 ```
 
 Boxplots of Adjusted Rand Indices for the stochastic block model with $5$
@@ -1560,10 +1681,13 @@ variables have been rearranged according to the HAC partition.
 <!-- knitr::kable(out) -->
 <!-- ``` -->
 <!-- <old> We apply MGLasso to the normalised counts to infer a graph and a -->
-<!-- clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$ -->
-<!-- and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$ -->
+<!-- clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
+--> <!-- and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$ -->
 <!-- clusters) are given below. In each case, The parameter $\lambda_1$ is -->
-<!-- chosen by stability selection. The hyperparameter of the StARS approach is set to $0.05$ which might select the Lasso penalty that leads to a sparse and stable graph between subsampled graphs. The grid of values taken by the fusion parameter $\lambda_2$ is set to $[0, 20].$  -->
+<!-- chosen by stability selection. The hyperparameter of the StARS approach is
+set to $0.05$ which might select the Lasso penalty that leads to a sparse and
+stable graph between subsampled graphs. The grid of values taken by the fusion
+parameter $\lambda_2$ is set to $[0, 20].$  -->
 
 Using these settings, we compute a clustering path of the solutions and
 estimated graphs for $5$ values of $\lambda_2$ corresponding to $5$ different
@@ -1660,16 +1784,22 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL) {
     df.paths <- rbind(df.paths,df)
   }
 
-  X_data <- as.data.frame(t(X)%*%pc) ## PCA projections (scores)
-  colnames(X_data) <- c("x","y")
+  X_data <- as.data.frame(t(X) %*% pc) ## PCA projections (scores)
+  colnames(X_data) <- c("x", "y")
   ifelse(is.null(colnames_),
          X_data$Name <- colnames(X),
          X_data$Name <- colnames_)
-  data_plot <- ggplot(data=df.paths,aes(x=x,y=y))
-  data_plot <- data_plot + geom_path(aes(group=group),colour='grey30',alpha=0.5)
-  data_plot <- data_plot + geom_text_repel(data=X_data, aes(x=x,y=y,label=Name), max.overlaps = 20)
-  data_plot <- data_plot + geom_point(data=X_data,aes(x=x,y=y),size=1.5)
-  data_plot <- data_plot + xlab('Principal Component 1') + ylab('Principal Component 2')
+  data_plot <- ggplot(data = df.paths, aes(x = x, y = y))
+  data_plot <-
+    data_plot + geom_path(aes(group = group), colour = 'grey30', alpha = 0.5)
+  data_plot <-
+    data_plot + geom_text_repel(data = X_data,
+                                aes(x = x, y = y, label = Name),
+                                max.overlaps = 20)
+  data_plot <-
+    data_plot + geom_point(data = X_data, aes(x = x, y = y), size = 1.5)
+  data_plot <-
+    data_plot + xlab('Principal Component 1') + ylab('Principal Component 2')
   data_plot + theme_bw()
 }
 
@@ -1822,8 +1952,12 @@ get_clusters_mgl <- function(beta_mgl, fuse_thresh = 1e-3, p) {
   return(clusters)
 }
 
-all_clusters_partition <- lapply(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), function(x) get_clusters_mgl(x$selected_Theta))
-all_num_clusters <- unlist(lapply(all_clusters_partition, function(x) length(unique(x))))
+all_clusters_partition <-
+  lapply(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), function(x)
+    get_clusters_mgl(x$selected_Theta))
+all_num_clusters <-
+  unlist(lapply(all_clusters_partition, function(x)
+    length(unique(x))))
 
 #' extracts meta-variables graphs 
 extract_meta <- function(full_graph=NULL, clusters) {
@@ -1855,46 +1989,78 @@ plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_fr, color 
 ind <- which(all_num_clusters == 63)[1]
 clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
-metaG <- c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
-metaG <- adj2igraph(metaG, vertex.attr = list(name=taxa_names(amgut1.filt.phy)[vec]))
-E(metaG)$weight <- abs(E(metaG)$weight) 
+metaG <-
+  c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+metaG <-
+  adj2igraph(metaG, vertex.attr = list(name = taxa_names(amgut1.filt.phy)[vec]))
+E(metaG)$weight <- abs(E(metaG)$weight)
 taxas <- amgut1.filt.phy@tax_table@.Data
 taxas <- cbind(clusters, taxas)
-taxas <- taxas[vec,]
-plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters")
+taxas <- taxas[vec, ]
+plot_network(
+  metaG,
+  taxas,
+  type = "taxa",
+  layout.method = layout_with_fr,
+  color = "clusters"
+)
 
 ind <- which(all_num_clusters == 31)[1]
 clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
-metaG <- c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
-metaG <- adj2igraph(metaG, vertex.attr = list(name=taxa_names(amgut1.filt.phy)[vec]))
-E(metaG)$weight <- abs(E(metaG)$weight) 
+metaG <-
+  c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+metaG <-
+  adj2igraph(metaG, vertex.attr = list(name = taxa_names(amgut1.filt.phy)[vec]))
+E(metaG)$weight <- abs(E(metaG)$weight)
 taxas <- amgut1.filt.phy@tax_table@.Data
 taxas <- cbind(clusters, taxas)
-taxas <- taxas[vec,]
-plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_dh, color = "clusters")
+taxas <- taxas[vec, ]
+plot_network(
+  metaG,
+  taxas,
+  type = "taxa",
+  layout.method = layout_with_dh,
+  color = "clusters"
+)
 
 ind <- which(all_num_clusters == 15)[1]
 clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
-metaG <- c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
-metaG <- adj2igraph(metaG, vertex.attr = list(name=taxa_names(amgut1.filt.phy)[vec]))
-E(metaG)$weight <- abs(E(metaG)$weight) 
+metaG <-
+  c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+metaG <-
+  adj2igraph(metaG, vertex.attr = list(name = taxa_names(amgut1.filt.phy)[vec]))
+E(metaG)$weight <- abs(E(metaG)$weight)
 taxas <- amgut1.filt.phy@tax_table@.Data
 taxas <- cbind(clusters, taxas)
-taxas <- taxas[vec,]
-plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_dh, color = "clusters")
+taxas <- taxas[vec, ]
+plot_network(
+  metaG,
+  taxas,
+  type = "taxa",
+  layout.method = layout_with_dh,
+  color = "clusters"
+)
 
 ind <- which(all_num_clusters == 2)[1]
 clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
-metaG <- c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
-metaG <- adj2igraph(metaG, vertex.attr = list(name=taxa_names(amgut1.filt.phy)[vec]))
-E(metaG)$weight <- abs(E(metaG)$weight) 
+metaG <-
+  c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+metaG <-
+  adj2igraph(metaG, vertex.attr = list(name = taxa_names(amgut1.filt.phy)[vec]))
+E(metaG)$weight <- abs(E(metaG)$weight)
 taxas <- amgut1.filt.phy@tax_table@.Data
 taxas <- cbind(clusters, taxas)
-taxas <- taxas[vec,]
-plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_dh, color = "clusters")
+taxas <- taxas[vec, ]
+plot_network(
+  metaG,
+  taxas,
+  type = "taxa",
+  layout.method = layout_with_dh,
+  color = "clusters"
+)
 ```
 
 Estimated graphs at multiple levels of granularity. The first graph shows a
@@ -1954,11 +2120,13 @@ $\lambda_2 = 5$ and neighborhood selection is given below. Adding a
 total variation parameter increases the merging effect, resulting in a
 larger number of edges in the graph.
 
-<!-- |                           |           | Neighborhood selection |       | -->
-<!-- |---------------------------|-----------|:----------------------:|-------| -->
-<!-- | MGLasso ($\lambda_2 = 5$) |           |       non-edges        | edges | -->
-<!-- |                           | non-edges |         15678          | 0     | -->
-<!-- |                           | edges     |          288           | 163   | -->
+<!-- |                           |           | Neighborhood selection |       |
+--> <!--
+|---------------------------|-----------|:----------------------:|-------| -->
+<!-- | MGLasso ($\lambda_2 = 5$) |           |       non-edges        | edges |
+--> <!-- |                           | non-edges |         15678          | 0
+| --> <!-- |                           | edges     |          288           |
+163   | -->
 
 <!-- : my table caption {#tbl-mylabel} -->
 
@@ -1995,7 +2163,9 @@ Methylation in promoters is linked to gene silencing, and methylation in the
 body of the gene can be related to tissue-specific expression or alternative
 splicing [@sow2019role].
 
-<!-- Epigenetic is the study of heritable changes which are not the result of a modification in the DNA sequence [@plomion2016forest]. Epigenetic marks in forest trees can be studied via  -->
+<!-- Epigenetic is the study of heritable changes which are not the result of a
+modification in the DNA sequence [@plomion2016forest]. Epigenetic marks in
+forest trees can be studied via  -->
 
 :::{#fig-context-epitree}
 ```{r}
@@ -2036,18 +2206,31 @@ methylation samples, and gene promoter samples.
 # Data
 epit_sparse <- readRDS(paste0(path_data, "epit-spca-select.rds"))
 
-#Selection of sparsity penalty parameter 
-mb_out      <- neighbor_select(data = epit_sparse, lambda_min = 1e-3, nlambda = 50, 
-                               nresamples = 50, verbose = TRUE, estim_var = 0.05)
+#Selection of sparsity penalty parameter
+mb_out      <-
+  neighbor_select(
+    data = epit_sparse,
+    lambda_min = 1e-3,
+    nlambda = 50,
+    nresamples = 50,
+    verbose = TRUE,
+    estim_var = 0.05
+  )
 
 lambda1_genot     <- mb_out$lambda_opt
 
-pen_params_genot <- seq_l2_l1_fixed(dt = epit_sparse, l1 = lambda1_genot, nl2 = 20, l2_max = 30.94)
+pen_params_genot <-
+  seq_l2_l1_fixed(
+    dt = epit_sparse,
+    l1 = lambda1_genot,
+    nl2 = 20,
+    l2_max = 30.94
+  )
 
-mgl_epit_sparse_geno <- lapply(pen_params_genot, 
-                                FUN = mglasso_pair_param, 
-                                X_ = epit_sparse, 
-                                type = "initial")
+mgl_epit_sparse_geno <- lapply(pen_params_genot,
+                               FUN = mglasso_pair_param,
+                               X_ = epit_sparse,
+                               type = "initial")
 
 saveRDS(paste0(path_data, "mgl_epit_sparse_geno.rds"))
 ```
@@ -2059,16 +2242,19 @@ saveRDS(paste0(path_data, "mgl_epit_sparse_geno.rds"))
 #| fig-height: 7
 #| warning: false
 
-mglasso_genot <- readRDS(paste0(path_data, "mgl_epit_sparse_geno.rds"))
+mglasso_genot <-
+  readRDS(paste0(path_data, "mgl_epit_sparse_geno.rds"))
 epit_sparse <- readRDS(paste0(path_data, "epit-spca-select.rds"))
 
-# Shorten columns' names 
-# To do: add colors to cluster path for known groups 
+# Shorten columns' names
+# To do: add colors to cluster path for known groups
 names_epit <- epit_sparse %>% colnames()
 
-cut_names <- names_epit %>% 
-  sapply(function(x) gsub("log2_rpd.", "", x)) %>% 
-  sapply(function(x) gsub("new_", "", x)) %>% 
+cut_names <- names_epit %>%
+  sapply(function(x)
+    gsub("log2_rpd.", "", x)) %>%
+  sapply(function(x)
+    gsub("new_", "", x)) %>%
   as.character()
 
 plot_clusterpath(as.matrix(epit_sparse), mglasso_genot, cut_names)
@@ -2118,11 +2304,36 @@ adj_mat <- function(mat, sym_rule = "and") {
   return(mat)
 }
 
-Matrix::image(adj_mat(mglasso_genot$`1`$selected_Theta), sub = "", xlab = "", ylab = "")
-Matrix::image(adj_mat(mglasso_genot$`2`$selected_Theta), sub = "", xlab = "", ylab = "")
-Matrix::image(adj_mat(mglasso_genot$`3`$selected_Theta), sub = "", xlab = "", ylab = "")
-Matrix::image(adj_mat(mglasso_genot$`4`$selected_Theta), sub = "", xlab = "", ylab = "")
-Matrix::image(adj_mat(mglasso_genot$`20`$selected_Theta), sub = "", xlab = "", ylab = "")
+Matrix::image(
+  adj_mat(mglasso_genot$`1`$selected_Theta),
+  sub = "",
+  xlab = "",
+  ylab = ""
+)
+Matrix::image(
+  adj_mat(mglasso_genot$`2`$selected_Theta),
+  sub = "",
+  xlab = "",
+  ylab = ""
+)
+Matrix::image(
+  adj_mat(mglasso_genot$`3`$selected_Theta),
+  sub = "",
+  xlab = "",
+  ylab = ""
+)
+Matrix::image(
+  adj_mat(mglasso_genot$`4`$selected_Theta),
+  sub = "",
+  xlab = "",
+  ylab = ""
+)
+Matrix::image(
+  adj_mat(mglasso_genot$`20`$selected_Theta),
+  sub = "",
+  xlab = "",
+  ylab = ""
+)
 ```
 
 Adjacency matrices for different levels of granularity. The first graph shows
