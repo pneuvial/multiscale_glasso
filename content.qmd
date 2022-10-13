@@ -678,7 +678,7 @@ in each block to $\rho$. Introducing a more realistic scheme with
 $\alpha_{ll}=0.75$ allows only to have an approximate control.
 
 ::: {#fig-model-sbm}
-```{r echo = TRUE}
+```{r echo = TRUE, message=FALSE}
 library(ggplot2)
 library(igraph)
 library(simone)
@@ -689,9 +689,9 @@ library(ghibli)
 library(phyloseq)
 library(ggrepel)
 
-path_checks <- "./rscripts/mglasso_functions/"
-source(paste0(path_checks, "cost.R"))
-source(paste0(path_checks, "simulate.R"))
+path_functions <- "./functions/"
+source(paste0(path_functions, "cost.R"))
+source(paste0(path_functions, "simulate.R"))
 
 set.seed(2020)
 sim_sbm <- sim_data(
@@ -861,8 +861,8 @@ roc_dtf_erdos <- rbind(roc_dt20, roc_dt40, roc_dt80)
 #| fig-width: 12
 #| fig-height: 7
 
-source(paste0(path_checks, "plot.R"))
-source(paste0(path_checks, "clustering.R"))
+source(paste0(path_functions, "plot.R"))
+source(paste0(path_functions, "clustering.R"))
 load("./data/roc_dtf_erdos.RData")
 
 np.labs <- c("frac(n, p) == 0.5", "frac(n, p) == 1", "frac(n, p) == 2")
@@ -1428,8 +1428,8 @@ the two principal components of the original data. The path is not always
 agglomerative, but the clusters' splits observed ensure optimal solutions.
 
 ```{r eval = FALSE, echo = TRUE, include=TRUE}
-source(paste0(path_checks, "perform.R"))
-source(paste0(path_checks, "select_model_mglasso.R"))
+source(paste0(path_functions, "perform.R"))
+source(paste0(path_functions, "select_model_mglasso.R"))
 
 #Load 
 load(paste0(path_data, "amgut1.filt.rda"))
@@ -1947,8 +1947,8 @@ mixed graphical models.
 # Session information {.appendix .unnumbered}
 
 ```{r eval = FALSE, echo=TRUE}
-source(paste0(path_checks, "plot.R"))
-source(paste0(path_checks, "clustering.R"))
+source(paste0(path_functions, "plot.R"))
+source(paste0(path_functions, "clustering.R"))
 
 # testthat::expect_true("pylearn-parsimony" %in%
 # reticulate::py_list_packages()$package) tryCatch(conesta_rwrapper(1), finally
