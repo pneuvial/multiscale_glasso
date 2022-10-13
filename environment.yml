@@ -10,3 +10,22 @@ dependencies:
   - scikit-learn
   - matplotlib
   - pandas
+  - r-base
+  - r-knitr
+  - r-plotly
+  - r-codetools
+  - r-huge
+  - r-matrix
+  - r-remotes
+  - r-reticulate
+  - r-rmarkdown
+  - r-tidyverse
+  - r-devtools
+  - r-tinytex
+  - r-mvtnorm
+  - r-mass
+  - r-igraph
+  - r-testthat
+  - r-BiocManager
+  - r-igraph
+  - r-parallel

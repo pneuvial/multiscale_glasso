@@ -893,11 +893,11 @@ source(paste0(path_checks, "plot.R"))
 source(paste0(path_checks, "clustering.R"))
 source(paste0(path_checks, "cost.R"))
 
-testthat::expect_true("pylearn-parsimony" %in% reticulate::py_list_packages()$package)
-tryCatch(conesta_rwrapper(1), finally = "Test result")
+# testthat::expect_true("pylearn-parsimony" %in% reticulate::py_list_packages()$package)
+# tryCatch(conesta_rwrapper(1), finally = "Test result")
 ```
 
-```{r}
+```{r eval=FALSE}
 reticulate::use_condaenv("computo", required = TRUE)
 reticulate::py_config()
 n = 30
@@ -2048,6 +2048,8 @@ mgl_epit_sparse_geno <- lapply(pen_params_genot,
                                 FUN = mglasso_pair_param, 
                                 X_ = epit_sparse, 
                                 type = "initial")
+
+saveRDS(paste0(path_data, "mgl_epit_sparse_geno.rds"))
 ```
 
 
@@ -2066,7 +2068,7 @@ names_epit <- epit_sparse %>% colnames()
 
 cut_names <- names_epit %>% 
   sapply(function(x) gsub("log2_rpd.", "", x)) %>% 
-  sapply(function(x) gsub("new_e", "", x)) %>% 
+  sapply(function(x) gsub("new_", "", x)) %>% 
   as.character()
 
 plot_clusterpath(as.matrix(epit_sparse), mglasso_genot, cut_names)

@@ -14,29 +14,24 @@ remotes::install_github("jchiquet/simone")
 remotes::install_github("zdk123/SpiecEasi")
 remotes::install_github("ewenme/ghibli")
 BiocManager::install("phyloseq")
+
+reticulate::py_install(packages = c("pylearn-parsimony"), 
+                       envname = "computo", 
+                       method = "conda", 
+                       conda = "auto", 
+                       python_version = 3.8, 
+                       pip = TRUE, 
+                       pip_options = "git+https://github.com/neurospin/pylearn-parsimony.git")
+
+if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::hasFun("restartSession"))
+  rstudioapi::restartSession()
+
+reticulate::py_config()
 ## ____________________________________________________
 ## Additional R packages needed by the user (CRAN)
 ## example: remote
 ## install.packages("anRpackage")
-install.packages("reticulate")
-install.packages("base")
-install.packages("knitr")
-install.packages("plotly")
-install.packages("codetools")
-install.packages("huge")
-install.packages("matrix")
-install.packages("remotes")
-install.packages("rmarkdown")
-install.packages("tidyverse")
-install.packages("devtools")
-install.packages("tinytex")
-install.packages("mvtnorm")
-install.packages("mass")
-install.packages("igraph")
-install.packages("testthat")
-install.packages("BiocManager")
-install.packages("igraph")
-install.packages("parallel")
+
 ## ____________________________________________________
 
 ## ____________________________________________________
