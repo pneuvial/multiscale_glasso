@@ -18,10 +18,10 @@ reticulate::py_install(packages = c("pylearn-parsimony"),
                        pip = TRUE, 
                        pip_options = 'git+https://github.com/neurospin/pylearn-parsimony.git')
 
-if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::hasFun("restartSession"))
-  rstudioapi::restartSession()
-
-reticulate::py_config()
+# if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::hasFun("restartSession"))
+#   rstudioapi::restartSession()
+# 
+# reticulate::py_config()
 
 remotes::install_github("jchiquet/simone")
 remotes::install_github("zdk123/SpiecEasi")
