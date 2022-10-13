@@ -1942,22 +1942,30 @@ the node-wise regression approach on which our method is based can be extended
 to a broader family of non-Gaussian distributions belonging to the exponential
 family as outlined by @yang2012graphical.  Our MGLasso approach can be easily
 extended to non-Gaussian distributions belonging to the exponential family and
-mixed graphical models.
+mixed graphical models. 
 
 # Session information {.appendix .unnumbered}
 
-```{r eval = FALSE, echo=TRUE}
-source(paste0(path_functions, "plot.R"))
-source(paste0(path_functions, "clustering.R"))
-
-# testthat::expect_true("pylearn-parsimony" %in%
-# reticulate::py_list_packages()$package) tryCatch(conesta_rwrapper(1), finally
-# = "Test result")
+```{r session-info, echo = TRUE}
+sessionInfo()
 ```
 
-```{r eval=FALSE}
+# Test core functions {.appendix .unnumbered}
+```{r}
 reticulate::use_condaenv("computo", required = TRUE)
 reticulate::py_config()
+
+# To check if all required python dependencies are available.
+testthat::expect_true(reticulate::py_module_available("numpy"))
+testthat::expect_true(reticulate::py_module_available("scipy"))
+testthat::expect_true(reticulate::py_module_available("six"))
+testthat::expect_true(reticulate::py_module_available("matplotlib"))
+testthat::expect_true("scikit-learn" %in% reticulate::py_list_packages()$package)
+testthat::expect_true("pylearn-parsimony" %in% reticulate::py_list_packages()$package)
+
+source_python(paste0(path_functions, "solve.py"))
+
+# Example test mglasso solver function 
 n = 30
 K = 2
 p = 4
@@ -1973,44 +1981,24 @@ mat.covariance
 set.seed(11)
 X <- mvtnorm::rmvnorm(n, mean = rep(0,p), sigma = as.matrix(mat.covariance))
 X <- scale(X)
-res <- conesta(X, 0.1, 0.1)
-```
 
+res_conesta <- conesta_rwrapper(X, 0.1, 0.1)
+res_conesta
 
-```{r eval = FALSE, echo = TRUE, include=TRUE}
-# The code used to generate the following results is based on R and python
-# libraries/functions. the reticulate package allows to compile python code in
-# Rstudio First set up the python dependencies before running the code
-
-library(reticulate)
-config <- reticulate::py_config() # Initialize python engine 
-# It is possible to create an isolated virtual or conda environment in which the
-# code will be compile by calling reticulate::virtualenv_create() or
-# reticulate::conda_create() and then activate the environment with
-# reticulate::use_condaenv() or reticulate::use_virtualenv().
-system2(config$python, c("-m", "pip", "install",
-                          shQuote("git+https://github.com/neurospin/pylearn-parsimony.git")))
-# The pylean-parsimony require scipy version 1.7.1. More recent versions
-# generate compilation errors.
-reticulate::py_install(packages = c("scipy == 1.7.1",
-                                     "scikit-learn",
-                                      "numpy == 1.22.4",
-                                      "six", # If needed
-                                      "matplotlib"))
-
-# To check if all required python dependencies are available.
-testthat::expect_true(reticulate::py_module_available("numpy"))
-testthat::expect_true(reticulate::py_module_available("scipy"))
-testthat::expect_true(reticulate::py_module_available("six"))
-testthat::expect_true(reticulate::py_module_available("matplotlib"))
-testthat::expect_true("scikit-learn" %in% reticulate::py_list_packages()$package)
-testthat::expect_true("pylearn-parsimony" %in% reticulate::py_list_packages()$package)
-
-# It might be necessary to reload Rstudio on some operator systems.
-source("./rscripts/mglasso_functions/onload.R")
-```
-
-
-```{r session-info, echo = TRUE}
-sessionInfo()
+source(paste0(path_functions, "mglasso.R"))
+# example path algorithm result
+res_mglasso <-
+  hggm_no_merge(
+    X,
+    lambda1 = 0,
+    fuse_thresh = 1e-3,
+    maxit = 1e3,
+    distance = "euclidean",
+    lambda2_start = 1e-2,
+    lambda2_factor = 1.5,
+    precision = 1e-2,
+    weights_ = NULL,
+    type = "initial",
+    compact = TRUE)
+res_mglasso
 ```
