@@ -28,4 +28,3 @@ dependencies:
   - r-testthat
   - r-BiocManager
   - r-igraph
-  - r-parallel
