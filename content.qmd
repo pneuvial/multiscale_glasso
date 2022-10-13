@@ -1953,7 +1953,7 @@ sessionInfo()
 
 # Test core functions {.appendix .unnumbered}
 ```{r}
-reticulate::use_condaenv("computo", required = TRUE)
+# reticulate::use_condaenv("computo", required = TRUE)
 reticulate::py_config()
 
 # To check if all required python dependencies are available.
