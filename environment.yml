@@ -29,3 +29,4 @@ dependencies:
   - r-BiocManager
   - r-igraph
   - r-ggrepel
+  - r-tables

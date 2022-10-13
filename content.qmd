@@ -1952,7 +1952,7 @@ sessionInfo()
 ```
 
 # Test core functions {.appendix .unnumbered}
-```{r eval=FALSE}
+```{r}
 reticulate::use_condaenv("computo", required = TRUE)
 reticulate::py_config()
 
