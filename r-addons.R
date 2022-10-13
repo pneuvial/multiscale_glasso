@@ -18,12 +18,6 @@ reticulate::py_install(packages = c("pylearn-parsimony"),
                        pip = TRUE, 
                        pip_options = 'git+https://github.com/neurospin/pylearn-parsimony.git')
 
-path_to_python <- reticulate::conda_python("computo")
-writeLines(sprintf("RETICULATE_PYTHON=%s", path_to_python),
-           Sys.getenv("GITHUB_ENV"))
-reticulate::py_config()
-
-
 # if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::hasFun("restartSession"))
 #   rstudioapi::restartSession()
 # 
