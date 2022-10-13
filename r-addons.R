@@ -14,6 +14,7 @@ remotes::install_github("jchiquet/simone")
 remotes::install_github("zdk123/SpiecEasi")
 remotes::install_github("ewenme/ghibli")
 BiocManager::install("phyloseq")
+install.packages("parallel")
 
 reticulate::py_install(packages = c("pylearn-parsimony"), 
                        envname = "computo", 
