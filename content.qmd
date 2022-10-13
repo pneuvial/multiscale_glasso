@@ -919,7 +919,7 @@ res <- conesta(X, 0.1, 0.1)
 ```
 
 
-```{r  eval = FALSE, echo = TRUE, include=TRUE}
+```{r eval = FALSE, echo = TRUE, include=TRUE}
 # The code used to generate the following results is based on R and python
 # libraries/functions. the reticulate package allows to compile python code in
 # Rstudio First set up the python dependencies before running the code
@@ -1627,7 +1627,6 @@ save(mgl_amgut_rev_set3,
      file = paste0(path_real_data, "mgl_amgut_rev_l2_seq0to4_20val.RData"))
 ```
 
-
 :::{#fig-clusterpath}
 
 ```{r}
@@ -2011,19 +2010,19 @@ knitr::include_graphics("./figures/carte-genotypes.png")
 Black poplar and sampling areas.
 :::
 
-The collected DNA methylation data are proportions, and expression data are
-counts data. Details on the plant material and experimental design can be found
-in @sow2019role and @chateigner2020gene. The transcriptomic data were measured
-via RNA-Seq and normalized using Trimmed Mean of M-Values combined with a Best
-linear unbiased predictor (BLUP) correction as described in @chateigner2020gene.
-The methylation data were measured through whole-genome bisulfite sequencing
-(WGBS) and are normalized via the classical logarithmic approach $log_2(x+1)$
-where $x$ is the methylation proportion. For each one of the $10$ populations
-(see @fig-context-epitree), DNA methylation in CG, CHG, and CHH contexts for
-promoters and gene-body and RNA sequencing data are observed on genotypes. A
-mean measure is computed from two replicates per population. The analysis has
-been restricted to a set of $150$ target genes which explains the most
-variability in the omics data and the subsequent number of samples from
+The collected DNA methylation and expression data are counts data. Details on
+the plant material and experimental design can be found in @sow2019role and
+@chateigner2020gene. The transcriptomic data were measured via RNA-Seq and
+normalized using Trimmed Mean of M-Values combined with a Best linear unbiased
+predictor (BLUP) correction as described in @chateigner2020gene. The methylation
+data were measured through whole-genome bisulfite sequencing (WGBS) and are
+normalized via the read per density approach then passed to a logarithm function
+$log_2(x+1)$ where $x$ is the methylation proportion. For each one of the $10$
+populations (see @fig-context-epitree), DNA methylation in CG, CHG, and CHH
+contexts for promoters and gene-body and RNA sequencing data are observed on
+genotypes. A mean measure is computed from two replicates per population. The
+analysis has been restricted to a set of $151$ target genes which explains the
+most variability in the omics data and the subsequent number of samples from
 different omic variables, which is $70.$
 
 The MGLasso model is fitted with fusion penalty values chosen in $[0, 30.94]$
@@ -2032,6 +2031,25 @@ threshold $0.05$. In the resulting clustering path (see
 @fig-clusterpath-poplar), we can identify three distinct and coherent clusters,
 which are samples corresponding to gene expression genotypes, gene-body
 methylation samples, and gene promoter samples.
+
+```{r eval = FALSE, echo = TRUE, include=TRUE}
+# Data
+epit_sparse <- readRDS(paste0(path_data, "epit-spca-select.rds"))
+
+#Selection of sparsity penalty parameter 
+mb_out      <- neighbor_select(data = epit_sparse, lambda_min = 1e-3, nlambda = 50, 
+                               nresamples = 50, verbose = TRUE, estim_var = 0.05)
+
+lambda1_genot     <- mb_out$lambda_opt
+
+pen_params_genot <- seq_l2_l1_fixed(dt = epit_sparse, l1 = lambda1_genot, nl2 = 20, l2_max = 30.94)
+
+mgl_epit_sparse_geno <- lapply(pen_params_genot, 
+                                FUN = mglasso_pair_param, 
+                                X_ = epit_sparse, 
+                                type = "initial")
+```
+
 
 :::{#fig-clusterpath-poplar}
 ```{r}

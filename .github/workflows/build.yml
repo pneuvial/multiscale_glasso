@@ -31,6 +31,10 @@ jobs:
           environment-file: environment.yml
           activate-environment: computo
           
+      - name: Install additional R dependencies
+        run: | 
+          conda run -n computo Rscript r-addons.R
+          
       - name: Install additional python dependencies
         shell: Rscript {0}
         run: | 
@@ -48,10 +52,6 @@ jobs:
           
           reticulate::py_config()
 
-      - name: Install additional R dependencies
-        run: | 
-          conda run -n computo Rscript r-addons.R
-          
       - name: Installing quarto
         uses: quarto-dev/quarto-actions/install-quarto@v1
         
