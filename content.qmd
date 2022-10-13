@@ -1759,7 +1759,7 @@ normalized using Trimmed Mean of M-Values combined with a Best linear unbiased
 predictor (BLUP) correction as described in @chateigner2020gene. The methylation
 data were measured through whole-genome bisulfite sequencing (WGBS) and are
 normalized via the read per density approach then passed to a logarithm function
-$log_2(x+1)$ where $x$ is the methylation proportion. For each one of the $10$
+$log_2(x+1)$ with $x \in \mathbb R$. For each one of the $10$
 populations (see @fig-context-epitree), DNA methylation in CG, CHG, and CHH
 contexts for promoters and gene-body and RNA sequencing data are observed on
 genotypes. A mean measure is computed from two replicates per population. The
