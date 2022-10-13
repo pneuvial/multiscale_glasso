@@ -186,8 +186,8 @@ expand_beta <- function(beta_level, clusters){
   return(beta_exp)
 }
 
-#' extracts meta-variables graphs 
-extract_meta <- function(full_graph, clusters) {
+#' extracts meta-variables indices
+extract_meta <- function(full_graph=NULL, clusters) {
   p <- length(clusters)
   
   meta_groups <- split(1:p, clusters)
@@ -196,7 +196,7 @@ extract_meta <- function(full_graph, clusters) {
     return(a[[1]])
   })
   
-  meta_graph <- full_graph[index_meta_vars, index_meta_vars]
+  #meta_graph <- full_graph[index_meta_vars, index_meta_vars]
   
   #return(meta_graph)
   return(index_meta_vars)

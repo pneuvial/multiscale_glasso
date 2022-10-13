@@ -158,12 +158,13 @@ beta_idty <- function(p){
 }
 
 #' symmetrize matrix of regression vectors pxp
-symmetrize <- function(mat, rule = "and"){
+symmetrize <- function(mat, rule = "and") {
   diag(mat) <- 0
-  if (rule == "and"){
-    mat <- sign(mat) * pmin(abs(mat),t(abs(mat)))
-  }else{ ## or rule
-    mat <- pmax(mat,t(mat)) - pmax(-mat,-t(mat)) 
+  if (rule == "and") {
+    mat <- sign(mat) * pmin(abs(mat), t(abs(mat)))
+  } else{
+    ## or rule
+    mat <- pmax(mat, t(mat)) - pmax(-mat, -t(mat))
   }
   return(mat)
 }

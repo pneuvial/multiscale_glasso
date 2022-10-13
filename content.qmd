@@ -16,7 +16,26 @@ author:
     affiliation-url: http://www.math-evry.cnrs.fr/
 date: last-modified
 abstract: >+
-  Gaussian Graphical Models (GGMs) are widely used in high-dimensional data analysis to synthesize the interaction between variables. In many applications, such as genomics or image analysis, graphical models rely on sparsity and clustering to reduce dimensionality and improve performances. This paper explores a slightly different paradigm where clustering is not knowledge-driven but performed simultaneously with the graph inference task. We introduce a novel Multiscale Graphical Lasso (MGLasso) to improve networks interpretability by proposing graphs at different granularity levels. The method estimates clusters through a  convex clustering approach, a relaxation of $k$-means, and hierarchical clustering. The conditional independence graph is simultaneously inferred through a neighborhood selection scheme for undirected graphical models. MGLasso extends and generalizes the sparse group fused lasso problem to undirected graphical models. We use continuation with Nesterov smoothing in a shrinkage-thresholding algorithm (CONESTA) to propose a regularization path of solutions when the Lasso penalty is kept constant. Extensive experiments on synthetic data compared the performances of our model to state-of-the-art clustering methods and network inference models. Applications to gut microbiome data and poplar's methylation mixed with transcriptomic data are presented.
+  Gaussian Graphical Models (GGMs) are widely used in high-dimensional data 
+  analysis to synthesize the interaction between variables. In many 
+  applications, such as genomics or image analysis, graphical models 
+  rely on sparsity and clustering to reduce dimensionality and improve 
+  performances. This paper explores a slightly different paradigm where 
+  clustering is not knowledge-driven but performed simultaneously with 
+  the graph inference task. We introduce a novel Multiscale Graphical 
+  Lasso (MGLasso) to improve networks interpretability by proposing graphs 
+  at different granularity levels. The method estimates clusters through a 
+  convex clustering approach, a relaxation of $k$-means, and hierarchical 
+  clustering. The conditional independence graph is simultaneously inferred 
+  through a neighborhood selection scheme for undirected graphical models. 
+  MGLasso extends and generalizes the sparse group fused lasso problem to 
+  undirected graphical models. We use continuation with Nesterov smoothing 
+  in a shrinkage-thresholding algorithm (CONESTA) to propose a regularization 
+  path of solutions when the Lasso penalty is kept constant. Extensive 
+  experiments on synthetic data compared the performances of our model 
+  to state-of-the-art clustering methods and network inference models. 
+  Applications to gut microbiome data and poplar's methylation mixed with 
+  transcriptomic data are presented.
 citation:
   type: article-journal
   container-title: "Computo"
@@ -308,16 +327,24 @@ Illustration of the permutation between regression coefficients in the MGLasso
 model. 
 :::
 
-<!-- $\hat D(\lambda_1^{(k)}) = \frac{\sum_{s<t} \hat \xi_{st}(\lambda_1^{(k)})}{p \choose 2}.$ -->
 <!-- \begin{equation} -->
-<!--    (\boldsymbol \beta^i,  \textcolor{blue}{\boldsymbol \tau_{ij}} \boldsymbol \beta^j)  =  -->
+<!--    (\boldsymbol \beta^i,  \textcolor{blue}{\boldsymbol \tau_{ij}}  -->
+<!--    \boldsymbol \beta^j)  = -->
 <!--    \begin{pmatrix} -->
-<!--         \beta_1^i & \beta_2^i & \dots & \tikzmarknode{a}{\beta_j^i} & \dots \dots & \tikzmarknode{b}{\beta_k^i} & \dots & \beta_p^i\\ -->
+<!--         \beta_1^i & \beta_2^i & \dots & \tikzmarknode{a}{\beta_j^i} &  -->
+<!--         \dots \dots & \tikzmarknode{b}{\beta_k^i} & \dots & \beta_p^i\\ -->
 <!--         \\ -->
 <!--         \\ -->
-<!--         \beta_1^j & \beta_2^j & \dots & \tikzmarknode{c}{\beta_k^j} & \dots \dots & \tikzmarknode{d}{\beta_i^j} & \dots & \beta_p^j -->
+<!--         \beta_1^j & \beta_2^j & \dots & \tikzmarknode{c}{\beta_k^j} &  -->
+<!--         \dots \dots & \tikzmarknode{d}{\beta_i^j} & \dots & \beta_p^j -->
 <!--     \end{pmatrix} -->
 <!-- \end{equation} -->
+<!-- \begin{tikzpicture}[remember picture,overlay] -->
+<!-- \draw[blue,-latex]([yshift=0.1ex]d.south) to[bend left]node[below]{}  -->
+<!--     ([yshift=0.1ex]c.south); -->
+<!-- \draw[blue,-latex]([yshift=-.1000ex]c.north) to[bend left]node[below]{}  -->
+<!--     ([yshift=-.1000ex]d.north); -->
+<!-- \end{tikzpicture} -->
 
 In practice, when external information about the clustering structure is
 available, the problem can be generalized into: 
@@ -663,186 +690,9 @@ $\alpha_{ll}=0.75$ allows only to have an approximate control.
 
 ::: {#fig-model-sbm}
 ```{r echo = TRUE}
-bloc_diag <- function(n_vars,
-                      connectivity_mat,
-                      prop_clusters,
-                      rho) {
-  true_nclusters <- 0
-  
-  while (true_nclusters != length(prop_clusters)) {
-    ## To make sure we have the required number of clusters
-    network <-
-      simone::rNetwork(n_vars, connectivity_mat, prop_clusters)
-    true_nclusters <- length(unique(network$clusters))
-  }
-  
-  precision_mat <-
-    network$A[order(network$clusters), order(network$clusters)]
-  
-  eff_clusters <- table(network$clusters)
-  
-  b = -rho / (1 + rho * (eff_clusters - 2) - rho ^ 2 * (eff_clusters - 1))
-  d = (1 + rho * (eff_clusters - 2)) / (1 + rho * (eff_clusters - 2) -
-                                          rho ^ 2 * (eff_clusters - 1))
-  
-  
-  for (i in 1:length(eff_clusters)) {
-    temp <-
-      precision_mat[which(row.names(precision_mat) == i), which(row.names(precision_mat) == i)]
-    temp <- as.matrix(temp)
-    temp[temp != 0] = b[i]
-    diag(temp) = d[i]
-    precision_mat[which(row.names(precision_mat) == i), which(row.names(precision_mat) == i)] = temp
-  }
-  
-  flag <- min(svd(precision_mat)$d)
-  if (flag < 0) {
-    diag(precision_mat) <- 1 - flag
-  }
-  
-  return(precision_mat)
-}
-
-#' simulate data with given graph structure
-sim_data <- function(p = 20,
-                     np_ratio = 2,
-                     structure = c("block_diagonal", "hub", "scale_free", "erdos"),
-                     alpha,
-                     prob_mat,
-                     rho,
-                     g,
-                     inter_cluster_edge_prob = 0.01,
-                     p_erdos = 0.1,
-                     verbose = FALSE) {
-  structure <- match.arg(structure)
-  n = round(np_ratio * p)
-  
-  switch (
-    structure,
-    erdos = {
-      network <- simone::rNetwork(p, p_erdos, 1)
-      correlation <- solve(network$Theta)
-      X           <- mvtnorm::rmvnorm(n, sigma = correlation)
-      graph <- network$Theta
-      
-      if (verbose)
-        message("Data, precision matrix and graph generated from Erdos structure.")
-    },
-    
-    hub = {
-      L = huge::huge.generator(
-        graph = "hub",
-        g = 5,
-        d = p,
-        n = n,
-        verbose = FALSE
-      )
-      
-      X = L$data
-      graph = L$omega
-      correlation = L$sigma
-      
-      if (verbose)
-        message("Data, precision matrix and graph generated from Hub structure.")
-    },
-    
-    scale_free = {
-      L = huge::huge.generator(
-        graph = "scale-free",
-        d = p,
-        n = n,
-        verbose = FALSE
-      ) ## d edges graph
-      
-      X = L$data
-      graph = L$omega
-      correlation = L$sigma
-      
-      if (verbose)
-        message("Data, precision matrix and graph generated from Scale free structure.")
-    },
-    
-    block_diagonal = {
-      if (inter_cluster_edge_prob != 0) {
-        # inter-clusters edges added in the flipped way
-        flag <- TRUE
-        
-        while (flag) {
-          K <- bloc_diag(p, prob_mat, alpha, rho)
-          
-          target_indices <-
-            which(K[upper.tri(K)] == 0) # Random selection of edges to be set to 1
-          
-          select_len <-
-            round(length(target_indices) * inter_cluster_edge_prob)
-          selected_indices <-
-            sample(target_indices, select_len)
-          
-          precision_level <- unique(K[upper.tri(K)])
-          precision_level <-
-            max(precision_level[precision_level != 0])
-          
-          K[upper.tri(K)][selected_indices] <- precision_level
-          K <-
-            as.matrix(Matrix::forceSymmetric(K, uplo = "U"))
-          
-          flag <-
-            any(eigen(K)$values <= 0) # Control of positive definiteness
-        }
-        
-        correlation <- solve(K)
-        graph = K
-        X           <-
-          mvtnorm::rmvnorm(n, sigma = correlation)
-        
-        if (verbose)
-          message(
-            "Data, precision matrix and graph generated from block-diagonal
-                                  structure with inter-clusters edges."
-          )
-      }
-      else {
-        # Only intra-cluster edges while approximately controlling correlation level
-        K <- bloc_diag(p, prob_mat, alpha, rho)
-        correlation <- solve(K)
-        graph = K
-        X           <-
-          mvtnorm::rmvnorm(n, sigma = correlation)
-        
-        if (verbose)
-          message(
-            "Data, precision matrix and graph generated from block-diagonal
-                                  structure with only intra-clusters edges."
-          )
-      }
-    }
-  )
-  return(list(
-    X = X,
-    graph = graph,
-    correlation = correlation
-  ))
-}
-
-#' symmetrize matrix of regression vectors pxp
-symmetrize <- function(mat, rule = "and") {
-  diag(mat) <- 0
-  if (rule == "and") {
-    mat <- sign(mat) * pmin(abs(mat), t(abs(mat)))
-  } else{
-    ## or rule
-    mat <- pmax(mat, t(mat)) - pmax(-mat, -t(mat))
-  }
-  return(mat)
-}
-
-adj_mat <- function(mat, sym_rule = "and") {
-  mat <- symmetrize(as.matrix(mat), rule = sym_rule)
-  mat[abs(mat) < 1e-10] <- 0
-  mat[mat != 0] <- 1
-  mat <- as(mat, "sparseMatrix")
-  return(mat)
-}
+path_checks <- "./rscripts/mglasso_functions/"
+source(paste0(path_checks, "cost.R"))
+source(paste0(path_checks, "simulate.R"))
 
 set.seed(2020)
 sim_sbm <- sim_data(
@@ -941,11 +791,8 @@ curves for the three models are given in @fig-roc-erdos, @fig-roc-sfree
 and @fig-roc-sbm by varying $\frac{n}{p}\in \{0.5,1,2\}$.
 
 ```{r echo=TRUE}
-path_checks <- "./rscripts/mglasso_functions/"
-source(paste0(path_checks, "simulate.R"))
 source(paste0(path_checks, "plot.R"))
 source(paste0(path_checks, "clustering.R"))
-source(paste0(path_checks, "cost.R"))
 
 # testthat::expect_true("pylearn-parsimony" %in%
 # reticulate::py_list_packages()$package) tryCatch(conesta_rwrapper(1), finally
@@ -1638,56 +1485,6 @@ As a preliminary analysis, we perform a hierarchical agglomerative clustering
 (HAC) on the OTUs, which allows us to identify four significant groups.
 The correlation matrix of the dataset is given in fig-emp-cor;
 variables have been rearranged according to the HAC partition.
-<!-- ::: {#fig-emp-cor} -->
-<!-- ```{r eval = FALSE} -->
-<!-- data(amgut1.filt, package = "SpiecEasi") -->
-<!-- dta <- amgut1.filt -->
-<!-- dta <- t(SpiecEasi::clr(dta + 1 , 1)) -->
-
-<!-- S <- cor(dta) -->
-<!-- hclust_dta <- hclust(dist(t(dta)), method = "ward.D") -->
-<!-- hclust_dta <- hclust(as.dist(1-S^2), method = "ward.D") -->
-
-<!-- cut_dta <- stats::cutree(hclust_dta, 4) -->
-
-<!-- Matrix::image(as(S[order(cut_dta), order(cut_dta)], -->
-<!--          "sparseMatrix"),  -->
-<!--       sub = "", xlab = "", ylab = "", -->
-<!--       colorkey = FALSE) -->
-<!-- ``` -->
-<!-- Empirical correlations in the gut data. -->
-<!-- ::: -->
-<!-- <old> -->
-<!-- The average correlations within blocks of variables belonging to the -->
-<!-- same cluster are given below. We observe relatively high levels of -->
-<!-- correlation in small blocks, similar to the simulation models used to -->
-<!-- evaluate the performance of clustering in <old>the [Simulation -->
-<!-- Experiments](#simulation-experiments)</old> Section -->
-<!-- <revision>[4](#simulation-experiments)</revision>. -->
-<!-- ```{r} -->
-<!-- C <- cor(dta) -->
-<!-- diag(C) <- 0 -->
-<!-- clusters <- cut_dta -->
-
-<!-- seq_p <- 1:length(clusters) -->
-<!-- L <- split(seq_p, factor(clusters)) -->
-
-<!-- mat <- t(sapply(L, -->
-<!--                 FUN = function(v) { -->
-<!--                   summary(as.vector(C[v,v])) -->
-<!--                 })) -->
-
-<!-- out <- data.frame(Cluster = 1:4, "Mean correlation" = round(mat[, "Mean"], 3)) -->
-<!-- knitr::kable(out) -->
-<!-- ``` -->
-<!-- <old> We apply MGLasso to the normalised counts to infer a graph and a -->
-<!-- clustering structure. The graphs obtained by MGLasso for $\lambda_2 = 0$
---> <!-- and for $\lambda_2 = 5$ (corresponding respectively $127$ and $80$ -->
-<!-- clusters) are given below. In each case, The parameter $\lambda_1$ is -->
-<!-- chosen by stability selection. The hyperparameter of the StARS approach is
-set to $0.05$ which might select the Lasso penalty that leads to a sparse and
-stable graph between subsampled graphs. The grid of values taken by the fusion
-parameter $\lambda_2$ is set to $[0, 20].$  -->
 
 Using these settings, we compute a clustering path of the solutions and
 estimated graphs for $5$ values of $\lambda_2$ corresponding to $5$ different
@@ -1803,7 +1600,8 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL) {
   data_plot + theme_bw()
 }
 
-plot_clusterpath(amgut1.filt, c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3))
+plot_clusterpath(amgut1.filt,
+                 c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3))
 ```
 
 Clustering path of the MGLasso convex clustering solutions on microbiome data
@@ -1814,12 +1612,6 @@ are equal; thus, the branches of the path converge to a unique point in the
 center of the graph.
 :::
 
-<!-- ::: {#fig-real-data-mglasso} -->
-<!-- ```{r, out.width="49%", out.height="20%", fig.show='hold',fig.align='center', echo = TRUE} -->
-<!-- knitr::include_graphics(c("figures/mglasso_tv0.png","figures/mglasso_full_graph_tv5.png")) -->
-<!-- ``` -->
-<!-- ::: -->
-
 The @fig-meta-graphs displays graphs and clusters for different levels of
 granularity: $127$, $63$, $31$, $15$ and $2$ clusters. For computing the
 clusters' assignment of nodes, the fusion threshold has been set to
@@ -1828,106 +1620,6 @@ same neighborhood; thus, the neighboring information is summarized into a single
 variable representative of the group. The subfigures show graphs at multiple
 levels of granularity which are built on the meta-variables or representative
 variables.
-
-<!-- ::: {#fig-real-data-mglasso} -->
-<!-- ```{r} -->
-<!-- ig.mgl.tv0 <- adj2igraph(mgl_amgut_rev$`1`$selected_Theta,  -->
-<!--                          vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
-<!-- E(ig.mgl.tv0)$weight <- abs(E(ig.mgl.tv0)$weight)  -->
-
-<!-- #get taxa table and add add new column for clusters -->
-<!-- clusters <- as.character(1:ncol(mgl_amgut_rev$`1`$selected_Theta)) -->
-<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
-<!-- taxas <- cbind(clusters, taxas) -->
-
-<!-- plot_network(ig.mgl.tv0, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
-<!-- ``` -->
-<!-- Inferred graph for no fusion penalty.  -->
-<!-- ::: -->
-
-<!-- :::{#fig-compare-taxa-clusters} -->
-<!-- ```{r} -->
-<!-- #| layout-ncol: 2 -->
-<!-- #| layout-nrow: 3 -->
-<!-- #| fig-cap: -->
-<!-- #|   - "127 clusters graph"  -->
-<!-- #|   - "63 clusters graph" -->
-<!-- #|   - "31 clusters graph" -->
-<!-- #|   - "15 clusters graph" -->
-<!-- #|   - "2 clusters graph" -->
-
-<!-- get_clusters_mgl <- function(beta_mgl, fuse_thresh = 1e-3, p) { -->
-<!--   p <- ncol(beta_mgl) -->
-
-<!--   clusters <- 1:p -->
-<!--   diffs <- dist_beta(beta_mgl, distance = "euclidean") ## Update distance matrix -->
-<!--   pairs_to_merge <- which(diffs <= fuse_thresh, arr.ind = TRUE) -->
-
-<!--   if(nrow(pairs_to_merge) != 0) -->
-<!--     clusters <- merge_clusters(pairs_to_merge, clusters)  # merge clusters -->
-
-<!--   return(clusters) -->
-<!-- } -->
-
-<!-- all_clusters_partition <- lapply(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), function(x) get_clusters_mgl(x$selected_Theta)) -->
-<!-- all_num_clusters <- unlist(lapply(all_clusters_partition, function(x) length(unique(x)))) -->
-<!-- # less_than_22_clusters <- which(all_num_clusters <= 22 & all_num_clusters != 1) -->
-<!-- #  -->
-<!-- # rand_indices <- NULL -->
-<!-- # for(clmgl in less_than_22_clusters){ -->
-<!-- #   for(clrank in 2:8){ -->
-<!-- #     rand_index <- mclust::adjustedRandIndex(all_clusters_partition[[clmgl]], taxas[,clrank]) -->
-<!-- #     rand_indices <- append(rand_indices, rand_index) -->
-<!-- #   } -->
-<!-- # } -->
-<!-- # max(rand_indices) -->
-
-<!-- ind <- which(all_num_clusters == 127)[1] -->
-<!-- clusters <- as.character(all_clusters_partition[[ind]]) -->
-<!-- ig.mgl.tv <- adj2igraph(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta, vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
-<!-- E(ig.mgl.tv)$weight <- abs(E(ig.mgl.tv)$weight)  -->
-<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
-<!-- taxas <- cbind(clusters, taxas) -->
-<!-- plot_network(ig.mgl.tv, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
-
-<!-- ind <- which(all_num_clusters == 63)[1] -->
-<!-- clusters <- as.character(all_clusters_partition[[ind]]) -->
-<!-- ig.mgl.tv <- adj2igraph(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta, vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
-<!-- E(ig.mgl.tv)$weight <- abs(E(ig.mgl.tv)$weight)  -->
-<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
-<!-- taxas <- cbind(clusters, taxas) -->
-<!-- plot_network(ig.mgl.tv, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
-
-<!-- ind <- which(all_num_clusters == 31)[1] -->
-<!-- clusters <- as.character(all_clusters_partition[[ind]]) -->
-<!-- ig.mgl.tv <- adj2igraph(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta, vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
-<!-- E(ig.mgl.tv)$weight <- abs(E(ig.mgl.tv)$weight)  -->
-<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
-<!-- taxas <- cbind(clusters, taxas) -->
-<!-- plot_network(ig.mgl.tv, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
-
-<!-- ind <- which(all_num_clusters == 15)[1] -->
-<!-- clusters <- as.character(all_clusters_partition[[ind]]) -->
-<!-- ig.mgl.tv <- adj2igraph(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta, vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
-<!-- E(ig.mgl.tv)$weight <- abs(E(ig.mgl.tv)$weight)  -->
-<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
-<!-- taxas <- cbind(clusters, taxas) -->
-<!-- plot_network(ig.mgl.tv, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
-
-<!-- ind <- which(all_num_clusters == 2)[1] -->
-<!-- clusters <- as.character(all_clusters_partition[[ind]]) -->
-<!-- ig.mgl.tv <- adj2igraph(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta, vertex.attr = list(name=taxa_names(amgut1.filt.phy))) -->
-<!-- E(ig.mgl.tv)$weight <- abs(E(ig.mgl.tv)$weight)  -->
-<!-- taxas <- amgut1.filt.phy@tax_table@.Data -->
-<!-- taxas <- cbind(clusters, taxas) -->
-<!-- plot_network(ig.mgl.tv, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters") -->
-<!-- ``` -->
-
-<!-- Taxa classes and MGLasso classes -->
-<!-- ::: -->
-
-<!-- #| layout-ncol: 2 -->
-<!-- #| layout-nrow: 3 -->
 
 :::{#fig-meta-graphs}
 ```{r}
@@ -1939,19 +1631,6 @@ variables.
 #|   - "Meta-variables graph with 15 clusters"
 #|   - "Meta-variables graph with 2 clusters"
 
-get_clusters_mgl <- function(beta_mgl, fuse_thresh = 1e-3, p) {
-  p <- ncol(beta_mgl)
-  
-  clusters <- 1:p
-  diffs <- dist_beta(beta_mgl, distance = "euclidean") ## Update distance matrix
-  pairs_to_merge <- which(diffs <= fuse_thresh, arr.ind = TRUE)
-  
-  if(nrow(pairs_to_merge) != 0)
-    clusters <- merge_clusters(pairs_to_merge, clusters)  # merge clusters
-  
-  return(clusters)
-}
-
 all_clusters_partition <-
   lapply(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), function(x)
     get_clusters_mgl(x$selected_Theta))
@@ -1959,32 +1638,24 @@ all_num_clusters <-
   unlist(lapply(all_clusters_partition, function(x)
     length(unique(x))))
 
-#' extracts meta-variables graphs 
-extract_meta <- function(full_graph=NULL, clusters) {
-  p <- length(clusters)
-  
-  meta_groups <- split(1:p, clusters)
-  
-  index_meta_vars <- sapply(meta_groups, function(a){
-    return(a[[1]])
-  })
-  
-  #meta_graph <- full_graph[index_meta_vars, index_meta_vars]
-  
-  #return(meta_graph)
-  return(index_meta_vars)
-}
-
 ind <- which(all_num_clusters == 127)[1]
 clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
-metaG <- c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
-metaG <- adj2igraph(metaG, vertex.attr = list(name=taxa_names(amgut1.filt.phy)[vec]))
-E(metaG)$weight <- abs(E(metaG)$weight) 
+metaG <-
+  c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+metaG <-
+  adj2igraph(metaG, vertex.attr = list(name = taxa_names(amgut1.filt.phy)[vec]))
+E(metaG)$weight <- abs(E(metaG)$weight)
 taxas <- amgut1.filt.phy@tax_table@.Data
 taxas <- cbind(clusters, taxas)
-taxas <- taxas[vec,]
-plot_network(metaG, taxas, type = "taxa", layout.method = layout_with_fr, color = "clusters")
+taxas <- taxas[vec, ]
+plot_network(
+  metaG,
+  taxas,
+  type = "taxa",
+  layout.method = layout_with_fr,
+  color = "clusters"
+)
 
 ind <- which(all_num_clusters == 63)[1]
 clusters <- as.character(all_clusters_partition[[ind]])
@@ -2100,37 +1771,6 @@ in the convex clustering problem can be suboptimal. The abundance of OTUs
 belonging to cluster $1$, mainly composed of Bacteroidetes and Firmicutes phyla,
 is seemingly dependent on the abundance of OTUS in cluster $2$, i.e.,
 Proteobacteria phylum.
-
-<old>
-The variables were reordered according to the clustering partition
-obtained from the distances between the regression vectors. Increasing
-$\lambda_2$ reduces the number of clusters and leads to a shrinking
-effect on the estimates. The adjacency matrix of the neighborhood
-selection equivalent to setting $\lambda_2$ to $0$ is given in
-fig-real-data-mglasso (up). In fig-real-data-mglasso (down), the
-deduced partition is composed of $80$ clusters.<revision> In order to
-represent these graphs as adjacency matrices, the regression vectors are
-concatenated in a matrix which diagonal elements are set to zero. Note
-that in the MB approach of estimating a graph, it is possible to obtain
-a vector for which the coefficients are all equal to zero. A zero column
-in the adjacency matrix might correspond to a column in the precision
-matrix for which only the diagonal coefficient is non-zero. </revision>A
-confusion matrix comparing the edges deduced by MGLasso with
-$\lambda_2 = 5$ and neighborhood selection is given below. Adding a
-total variation parameter increases the merging effect, resulting in a
-larger number of edges in the graph.
-
-<!-- |                           |           | Neighborhood selection |       |
---> <!--
-|---------------------------|-----------|:----------------------:|-------| -->
-<!-- | MGLasso ($\lambda_2 = 5$) |           |       non-edges        | edges |
---> <!-- |                           | non-edges |         15678          | 0
-| --> <!-- |                           | edges     |          288           |
-163   | -->
-
-<!-- : my table caption {#tbl-mylabel} -->
-
-<!-- @tbl-mylabel -->
 
 ## Application to epigenetic and transcriptomic genotypes in poplar  
 

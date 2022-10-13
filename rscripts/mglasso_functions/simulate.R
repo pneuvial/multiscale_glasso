@@ -22,120 +22,153 @@ sim_data <- function(p = 20,
                      g,
                      inter_cluster_edge_prob = 0.01,
                      p_erdos = 0.1,
-                     verbose = FALSE){
-  
+                     verbose = FALSE) {
   structure <- match.arg(structure)
   n = round(np_ratio * p)
   
-  switch (structure,
-          erdos = {
-            network <- simone::rNetwork(p, p_erdos, 1)
-            correlation <- solve(network$Theta)
-            X           <- mvtnorm::rmvnorm(n, sigma = correlation)
-            graph <- network$Theta
-            
-            if(verbose) message("Data, precision matrix and graph generated from Erdos structure.")
-          },
+  switch (
+    structure,
+    erdos = {
+      network <- simone::rNetwork(p, p_erdos, 1)
+      correlation <- solve(network$Theta)
+      X           <- mvtnorm::rmvnorm(n, sigma = correlation)
+      graph <- network$Theta
+      
+      if (verbose)
+        message("Data, precision matrix and graph generated from Erdos structure.")
+    },
+    
+    hub = {
+      L = huge::huge.generator(
+        graph = "hub",
+        g = 5,
+        d = p,
+        n = n,
+        verbose = FALSE
+      )
+      
+      X = L$data
+      graph = L$omega
+      correlation = L$sigma
+      
+      if (verbose)
+        message("Data, precision matrix and graph generated from Hub structure.")
+    },
+    
+    scale_free = {
+      L = huge::huge.generator(
+        graph = "scale-free",
+        d = p,
+        n = n,
+        verbose = FALSE
+      ) ## d edges graph
+      
+      X = L$data
+      graph = L$omega
+      correlation = L$sigma
+      
+      if (verbose)
+        message("Data, precision matrix and graph generated from Scale free structure.")
+    },
+    
+    block_diagonal = {
+      if (inter_cluster_edge_prob != 0) {
+        # inter-clusters edges added in the flipped way
+        flag <- TRUE
+        
+        while (flag) {
+          K <- bloc_diag(p, prob_mat, alpha, rho)
           
-          hub = {
-            L = huge::huge.generator(graph = "hub", g = 5, d = p, n = n, verbose = FALSE)
-            
-            X=L$data
-            graph = L$omega
-            correlation = L$sigma
-            
-            if(verbose) message("Data, precision matrix and graph generated from Hub structure.")
-          },
+          target_indices <-
+            which(K[upper.tri(K)] == 0) # Random selection of edges to be set to 1
           
-          scale_free = {
-            L = huge::huge.generator(graph = "scale-free", d = p, n = n, verbose = FALSE) ## d edges graph
-            
-            X=L$data
-            graph = L$omega
-            correlation = L$sigma
-            
-            if(verbose) message("Data, precision matrix and graph generated from Scale free structure.")
-          },
+          select_len <-
+            round(length(target_indices) * inter_cluster_edge_prob)
+          selected_indices <-
+            sample(target_indices, select_len)
           
-          block_diagonal = { 
-            
-            if(inter_cluster_edge_prob != 0) { # inter-clusters edges added in the flipped way
-              flag <- TRUE
-              
-              while(flag) { # To do: treat the flag case instead of generating a new model
-                K <- bloc_diag(p, prob_mat, alpha, rho)
-                
-                target_indices <- which(K[upper.tri(K)] == 0) # Random selection of edges to be set to 1
-                
-                select_len <- round(length(target_indices) * inter_cluster_edge_prob)
-                selected_indices <- sample(target_indices, select_len)
-                
-                precision_level <- unique(K[upper.tri(K)])
-                precision_level <- max(precision_level[precision_level != 0]) # je prends la precision max à l'intérieur des blocs
-                                                                              # et je l'affecte dans les arêtes inter-blocs
-                
-                K[upper.tri(K)][selected_indices] <- precision_level
-                K <- as.matrix(Matrix::forceSymmetric(K, uplo = "U"))
-                
-                flag <- any(eigen(K)$values <= 0) # Control of positive definiteness
-              }
-              
-              correlation <- solve(K)
-              graph = K
-              X           <- mvtnorm::rmvnorm(n, sigma = correlation)
-              
-              if(verbose) message("Data, precision matrix and graph generated from block-diagonal 
-                                  structure with inter-clusters edges.")
-            }
-            else { # Only intra-cluster edges while approximately controlling correlation level
-              K <- bloc_diag(p, prob_mat, alpha, rho)
-              correlation <- solve(K)
-              graph = K
-              X           <- mvtnorm::rmvnorm(n, sigma = correlation)
-              
-              if(verbose) message("Data, precision matrix and graph generated from block-diagonal 
-                                  structure with only intra-clusters edges.")
-            }
-          }
+          precision_level <- unique(K[upper.tri(K)])
+          precision_level <-
+            max(precision_level[precision_level != 0])
+          
+          K[upper.tri(K)][selected_indices] <- precision_level
+          K <-
+            as.matrix(Matrix::forceSymmetric(K, uplo = "U"))
+          
+          flag <-
+            any(eigen(K)$values <= 0) # Control of positive definiteness
+        }
+        
+        correlation <- solve(K)
+        graph = K
+        X           <-
+          mvtnorm::rmvnorm(n, sigma = correlation)
+        
+        if (verbose)
+          message(
+            "Data, precision matrix and graph generated from block-diagonal
+                                  structure with inter-clusters edges."
+          )
+      }
+      else {
+        # Only intra-cluster edges while approximately controlling correlation level
+        K <- bloc_diag(p, prob_mat, alpha, rho)
+        correlation <- solve(K)
+        graph = K
+        X           <-
+          mvtnorm::rmvnorm(n, sigma = correlation)
+        
+        if (verbose)
+          message(
+            "Data, precision matrix and graph generated from block-diagonal
+                                  structure with only intra-clusters edges."
+          )
+      }
+    }
   )
-  
-  return(list(X=X, graph=graph, correlation=correlation))
+  return(list(
+    X = X,
+    graph = graph,
+    correlation = correlation
+  ))
 }
 
 #'return precision matrix
-bloc_diag <- function(n_vars, connectivity_mat, prop_clusters, rho) {
-  
+bloc_diag <- function(n_vars,
+                      connectivity_mat,
+                      prop_clusters,
+                      rho) {
   true_nclusters <- 0
   
-  while (true_nclusters != length(prop_clusters)){ ## controle pour s'assurer qu'il y a bien le nombre de clusters voulu
-    network <- simone::rNetwork(n_vars, connectivity_mat, prop_clusters)
+  while (true_nclusters != length(prop_clusters)) {
+    ## To make sure we have the required number of clusters
+    network <-
+      simone::rNetwork(n_vars, connectivity_mat, prop_clusters)
     true_nclusters <- length(unique(network$clusters))
   }
   
-  precision_mat <- network$A[order(network$clusters), order(network$clusters)]
+  precision_mat <-
+    network$A[order(network$clusters), order(network$clusters)]
   
   eff_clusters <- table(network$clusters)
   
-  b = -rho/(1+rho*(eff_clusters-2) -rho^2*(eff_clusters-1))
-  d = (1+rho*(eff_clusters-2))/(1+rho*(eff_clusters-2) -rho^2*(eff_clusters-1))
+  b = -rho / (1 + rho * (eff_clusters - 2) - rho ^ 2 * (eff_clusters - 1))
+  d = (1 + rho * (eff_clusters - 2)) / (1 + rho * (eff_clusters - 2) -
+                                          rho ^ 2 * (eff_clusters - 1))
   
   
   for (i in 1:length(eff_clusters)) {
-    #bloc <- matrix(b[i], eff_clusters[i], eff_clusters[i])
-    temp <- precision_mat[which(row.names(precision_mat) == i), which(row.names(precision_mat) == i)]
+    temp <-
+      precision_mat[which(row.names(precision_mat) == i), which(row.names(precision_mat) == i)]
     temp <- as.matrix(temp)
-    
     temp[temp != 0] = b[i]
     diag(temp) = d[i]
-    
     precision_mat[which(row.names(precision_mat) == i), which(row.names(precision_mat) == i)] = temp
-    
   }
   
   flag <- min(svd(precision_mat)$d)
-  if(flag < 0){
+  if (flag < 0) {
     diag(precision_mat) <- 1 - flag
-    
   }
   
   return(precision_mat)
@@ -304,7 +337,9 @@ one_simu_extended <- function(list_ii_rho, verbose = FALSE, model = "block_diago
   return(res)
 }
 
-get_clusters_mgl <- function(beta_mgl, fuse_thresh = thresh_fuse, p) {
+get_clusters_mgl <- function(beta_mgl, fuse_thresh = 1e-3, p) {
+  p <- ncol(beta_mgl)
+  
   clusters <- 1:p
   diffs <- dist_beta(beta_mgl, distance = "euclidean") ## Update distance matrix
   pairs_to_merge <- which(diffs <= fuse_thresh, arr.ind = TRUE)
@@ -532,9 +567,10 @@ get_range_nclusters <- function(out, thresh_fuse = 1e-6, p = 40){
   res
 }
 
-adj_mat <- function(mat) {
-  diag(mat) <- 0
-  mat[ abs(mat) < 1e-10] <- 0
+adj_mat <- function(mat, sym_rule = "and") {
+  mat <- symmetrize(as.matrix(mat), rule = sym_rule)
+  mat[abs(mat) < 1e-10] <- 0
   mat[mat != 0] <- 1
+  mat <- as(mat, "sparseMatrix")
   return(mat)
 }
