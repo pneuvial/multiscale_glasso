@@ -224,7 +224,8 @@ $$
 $${#eq-neighborhood} 
 where $\lambda$ is a non-negative regularization parameter,
 $\mathbf{X}^{\setminus i}$ denotes the matrix $\mathbf{X}$ deprived of column
-$i$, $\boldsymbol{\beta}^i$ is a vector of $p-1$ regression coefficients and
+$i$, $\boldsymbol{\beta}^i = (\beta^i_j)_{j \in \{1,\dots,p\} \backslash i}$ 
+is a vector of $p-1$ regression coefficients and
 $\left \lVert . \right \rVert_1$ is the $\ell_1-$norm. These Lasso regularized
 problems estimate the neighborhoods, one variable at a time. The final edge set
 estimates $\hat E$ can be deduced from the union of the estimated neighborhoods
@@ -1951,7 +1952,7 @@ sessionInfo()
 ```
 
 # Test core functions {.appendix .unnumbered}
-```{r}
+```{r eval=FALSE}
 reticulate::use_condaenv("computo", required = TRUE)
 reticulate::py_config()
 
