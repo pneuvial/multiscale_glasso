@@ -1953,8 +1953,10 @@ sessionInfo()
 
 # Test core functions {.appendix .unnumbered}
 ```{r}
-# reticulate::use_condaenv("computo", required = TRUE)
-# reticulate::py_config()
+path_to_python <- reticulate::conda_python("computo")
+writeLines(sprintf("RETICULATE_PYTHON=%s", path_to_python),
+           Sys.getenv("GITHUB_ENV"))
+reticulate::py_config()
 
 # To check if all required python dependencies are available.
 testthat::expect_true(reticulate::py_module_available("numpy"))
