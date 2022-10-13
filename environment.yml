@@ -17,7 +17,7 @@ dependencies:
   - r-huge
   - r-matrix
   - r-remotes
-  - r-reticulate
+  - reticulate
   - r-rmarkdown
   - r-tidyverse
   - r-devtools
@@ -28,3 +28,4 @@ dependencies:
   - r-testthat
   - r-BiocManager
   - r-igraph
+  - r-parallel
