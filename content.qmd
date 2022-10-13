@@ -1954,7 +1954,7 @@ sessionInfo()
 # Test core functions {.appendix .unnumbered}
 ```{r}
 # reticulate::use_condaenv("computo", required = TRUE)
-reticulate::py_config()
+# reticulate::py_config()
 
 # To check if all required python dependencies are available.
 testthat::expect_true(reticulate::py_module_available("numpy"))
@@ -1964,7 +1964,7 @@ testthat::expect_true(reticulate::py_module_available("matplotlib"))
 testthat::expect_true("scikit-learn" %in% reticulate::py_list_packages()$package)
 testthat::expect_true("pylearn-parsimony" %in% reticulate::py_list_packages()$package)
 
-source_python(paste0(path_functions, "solve.py"))
+reticulate::source_python(paste0(path_functions, "solve.py"))
 
 # Example test mglasso solver function 
 n = 30
