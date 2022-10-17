@@ -53,7 +53,7 @@ editor_options:
 ---
 
 [![build
-status](https://github.com/desanou/%7B%7B%3C%20meta%20repo%20%3E%7D%7D/workflows/build/badge.svg)](https://github.com/desanou/%7B%7B%3C%20meta%20repo%20%3E%7D%7D)
+status](https://github.com/desanou/multiscale_glasso/actions/workflows/build.yml/badge.svg)](https://github.com/desanou/%7B%7B%3C%20meta%20repo%20%3E%7D%7D)
 [![Creative Commons
 License](https://i.creativecommons.org/l/by/4.0/80x15.png)](http://creativecommons.org/licenses/by/4.0/)
  
@@ -318,21 +318,21 @@ model.
 :::
 
 <!-- \begin{equation} -->
-<!--    (\boldsymbol \beta^i,  \textcolor{blue}{\boldsymbol \tau_{ij}}  -->
+<!--    (\boldsymbol \beta^i,  \textcolor{blue}{\boldsymbol \tau_{ij}} -->
 <!--    \boldsymbol \beta^j)  = -->
 <!--    \begin{pmatrix} -->
-<!--         \beta_1^i & \beta_2^i & \dots & \tikzmarknode{a}{\beta_j^i} &  -->
+<!--         \beta_1^i & \beta_2^i & \dots & \tikzmarknode{a}{\beta_j^i} & -->
 <!--         \dots \dots & \tikzmarknode{b}{\beta_k^i} & \dots & \beta_p^i\\ -->
 <!--         \\ -->
 <!--         \\ -->
-<!--         \beta_1^j & \beta_2^j & \dots & \tikzmarknode{c}{\beta_k^j} &  -->
+<!--         \beta_1^j & \beta_2^j & \dots & \tikzmarknode{c}{\beta_k^j} & -->
 <!--         \dots \dots & \tikzmarknode{d}{\beta_i^j} & \dots & \beta_p^j -->
 <!--     \end{pmatrix} -->
 <!-- \end{equation} -->
 <!-- \begin{tikzpicture}[remember picture,overlay] -->
-<!-- \draw[blue,-latex]([yshift=0.1ex]d.south) to[bend left]node[below]{}  -->
+<!-- \draw[blue,-latex]([yshift=0.1ex]d.south) to[bend left]node[below]{} -->
 <!--     ([yshift=0.1ex]c.south); -->
-<!-- \draw[blue,-latex]([yshift=-.1000ex]c.north) to[bend left]node[below]{}  -->
+<!-- \draw[blue,-latex]([yshift=-.1000ex]c.north) to[bend left]node[below]{} -->
 <!--     ([yshift=-.1000ex]d.north); -->
 <!-- \end{tikzpicture} -->
 
