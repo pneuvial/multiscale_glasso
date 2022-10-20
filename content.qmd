@@ -32,7 +32,7 @@ abstract: >+
   undirected graphical models. We use continuation with Nesterov smoothing 
   in a shrinkage-thresholding algorithm (CONESTA) to propose a regularization 
   path of solutions when the Lasso penalty is kept constant. Extensive 
-  experiments on synthetic data compared the performances of our model 
+  experiments on synthetic data compare the performances of our model 
   to state-of-the-art clustering methods and network inference models. 
   Applications to gut microbiome data and poplar's methylation mixed with 
   transcriptomic data are presented.
@@ -475,7 +475,7 @@ updates.
     \COMMENT{FISTA}
     \STATE $k=2$ \COMMENT{new iterator}
     \STATE $\boldsymbol{\theta}_{\operatorname{FISTA}}^1 = \boldsymbol{\theta}_{\operatorname{FISTA}}^0 = \boldsymbol{\theta}^i$ \COMMENT{Initial parameters value}
-    \STATE $t_{\mu} = \frac{1}{L(g + \lambda_2 s_{\mu})}$ \COMMENT{Compute stepsize}
+    \STATE $t_{\mu} = \frac{1}{L(g + \lambda_2 s_{\mu})}$ \COMMENT{Compute stepsize with $L(g + \lambda_2 s_{\mu})$ the Lipschitz constant of $\nabla(g + \lambda_2 s_{\mu})$}
     
     \Repeat
       \STATE $\boldsymbol{z} = \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} + \frac{k-2}{k+1}(\boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} - \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-2})$
@@ -496,9 +496,9 @@ updates.
 
 ## Reformulation of MGLasso for CONESTA algorithm {#reformulation-of-mglasso-for-conesta-algorithm}
 
-To apply CONESTA, it is necessary to reformulate the MGLasso problem in order to
-comply with the form of loss function required by CONESTA. The objective of
-MGLasso can indeed be written as
+Using CONESTA for solving the MGLasso problem requires a reformulation in order 
+to comply with the form of loss function required by CONESTA. 
+The objective of MGLasso can be written as
 $$ 
 \operatorname{argmin} \frac{1}{2} ||\mathbf{Y} - \tilde{\mathbf{X}}
 \tilde{\boldsymbol{\beta}}||_2^2 + \lambda_1 ||\tilde{\boldsymbol{\beta}}||_1 +
@@ -580,7 +580,7 @@ samples is small compared to the number of variables, as classical Akaike
 information criterion [AIC, @akaike1998information] and Bayesian information
 criterion [BIC, @schwarz1978estimating] tend to perform poorly [@Liu2010].
 
-In this paper, we focused on the StARS stability selection approach proposed by
+In this paper, we focus on the StARS stability selection approach proposed by
 @Liu2010 as suggested by some preliminary tests where we compared the Extended
 BIC [EBIC, @foygel2010extended], the BIC calibrated with slope heuristics
 [@baudry2012slope], the Rotation invariant criterion implemented in the Huge
@@ -602,11 +602,9 @@ $$
 \theta_{st}^{(k)} = \frac{1}{N} \sum_{j=1}^N \mathcal{A}^{k,j}_{st}.
 $$ 
 Define
-<old>$$
-\hat \xi_{st}(\Lambda) = 2 \hat \theta_{st} (\Lambda) \left ( 1 - \hat
-\theta_{st} (\Lambda) \right )
-$$ 
-</old>
+<old> $$\hat \xi_{st}(\Lambda) = 2 \hat \theta_{st} (\Lambda) \left ( 1 - \hat
+\theta_{st} (\Lambda) \right )$$ 
+
 $$
 \hat \xi_{st}(\lambda_1^{(k)}) = 2 \hat \theta_{st}^{(k)}  \left ( 1 - \hat
 \theta_{st}^{(k)} \right )
@@ -909,11 +907,11 @@ ggplot(roc_dtf_erdos, aes(
 ```
 
 Mean ROC curves for MGLasso and GLasso graph inference in the Erdös-Renyi model.
-We vary the fusion penalty parameter of MGLasso $\lambda_2 \in \{0, 3.33, 10\}$
+We varied the fusion penalty parameter of MGLasso $\lambda_2 \in \{0, 3.33, 10\}$
 alongside the ratio $\frac{n}{p}\in \{0.5,1,2\}$. Within each panel, the ROC
 curve shows the True positive rate (y-axis) vs. the False positive rate (x-axis)
 for both MGLasso (blue) and GLasso (brown). Since GLasso does not have a fusion
-penalty, its ROC curves are replicated for panels belonging to the same row. We
+penalty, its ROC curves were replicated for panels belonging to the same row. We
 also plot the random classifier (dotted grey line). The results have been
 averaged over $50$ simulated datasets and suggest that MGLasso performs no worse
 than GLasso. For $\lambda_2 = 0$, the MGLasso approach is equivalent to GLasso
@@ -1145,11 +1143,11 @@ ggplot(roc_dtf_sbm, aes(
 ```
 
 Mean ROC curves for MGLasso and GLasso graph inference in the stochastic block
-model. We vary the fusion penalty parameter of MGLasso $\lambda_2 \in \{0, 3.33,
+model. We varied the fusion penalty parameter of MGLasso $\lambda_2 \in \{0, 3.33,
 10\}$ alongside the ratio $\frac{n}{p}\in \{0.5,1,2\}$. Within each panel, the
 ROC curve shows the True positive rate (y-axis) vs. the False positive rate
 (x-axis) for both MGLasso (blue) and GLasso (brown). Since GLasso does not have
-a fusion penalty, its ROC curves are replicated for panels belonging to the same
+a fusion penalty, its ROC curves were replicated for panels belonging to the same
 row. We also plot the random classifier (dotted grey line). The results have
 been averaged over $50$ simulated datasets and suggest that MGLasso performs no
 worse than GLasso. For $\lambda_2 = 0$, the MGLasso approach is equivalent to
@@ -1159,7 +1157,7 @@ Glasso in its neighborhood selection version.
 Based on these empirical results, we first observe that, in all the considered
 simulation models, MGLasso improves over GLasso in terms of support recovery in
 the high-dimensional setting where $p<n$. In addition, in the absence of
-afusionpenalty, i.e., $\lambda_2 = 0$, MGLasso performs no worse than GLasso in
+a fusion penalty, i.e., $\lambda_2 = 0$, MGLasso performs no worse than GLasso in
 each of the $3$ models. However, for $\lambda_2>0$, increasing penalty value
 does not seem to significantly improve the support recovery performances for the
 MGLasso, as we observe similar results for $\lambda_2=3.3,10$. Preliminary
@@ -1688,7 +1686,7 @@ To assess the relevance of the inferred clusters, they are compared to known
 taxonomic ranks (phylum, class, order, family, genera, or species). The phylum
 classification is used. For example, for a clustering partition in $2$ groups,
 the MGLasso clustering partition is composed of $120$ variables versus $7$
-variables. The cluster $2$ has been shown to be exclusively composed of OTUs
+variables. The cluster $2$ is exclusively composed of OTUs
 belonging to the Proteobacteria phylum. The cluster $1$ also contains
 Proteobacteria OTUs, so those identified in cluster $2$ might share more
 intimate characteristics.
@@ -1711,12 +1709,12 @@ belonging to cluster $1$, mainly composed of Bacteroidetes and Firmicutes phyla,
 is seemingly dependent on the abundance of OTUS in cluster $2$, i.e.,
 Proteobacteria phylum.
 
-## Application to epigenetic and transcriptomic genotypes in poplar  
+## Application to methylation and transcriptomic genotypes in poplar  
 
 Next, we investigate interactions between European poplar genotypes for
 transcriptomic and DNA methylation data extracted from the Evolutionary and
 functional impact of EPIgenetic variation in forest TREEs project [EPITREE,
-@maury2019epigenetics]. The analysis is purposefully applied to the samples and
+@maury2019epigenetics]. The analysis was purposefully applied to the samples and
 not the genes in order to highlight the MGLasso clustering performance and show
 some potential relationships between DNA methylation and gene expression levels
 for some genotypes.
@@ -1942,7 +1940,8 @@ with an optimization algorithm based on CONESTA and a model selection procedure.
 Our simulations results over synthetic and real datasets showed that MGLasso can
 perform better than GLasso in network support recovery in the presence of groups
 of correlated variables, and we illustrated the method with the analysis of
-microbial associations data. The present work paves the way for future
+microbial associations data and methylation mixed with transcriptomic data. 
+The present work paves the way for future
 improvements: first, by incorporating prior knowledge through more flexible
 weighted regularization; second, by studying the theoretical properties of the
 method in terms of statistical guarantees for the MGLasso estimator. Moreover,
