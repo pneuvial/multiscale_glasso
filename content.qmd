@@ -25,13 +25,14 @@ abstract: >+
   the graph inference task. We introduce a novel Multiscale Graphical 
   Lasso (MGLasso) to improve networks interpretability by proposing graphs 
   at different granularity levels. The method estimates clusters through a 
-  convex clustering approach, a relaxation of $k$-means, and hierarchical 
+  convex clustering approach --- a relaxation of $k$-means, and hierarchical 
   clustering. The conditional independence graph is simultaneously inferred 
   through a neighborhood selection scheme for undirected graphical models. 
   MGLasso extends and generalizes the sparse group fused lasso problem to 
   undirected graphical models. We use continuation with Nesterov smoothing 
   in a shrinkage-thresholding algorithm (CONESTA) to propose a regularization 
-  path of solutions when the Lasso penalty is kept constant. Extensive 
+  path of solutions along the group fused Lasso penalty, 
+  while the Lasso penalty is kept constant. Extensive 
   experiments on synthetic data compare the performances of our model 
   to state-of-the-art clustering methods and network inference models. 
   Applications to gut microbiome data and poplar's methylation mixed with 
@@ -165,8 +166,8 @@ Fusion penalties have also been used in simple regression problems
 [@tibshirani2005sparsity] and multivariate regression analysis (multitask
 learning) with multiple outcomes [see, e.g., @chen2010graph; @degras2021sparse;
 @dondelinger2020joint; @hallac2015network; @chu2021adaptive]. The defined
-penalties encourage fusion between predictors, in simple regression, or outcomes
-that share similar model coefficients, in multitask learning. Fusions can be
+penalties encourage fusion between predictors in simple regression, or outcomes
+that share similar model coefficients in multitask learning. Fusions can be
 formulated in a general form assuming no order on the variables as in convex
 clustering [@Hoefling2010; @petry2011pairwise] or assuming the availability of
 prior information about clusters [@rudin1992nonlinear; @hallac2015network].
@@ -182,11 +183,10 @@ variables belonging to the same cluster to have the same neighborhood. MGLasso
 exploits the multitask learning framework for GGMs inference coupled with a
 convex clustering problem over the nodes to infer multiscale networks and
 clusters simultaneously. To our knowledge, this is the first attempt in the
-literature of undirected GGMs. MGLasso can also be seen as a sort of sparse
+literature of undirected GGMs. MGLasso can also be seen as an extension of sparse
 group fused Lasso for graphical models and be straightforwardly extended to
 probability distributions belonging to the exponential family
-[@yang2012graphical]. The MGLasso algorithm is implemented in a path-algorithm
-way in the R package _mglasso_ available at
+[@yang2012graphical]. The MGLasso algorithm is implemented in the R package _mglasso_ available at
 <https://CRAN.R-project.org/package=mglasso>. The remainder of this paper is
 organized as follows. In Section [2](#multiscale-graphical-lasso) and Section
 [3](#numerical-scheme), we formally introduce the Multiscale Graphical Lasso and
@@ -199,12 +199,14 @@ Let $\mathbf X = (X^1, \dots, X^p)^T$ be a $p$-dimensional Gaussian random
 vector, with mean vector $\boldsymbol \mu \in \mathbb R^p$ and positive definite
 covariance matrix $\mathbf \Sigma \in \mathbb R^{p \times p}$. Let $G = (V, E)$
 be a graph encoding the conditional independence structure of the normal
-distribution $\mathcal N(\boldsymbol \mu, \mathbf \Sigma),$ where $V =
-\{1,\ldots p\}$ is the set of vertices and $E$ the set of edges. The graph $G$
-is uniquely determined by the support of the precision matrix $\mathbf{\Omega} =
-\mathbf{\Sigma}^{-1}$ [@Dempster1972]. Specifically, for any two vertices $i
-\neq j\in V$, the edge $(i,j)$ does not belong to the set $E$ if and only if
-$\Omega_{ij} = 0.$ The variables $X^i$ and $X^j$ are said to be independent
+distribution $\mathcal N(\boldsymbol \mu, \mathbf \Sigma),$ where 
+$V = \{1,\ldots p\}$ is the set of vertices and $E$ the set of edges. The graph $G$
+is uniquely determined by the support of the precision matrix 
+$\mathbf{\Omega} = \mathbf{\Sigma}^{-1}$ [@Dempster1972]. 
+Specifically, for any two vertices $i \neq j\in V$, 
+the edge $(i,j)$ belongs to the set $E$ if and only if
+$\Omega_{ij} \neq 0.$ On the contrary, if $\Omega_{ij} = 0$,
+the variables $X^i$ and $X^j$ are said to be independent
 conditionally to the remaining variables $X^{\setminus (i, j)}$. We note, 
 $$
 X^i
@@ -234,9 +236,8 @@ central relationship between simple linear regression and precision matrix
 coefficients. It can be shown that $\beta^i_j =
 -\frac{\Omega_{ij}}{\Omega_{ii}}$ [@Lauritzen1996].
 
-Consider the data matrix $\mathbf X \in \mathbb R^{n \times p}$ without any
-underlying distribution and the clustering analysis of the $p$ points in
-$\mathbb R^n.$ The convex clustering problem [@Hocking2011; @Lindsten2011;
+On the other hand, let us now consider the clustering analysis of the $p$
+variables in $\mathbb R^n.$ The convex clustering problem [@Hocking2011; @Lindsten2011;
 @pelckmans2005convex] is the minimization of the quantity 
 $$
 \frac{1}{2}
@@ -254,9 +255,12 @@ are assigned to the same cluster if $\hat{\boldsymbol \alpha^i} \approx
 \hat{\boldsymbol \alpha^j}.$ The regularization path of solutions to problem in
 @eq-clusterpath can be represented as a dendrogram. The path properties have
 been studied in @chi2015splitting and @chiquet2017fast, among others.
+Note that these approaches rely on geometric properties of matrix $\boldsymbol X,$
+and do not require any assumption on the distribution of the covariates.
 
-We propose merging the $p$ independent Lasso regressions of the MB approach into
-a single optimization criterion where a convex clustering fusion penalty in
+We propose to combine the MB and convex clustering approaches.
+Specifically, the $p$ independent Lasso regressions of the MB approach are merged
+into a single optimization criterion where a convex clustering fusion penalty in
 $\ell_2$ is applied on the regression vectors considered as cluster centers.
 Namely, the _Multiscale Graphical Lasso_ (MGLasso) pseudo-likelihood problem
 minimizes in a Gaussian framework the following quantity: 
@@ -1430,7 +1434,7 @@ estimated graphs for $5$ values of $\lambda_2$ corresponding to $5$ different
 clusters partitions. The @fig-clusterpath shows how the predicted
 $\hat{\boldsymbol X}$ evolves through $\lambda_2.$ The $\hat{\boldsymbol X}$ are
 computed from estimated centroids $\hat{\boldsymbol \beta}$ and projected onto
-the two principal components of the original data. The path is not always
+two principal components of the original data. The path is not always
 agglomerative, but the clusters' splits observed ensure optimal solutions.
 
 ```{r eval = FALSE, echo = TRUE, include=TRUE}
@@ -1500,7 +1504,7 @@ load(paste0(path_data, "amgut1.filt.phy.rda"))
 load(paste0(path_data, "amgut1.filt.rda"))
 amgut1.filt <- t(clr(amgut1.filt + 1 , 1))
 
-plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL) {
+plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps) {
   ## Initialisations
   p <- ncol(X)
   df.paths <- data.frame(x=c(),y=c(), group=c())
@@ -1508,7 +1512,7 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL) {
 
   ## Principal component analysis
   svdX <- svd(X)                ## singular value decomposition
-  pc <- svdX$u[,1:2,drop=FALSE] ## singular vectors
+  pc <- svdX$u[,3:4,drop=FALSE] ## singular vectors
 
   for (j in 1:nlevel) {
     Beta <- mglasso_res[[j]]$selected_Theta
@@ -1520,7 +1524,8 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL) {
     df.paths <- rbind(df.paths,df)
   }
 
-  X_data <- as.data.frame(t(X) %*% pc) ## PCA projections (scores)
+  # X_data <- as.data.frame(t(X) %*% pc) ## PCA projections (scores)
+  X_data <- df.paths[1:p,]
   colnames(X_data) <- c("x", "y")
   ifelse(is.null(colnames_),
          X_data$Name <- colnames(X),
@@ -1531,20 +1536,20 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL) {
   data_plot <-
     data_plot + geom_text_repel(data = X_data,
                                 aes(x = x, y = y, label = Name),
-                                max.overlaps = 20)
+                                max.overlaps = max.overlaps)
   data_plot <-
     data_plot + geom_point(data = X_data, aes(x = x, y = y), size = 1.5)
   data_plot <-
-    data_plot + xlab('Principal Component 1') + ylab('Principal Component 2')
+    data_plot + xlab('Principal Component 3') + ylab('Principal Component 4')
   data_plot + theme_bw()
 }
 
 plot_clusterpath(amgut1.filt,
-                 c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3))
+                 c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), max.overlaps = 10)
 ```
 
 Clustering path of the MGLasso convex clustering solutions on microbiome data
-with $127$ OTUs. The predicted and original data are projected onto the two
+with $127$ OTUs. The predicted data are projected onto the two
 principal components of the original data, while the fusion penalty varies. As
 $\lambda_2$ increases, it reaches a value for which all the estimated centroids
 are equal; thus, the branches of the path converge to a unique point in the
@@ -1834,7 +1839,48 @@ cut_names <- names_epit %>%
     gsub("new_", "", x)) %>%
   as.character()
 
-plot_clusterpath(as.matrix(epit_sparse), mglasso_genot, cut_names)
+plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps) {
+  ## Initialisations
+  p <- ncol(X)
+  df.paths <- data.frame(x=c(),y=c(), group=c())
+  nlevel <- length(mglasso_res)
+
+  ## Principal component analysis
+  svdX <- svd(X)                ## singular value decomposition
+  pc <- svdX$u[,1:2,drop=FALSE] ## singular vectors
+
+  for (j in 1:nlevel) {
+    Beta <- mglasso_res[[j]]$selected_Theta
+    Xpred <- sapply(1:p, function(i){X %*% Beta[i,]})
+    pcs <- t(pc)%*%Xpred
+    x <- pcs[1,]
+    y <- pcs[2,]
+    df <- data.frame(x=pcs[1,], y=pcs[2,], group=1:p)
+    df.paths <- rbind(df.paths,df)
+  }
+
+  # X_data <- as.data.frame(t(X) %*% pc) ## PCA projections (scores)
+  X_data <- df.paths[1:p,]
+  colnames(X_data) <- c("x", "y")
+  ifelse(is.null(colnames_),
+         X_data$Name <- colnames(X),
+         X_data$Name <- colnames_)
+  data_plot <- ggplot(data = df.paths, aes(x = x, y = y))
+  data_plot <-
+    data_plot + geom_path(aes(group = group), colour = 'grey30', alpha = 0.5)
+  data_plot <-
+    data_plot + geom_text_repel(data = X_data,
+                                aes(x = x, y = y, label = Name),
+                                max.overlaps = max.overlaps)
+  data_plot <-
+    data_plot + geom_point(data = X_data, aes(x = x, y = y), size = 1.5)
+  data_plot <-
+    data_plot + xlab('Principal Component 1') + ylab('Principal Component 2')
+  data_plot + theme_bw()
+}
+
+
+plot_clusterpath(as.matrix(epit_sparse), mglasso_genot, cut_names, max.overlaps = 20)
 ```
 
 Clustering path of solutions on DNA methylation and transcriptomic samples. The
