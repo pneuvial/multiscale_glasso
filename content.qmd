@@ -726,8 +726,8 @@ Matrix::image(
 
 Adjacency matrix of a stochastic block model defined by $K=5$ classes with
 identical prior probabilities set to $\pi = 1/K$, inter-classes connection
-probability $\alpha_{kl}=0.75, k \neq l$, intra-classes connection probability
-$\alpha_{ll}=0.01$ and $p=40$ vertices.
+probability $\alpha_{kl}=0.01, k \neq l$, intra-classes connection probability
+$\alpha_{ll}=0.75$ and $p=40$ vertices.
 :::
 
 ### Erdös-Renyi Model
