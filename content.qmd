@@ -589,8 +589,7 @@ criterion [BIC, @schwarz1978estimating] tend to perform poorly [@Liu2010].
 
 In this paper, we focus on the StARS stability selection approach proposed by
 @Liu2010 as suggested by some preliminary tests where we compared the Extended
-BIC [EBIC, @foygel2010extended], the BIC calibrated with slope heuristics
-[@baudry2012slope], the Rotation invariant criterion implemented in the Huge
+BIC [EBIC, @foygel2010extended], a model selection criterion calibrated with slope heuristics [@baudry2012slope], the Rotation invariant criterion implemented in the Huge
 package [@zhao2012huge], the GGMSelect procedure [@giraud2012graph],
 cross-validation [@bien2011sparse] and StARS. The method uses $k$ subsamples of
 data to estimate the associated graphs for a given range of $\lambda_1$ values.
