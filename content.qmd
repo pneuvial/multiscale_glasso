@@ -526,6 +526,9 @@ of $\lambda_2$ to obtain a hierarchical clustering. The corresponding
 pseudo-code is given in the following algorithm where $(\mathbf{X}^i)^{\dagger}$
 denotes the pseudo-inverse of $\mathbf{X}^i$ and $\epsilon_{fuse}$ the threshold
 for merging clusters.
+<revision>
+We note here that problem in @eq-refpbm is of the same form as the optimization problem solved in the paper by @hadjselem2018: as they showed, CONESTA outperforms other optimization approaches such as the alternating direction method of multipliers [ADMM, @Boyd2011], the excessive gap method [EGM, @nesterov2005excessive], the classical FISTA with fixed smoothing and the inexact FISTA [@schmidt2011convergence]. Rather than repeating their experiments, we refer the reader to Section IV of their paper.
+</revision>
 
 ::: {#algo-mglasso}
 ```{=html}
@@ -1504,7 +1507,67 @@ load(paste0(path_data, "amgut1.filt.phy.rda"))
 load(paste0(path_data, "amgut1.filt.rda"))
 amgut1.filt <- t(clr(amgut1.filt + 1 , 1))
 
-plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps) {
+
+hac_amgut <- hclust(dist(t(amgut1.filt)), method = "ward.D")
+labels_hac <- cutree(hac_amgut, 4)
+repart_clusters <- table(labels_hac)
+
+
+
+#########
+rank2_table <- table(taxas[,"Rank2"])
+col_leaves <- as.factor(rep(rainbow_hcl(6, c=90, l=50), times = rank2_table))
+
+# levels(col_leaves) <- list("p__Tenericutes" = "#0082CE",
+#                            "p__Proteobacteria" = "#009681",
+#                            "p__Firmicutes" = "#228B00",
+#                            "p__Bacteroidetes" = "#9F7000",
+#                            = "#B646C7",
+#                            "p__Actinobacteria" = "#CC476B")
+##########
+
+# plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps) {
+#   ## Initialisations
+#   p <- ncol(X)
+#   df.paths <- data.frame(x=c(),y=c(), group=c())
+#   nlevel <- length(mglasso_res)
+# 
+#   ## Principal component analysis
+#   svdX <- svd(X)                ## singular value decomposition
+#   pc <- svdX$u[,3:4,drop=FALSE] ## singular vectors
+# 
+#   for (j in 1:nlevel) {
+#     Beta <- mglasso_res[[j]]$selected_Theta
+#     Xpred <- sapply(1:p, function(i){X %*% Beta[i,]})
+#     pcs <- t(pc)%*%Xpred
+#     x <- pcs[1,]
+#     y <- pcs[2,]
+#     df <- data.frame(x=pcs[1,], y=pcs[2,], group=1:p)
+#     df.paths <- rbind(df.paths,df)
+#   }
+# 
+#   # X_data <- as.data.frame(t(X) %*% pc) ## PCA projections (scores)
+#   X_data <- df.paths[1:p,]
+#   colnames(X_data) <- c("x", "y")
+#   ifelse(is.null(colnames_),
+#          X_data$Name <- colnames(X),
+#          X_data$Name <- colnames_)
+#   data_plot <- ggplot(data = df.paths, aes(x = x, y = y))
+#   data_plot <-
+#     data_plot + geom_path(aes(group = group), colour = 'grey30', alpha = 0.5)
+#   data_plot <-
+#     data_plot + geom_text_repel(data = X_data,
+#                                 aes(x = x, y = y, label = Name),
+#                                 max.overlaps = max.overlaps)
+#   data_plot <-
+#     data_plot + geom_point(data = X_data, aes(x = x, y = y), size = 1.5)
+#   data_plot <-
+#     data_plot + xlab('Principal Component 3') + ylab('Principal Component 4')
+#   data_plot + theme_bw()
+# }
+
+
+plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps, cut_k_vars = 5, colors_) {
   ## Initialisations
   p <- ncol(X)
   df.paths <- data.frame(x=c(),y=c(), group=c())
@@ -1514,38 +1577,40 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps) {
   svdX <- svd(X)                ## singular value decomposition
   pc <- svdX$u[,3:4,drop=FALSE] ## singular vectors
 
-  for (j in 1:nlevel) {
+  for (j in cut_k_vars:nlevel) {
     Beta <- mglasso_res[[j]]$selected_Theta
     Xpred <- sapply(1:p, function(i){X %*% Beta[i,]})
     pcs <- t(pc)%*%Xpred
     x <- pcs[1,]
     y <- pcs[2,]
-    df <- data.frame(x=pcs[1,], y=pcs[2,], group=1:p)
+    df <- data.frame(x=pcs[1,], y=pcs[2,], group=1:p, Rank2 = colors_)
     df.paths <- rbind(df.paths,df)
   }
 
   # X_data <- as.data.frame(t(X) %*% pc) ## PCA projections (scores)
   X_data <- df.paths[1:p,]
-  colnames(X_data) <- c("x", "y")
+  #colnames(X_data) <- c("x", "y")
   ifelse(is.null(colnames_),
          X_data$Name <- colnames(X),
          X_data$Name <- colnames_)
   data_plot <- ggplot(data = df.paths, aes(x = x, y = y))
   data_plot <-
-    data_plot + geom_path(aes(group = group), colour = 'grey30', alpha = 0.5)
+    data_plot + geom_path(aes(group = group,  colour = Rank2), alpha = 0.5)
   data_plot <-
     data_plot + geom_text_repel(data = X_data,
                                 aes(x = x, y = y, label = Name),
                                 max.overlaps = max.overlaps)
   data_plot <-
-    data_plot + geom_point(data = X_data, aes(x = x, y = y), size = 1.5)
+    data_plot + geom_point(data = X_data, aes(x = x, y = y, colour = Rank2), size = 1.5)
   data_plot <-
     data_plot + xlab('Principal Component 3') + ylab('Principal Component 4')
   data_plot + theme_bw()
 }
 
-plot_clusterpath(amgut1.filt,
-                 c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), max.overlaps = 10)
+# plot_clusterpath(amgut1.filt,
+#                  c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), max.overlaps = 10)
+
+plot_clusterpath(amgut1.filt, c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), max.overlaps = 10, cut_k_vars = 1, colors_ = taxas[,"Rank2"])
 ```
 
 Clustering path of the MGLasso convex clustering solutions on microbiome data
@@ -1587,6 +1652,8 @@ clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
 metaG <-
   c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+
+metaG <- symmetrize(metaG)
 metaG <-
   adj2igraph(metaG, vertex.attr = list(name = taxa_names(amgut1.filt.phy)[vec]))
 E(metaG)$weight <- abs(E(metaG)$weight)
@@ -1606,6 +1673,8 @@ clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
 metaG <-
   c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+
+metaG <- symmetrize(metaG)
 metaG <-
   adj2igraph(metaG, vertex.attr = list(name = taxa_names(amgut1.filt.phy)[vec]))
 E(metaG)$weight <- abs(E(metaG)$weight)
@@ -1619,12 +1688,13 @@ plot_network(
   layout.method = layout_with_fr,
   color = "clusters"
 )
-
 ind <- which(all_num_clusters == 31)[1]
 clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
 metaG <-
   c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+
+metaG <- symmetrize(metaG)
 metaG <-
   adj2igraph(metaG, vertex.attr = list(name = taxa_names(amgut1.filt.phy)[vec]))
 E(metaG)$weight <- abs(E(metaG)$weight)
@@ -1644,6 +1714,8 @@ clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
 metaG <-
   c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+
+metaG <- symmetrize(metaG)
 metaG <-
   adj2igraph(metaG, vertex.attr = list(name = taxa_names(amgut1.filt.phy)[vec]))
 E(metaG)$weight <- abs(E(metaG)$weight)
@@ -1663,6 +1735,8 @@ clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
 metaG <-
   c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3)[[ind]]$selected_Theta[vec, vec]
+
+metaG <- symmetrize(metaG)
 metaG <-
   adj2igraph(metaG, vertex.attr = list(name = taxa_names(amgut1.filt.phy)[vec]))
 E(metaG)$weight <- abs(E(metaG)$weight)
@@ -1839,7 +1913,30 @@ cut_names <- names_epit %>%
     gsub("new_", "", x)) %>%
   as.character()
 
-plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps) {
+####
+order_omics <- c(
+  grep("exp", cut_names),
+  grep("gbM.CG", cut_names),
+  grep("gbM.CHG", cut_names),
+  grep("gbM.CHH", cut_names),
+  grep("prom.CG", cut_names),
+  grep("prom.CHG", cut_names),
+  grep("prom.CHH", cut_names))
+
+col_leaves <- as.factor(rep(rainbow_hcl(7, c=90, l=50), each = 10))
+
+col_leaves <- col_leaves[order(order_omics)]
+
+levels(col_leaves) <- list("RNA-Seq" = "#0093A9",
+                           "CpG-Body" = "#00944F",
+                           "CHG-Body" = "#4473D7",
+                           "CHH-Body" = "#5D8400",
+                           "CpG-Promoter" = "#A86B00",
+                           "CHG-Promoter" = "#C03FBE",
+                           "CHH-Promoter" = "#CC476B")
+####
+
+plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps, cut_k_vars = 5, colors_) {
   ## Initialisations
   p <- ncol(X)
   df.paths <- data.frame(x=c(),y=c(), group=c())
@@ -1849,38 +1946,37 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps) {
   svdX <- svd(X)                ## singular value decomposition
   pc <- svdX$u[,1:2,drop=FALSE] ## singular vectors
 
-  for (j in 1:nlevel) {
+  for (j in cut_k_vars:nlevel) {
     Beta <- mglasso_res[[j]]$selected_Theta
     Xpred <- sapply(1:p, function(i){X %*% Beta[i,]})
     pcs <- t(pc)%*%Xpred
     x <- pcs[1,]
     y <- pcs[2,]
-    df <- data.frame(x=pcs[1,], y=pcs[2,], group=1:p)
+    df <- data.frame(x=pcs[1,], y=pcs[2,], group=1:p, Data = colors_)
     df.paths <- rbind(df.paths,df)
   }
 
   # X_data <- as.data.frame(t(X) %*% pc) ## PCA projections (scores)
   X_data <- df.paths[1:p,]
-  colnames(X_data) <- c("x", "y")
+  #colnames(X_data) <- c("x", "y")
   ifelse(is.null(colnames_),
          X_data$Name <- colnames(X),
          X_data$Name <- colnames_)
   data_plot <- ggplot(data = df.paths, aes(x = x, y = y))
   data_plot <-
-    data_plot + geom_path(aes(group = group), colour = 'grey30', alpha = 0.5)
+    data_plot + geom_path(aes(group = group,  colour = Data), alpha = 0.5)
   data_plot <-
     data_plot + geom_text_repel(data = X_data,
                                 aes(x = x, y = y, label = Name),
                                 max.overlaps = max.overlaps)
   data_plot <-
-    data_plot + geom_point(data = X_data, aes(x = x, y = y), size = 1.5)
+    data_plot + geom_point(data = X_data, aes(x = x, y = y, colour = Data), size = 1.5)
   data_plot <-
     data_plot + xlab('Principal Component 1') + ylab('Principal Component 2')
   data_plot + theme_bw()
 }
 
-
-plot_clusterpath(as.matrix(epit_sparse), mglasso_genot, cut_names, max.overlaps = 20)
+plot_clusterpath(as.matrix(epit_sparse), mglasso_genot, cut_names, max.overlaps = 20, cut_k_vars = 2, colors_ = col_leaves)
 ```
 
 Clustering path of solutions on DNA methylation and transcriptomic samples. The
@@ -1928,31 +2024,31 @@ adj_mat <- function(mat, sym_rule = "and") {
 }
 
 Matrix::image(
-  adj_mat(mglasso_genot$`1`$selected_Theta),
+  adj_mat(mglasso_genot$`1`$selected_Theta[order_omics, order_omics]),
   sub = "",
   xlab = "",
   ylab = ""
 )
 Matrix::image(
-  adj_mat(mglasso_genot$`2`$selected_Theta),
+  adj_mat(mglasso_genot$`2`$selected_Theta[order_omics, order_omics]),
   sub = "",
   xlab = "",
   ylab = ""
 )
 Matrix::image(
-  adj_mat(mglasso_genot$`3`$selected_Theta),
+  adj_mat(mglasso_genot$`3`$selected_Theta[order_omics, order_omics]),
   sub = "",
   xlab = "",
   ylab = ""
 )
 Matrix::image(
-  adj_mat(mglasso_genot$`4`$selected_Theta),
+  adj_mat(mglasso_genot$`4`$selected_Theta[order_omics, order_omics]),
   sub = "",
   xlab = "",
   ylab = ""
 )
 Matrix::image(
-  adj_mat(mglasso_genot$`20`$selected_Theta),
+  adj_mat(mglasso_genot$`20`$selected_Theta[order_omics, order_omics]),
   sub = "",
   xlab = "",
   ylab = ""
