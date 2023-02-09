@@ -1374,9 +1374,7 @@ estimated clusters $\{5,10,15,20\}$ vary alongside the ratio $\frac{n}{p}\in
 datasets for $k$-means (blue), hierarchical agglomerative clustering (yellow),
 and MGLasso (brown) methods are plotted against the ratio $\frac{n}{p}.$  The
 cluster assignments of MGLasso are computed from a distance between estimated
-regression vectors for a given value of $\lambda_2.$ Missing boxplots for
-MGLasso thus mean computed partitions in the grid of values of $\lambda_2$ do
-not yield the fixed number of clusters. The higher the ARI values, the better
+regression vectors for a given value of $\lambda_2.$ The higher the ARI values, the better
 the estimated clustering partition is.
 :::
 
