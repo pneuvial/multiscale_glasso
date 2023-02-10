@@ -701,6 +701,7 @@ library(Matrix)
 library(ghibli)
 library(phyloseq)
 library(ggrepel)
+library(colorspace)
 
 path_functions <- "./functions/"
 source(paste0(path_functions, "cost.R"))
@@ -786,7 +787,7 @@ curve, we vary the parameter $\lambda_1$ while the parameter $\lambda_2$
 penalty levels for the $\lambda_2$ parameter; since GLasso does not
 depend on $\lambda_2$, the GLasso ROC curves are replicated.
 
-In a decision rule associated with a sparsity penalty level $\lambda_1$, we
+<old> In a decision rule associated with a sparsity penalty level $\lambda_1$, we
 recall the definition of the two following functions. The sensitivity, also
 called the true positive rate or recall, is given by : \begin{align*} \lambda_1
 &\mapsto \text{sensitivity}(\lambda_1) = \frac{TP(\lambda_1)}{TP(\lambda_1) +
@@ -795,7 +796,9 @@ selectivity, is defined as follows: \begin{align*} \lambda_1 &\mapsto
 \text{specificity}(\lambda_1) = \frac{TN(\lambda_1)}{TN(\lambda_1) +
 FP(\lambda_1)}. \end{align*} The ROC curve with the parameter $\lambda_1$
 represents $\text{sensitivity}(\lambda_1)$ as a function of $1 -
-\text{specificity}(\lambda_1)$ which is the false positive rate.
+\text{specificity}(\lambda_1)$ which is the false positive rate. </old>
+
+<revision> In a decision rule associated with a sparsity penalty level $\lambda_1$, we recall the definition of the two following functions. The true positive rate is given by $\frac{TP(\lambda_1)}{TP(\lambda_1) + FN(\lambda_1)}.$ The false positive rate is defined as follows $1 - \frac{TN(\lambda_1)}{TN(\lambda_1) + FP(\lambda_1)}$, where $TP$ is the number of true positives, $TN$ the number of true negatives, $FN$ the number of false negatives and $FP$ the number of false positives. The ROC curve represents the true positive rate as a function of the false positive rate. For a given level of true positive rate, the best method minimizes the false positive rate. </revision>
 
 For each configuration ($n, p$ fixed), we generate $50$ replications and
 their associated ROC curves, which are then averaged. The average ROC
@@ -891,7 +894,7 @@ ggplot(roc_dtf_erdos, aes(
   y     = 100 * tpr,
   color = method
 )) +
-  geom_line(size = 0.7) +
+  geom_line(linewidth = 0.7) +
   facet_grid(np ~ tv, labeller = labeller(
     np = as_labeller(np.labs, label_parsed),
     tv = as_labeller(tv.labs, label_parsed)
@@ -1378,7 +1381,7 @@ regression vectors for a given value of $\lambda_2.$ The higher the ARI values, 
 the estimated clustering partition is.
 :::
 
-The results shown in @fig-ari-low-cor and @fig-ari-high-cor demonstrate that,
+<old> The results shown in @fig-ari-low-cor and @fig-ari-high-cor demonstrate that,
 particularly at the lower to medium levels of the hierarchy (between $20$ and $10$
 clusters), the hierarchical clustering structure uncovered by MGLasso is
 comparable to popular clustering methods used in practice. For the higher levels
@@ -1386,7 +1389,16 @@ comparable to popular clustering methods used in practice. For the higher levels
 compared methods also deteriorate as the level of correlation inside clusters
 decreases. Note that the MGLasso performances are sensible to fusion threshold
 $\epsilon_{fuse}$ set to $10^{-6}$ for this simulation study. Using non-trivial
-weights could also help improve the overall performance.
+weights could also help improve the overall performance. </old>
+
+<revision>
+The results shown in @fig-ari-low-cor and @fig-ari-high-cor suggest that, particularly at the lower to medium levels of the hierarchy (between $20$ and $10$ clusters), the hierarchical clustering structure recovered by MGLASSO is
+comparable to popular clustering methods used in practice. For the higher levels
+(5 clusters), the performances of MGLASSO deteriorate. As expected, the three
+compared methods also underperform as the level of correlation inside clusters
+decreases. Note that the MGLASSO performances may be sensible to fusion threshold
+$\epsilon_{fuse}$ set to $10^{-6}$ for this simulation study. Using non-trivial
+weights could also help improve the overall performance. The expected empirical evidence according to which the MGLASSO would work fairly well for correlated variables is somehow highlighted in the Figures. However, the result also suggests that controling the correlation between groups of predictors used for each node wise regression in the simulation model, is not an easy problem in a multitask learning framework where the set of predictors is the same as the set of responses. As also noticed in \cite{wang2018sparse}, some preliminary tests suggest that the MGLASSO clusters recovery performance is robust to the Lasso penalty parameter used. Higher values for the penalty contributes, however, to increase the strength of the fusion, i.e., the number of variables merging simultaneously.</revision>
 
 # Applications 
 To illustrate the proposed simultaneous graphs and clusters inference approach,
@@ -1512,6 +1524,7 @@ repart_clusters <- table(labels_hac)
 
 
 #########
+taxas <- amgut1.filt.phy@tax_table@.Data
 rank2_table <- table(taxas[,"Rank2"])
 col_leaves <- as.factor(rep(rainbow_hcl(6, c=90, l=50), times = rank2_table))
 
@@ -1615,7 +1628,7 @@ with $127$ OTUs. The predicted data are projected onto the two
 principal components of the original data, while the fusion penalty varies. As
 $\lambda_2$ increases, it reaches a value for which all the estimated centroids
 are equal; thus, the branches of the path converge to a unique point in the
-center of the graph.
+center of the graph. OTUs are colored according to their phylum classification. The path displays abrupt merges. The pure cluster on the graph's left side (down) corresponds to the phylum Bacteroidetes.
 :::
 
 The @fig-meta-graphs displays graphs and clusters for different levels of
@@ -1662,7 +1675,7 @@ plot_network(
   taxas,
   type = "taxa",
   layout.method = layout_with_fr,
-  color = "clusters"
+  color = "Rank2"
 )
 
 ind <- which(all_num_clusters == 63)[1]
@@ -1683,7 +1696,7 @@ plot_network(
   taxas,
   type = "taxa",
   layout.method = layout_with_fr,
-  color = "clusters"
+  color = "Rank2"
 )
 ind <- which(all_num_clusters == 31)[1]
 clusters <- as.character(all_clusters_partition[[ind]])
@@ -1703,7 +1716,7 @@ plot_network(
   taxas,
   type = "taxa",
   layout.method = layout_with_dh,
-  color = "clusters"
+  color = "Rank2"
 )
 
 ind <- which(all_num_clusters == 15)[1]
@@ -1724,7 +1737,7 @@ plot_network(
   taxas,
   type = "taxa",
   layout.method = layout_with_dh,
-  color = "clusters"
+  color = "Rank2"
 )
 
 ind <- which(all_num_clusters == 2)[1]
@@ -1745,15 +1758,13 @@ plot_network(
   taxas,
   type = "taxa",
   layout.method = layout_with_dh,
-  color = "clusters"
+  color = "Rank2"
 )
 ```
 
 Estimated graphs at multiple levels of granularity. The first graph shows a
 network inferred when $\lambda_2 =0$. The number of clusters is equal to the
-number of OTUs. Increasing the fusion penalty allows us to uncover graphs built
-over the representative variable of each cluster. The name of the node is the
-corresponding OTU, and the legend panel shows the cluster assignment. The number
+number of OTUs. Increasing the fusion penalty makes it possible to uncover graphs built on the representative variable of each cluster. OTUs are colored according to their phylum taxonomic classifier. The number
 of clusters is computed from the regression vectors with a fixed fusion
 threshold.
 :::
@@ -1973,7 +1984,7 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps, cut
   data_plot + theme_bw()
 }
 
-plot_clusterpath(as.matrix(epit_sparse), mglasso_genot, cut_names, max.overlaps = 20, cut_k_vars = 2, colors_ = col_leaves)
+plot_clusterpath(as.matrix(epit_sparse), mglasso_genot, cut_names, max.overlaps = 20, cut_k_vars = 1, colors_ = col_leaves)
 ```
 
 Clustering path of solutions on DNA methylation and transcriptomic samples. The
@@ -2052,20 +2063,7 @@ Matrix::image(
 )
 ```
 
-Adjacency matrices for different levels of granularity. The first graph shows
-the inferred network when no fusion penalty is added to the model. The first
-block of $10 \times 10$ variables corresponds to expression samples. The second
-sparser block of $20 \times 20$ corresponds to DNA methylation measures in the
-CG context for promoter and gene-body. The following blocks of the same size
-correspond to CHG and CHH DNA methylation contexts. The bands of edges show a
-relationship between measures of DNA methylation between the three contexts for
-the same populations. For e.g., the Loire methylation sample in the CG context
-is likely to be related to the Loire methylation in the CHG and CHH contexts.
-The graphs also show some relationships between expression and methylation
-samples. When the fusion penalty increases, the blocks corresponding to the
-three contexts of methylation merge in the first place, then follow the top-left
-block of expression data. For $\lambda_2 = 30.94$, all the samples are merged
-into a unique cluster and a complete graph. 
+Adjacency matrices for different fusion penalty parameters. The first graph shows the inferred network when no fusion penalty is added to the model. In that graph, the first block of size $10 \times 10$ variables corresponds to RNA-Seq samples. The second sparser block of size $30 \times 30$ corresponds to gene-body DNA methylation data in the three methylation contexts. The last sparse block of the same size corresponds to promoter methylation. The edge bands suggest a relationship between DNA methylation measurements that belong to the same context. For example, the Loire methylation sample in the CpG context is likely related to the Loire samples in the CHG and CHH contexts. The graphs also suggest some relationships between expression and methylation for some natural populations. As the merging penalty increases, the blocks corresponding to the three methylation contexts merge first, then follow the upper left block corresponding to the expression data. For $\lambda_2 = 30.94,$ all natural populations merge into a single cluster and complete graph.
 :::
 
 # Conclusion
