@@ -63,7 +63,7 @@ License](https://i.creativecommons.org/l/by/4.0/80x15.png)](http://creativecommo
 ```{=html}
 <style>
 old {color: silver; display: none}
-revision { color: Orange }
+revision { color: gray-700 }
 </style>
 ```
 <!-- Exemple <revision> commentaire </revision> -->
@@ -684,7 +684,14 @@ k\}}$. The precision matrix $\mathbf{\Omega}$ of the graph is then calculated as
 follows. We define $\Omega_{ij} = 0$ if $Z_i\neq Z_j$ ; otherwise, we define
 $\Omega_{ij} = A_{ij}\omega_{ij}$ where, for all $i\in\{1,\ldots,p\}$ and for
 all $j\in\{1,\ldots,p| Z_j = Z_i\}$, $\omega_{ij}$ is given by :
-
+$$
+\begin{equation*}
+\begin{aligned}
+&\omega_{ii} := \frac{1+\rho(p_{Z_i}-2)}{1+\rho(p_{Z_i}-2)-\rho^2(p_{Z_i}-1)};\\
+&\omega_{ij} := \frac{-\rho}{1+\rho(p_{Z_i}-2)-\rho^2(p_{Z_i}-1)}.
+\end{aligned}
+\end{equation*}
+$$
 If $\alpha_{ll}$ were to be equal to one, this construction of $\mathbf{\Omega}$
 would make it possible to control the level of correlation between the variables
 in each block to $\rho$. Introducing a more realistic scheme with
@@ -1388,17 +1395,10 @@ comparable to popular clustering methods used in practice. For the higher levels
 (5 clusters), the performances of MGLasso deteriorate. As expected, the three
 compared methods also deteriorate as the level of correlation inside clusters
 decreases. Note that the MGLasso performances are sensible to fusion threshold
-$\epsilon_{fuse}$ set to $10^{-6}$ for this simulation study. Using non-trivial
-weights could also help improve the overall performance. </old>
+$\epsilon_{fuse}$ set to $10^{-6}$ for this simulation study. </old>
 
 <revision>
-The results shown in @fig-ari-low-cor and @fig-ari-high-cor suggest that, particularly at the lower to medium levels of the hierarchy (between $20$ and $10$ clusters), the hierarchical clustering structure recovered by MGLASSO is
-comparable to popular clustering methods used in practice. For the higher levels
-(5 clusters), the performances of MGLASSO deteriorate. As expected, the three
-compared methods also underperform as the level of correlation inside clusters
-decreases. Note that the MGLASSO performances may be sensible to fusion threshold
-$\epsilon_{fuse}$ set to $10^{-6}$ for this simulation study. Using non-trivial
-weights could also help improve the overall performance. The expected empirical evidence according to which the MGLASSO would work fairly well for correlated variables is somehow highlighted in the Figures. However, the result also suggests that controling the correlation between groups of predictors used for each node wise regression in the simulation model, is not an easy problem in a multitask learning framework where the set of predictors is the same as the set of responses. As also noticed in \cite{wang2018sparse}, some preliminary tests suggest that the MGLASSO clusters recovery performance is robust to the Lasso penalty parameter used. Higher values for the penalty contributes, however, to increase the strength of the fusion, i.e., the number of variables merging simultaneously.</revision>
+The expected empirical evidence that MGLasso would work reasonably well for strongly correlated variables is somehow highlighted in @fig-ari-low-cor and @fig-ari-high-cor. The performances of MGLasso slightly improve when going from @fig-ari-low-cor to @fig-ari-high-cor, which corresponds to correlation levels of 0.1 and 0.3 between variables belonging to the same block, respectively. We observe the same trend for the HAC and the k-means. Compared to these two approaches, the MGLasso presents the lowest values of adjusted Rand indices, thus suggesting a lower quality of clustering. It should be noted that the performance of MGLasso can be sensitive to the selection of the Lasso penalty parameter and the threshold fixed to determine clusters' fusion. In practice, this fusion threshold is varied in a grid of values close to zero and lower than $10^{-3}$. The value leading to the maximum number of intermediate clusters in the clustering path is chosen. Using non-trivial weights could also improve the overall performance of MGLasso. </revision>
 
 # Applications 
 To illustrate the proposed simultaneous graphs and clusters inference approach,
