@@ -4,15 +4,15 @@ subtitle: ""
 author:
   - name: Edmond Sanou
     url: https://desanou.github.io/
-    affiliation: "LaMME, Université d'Evry Val d'Essonne"
+    affiliation: "Université Paris-Saclay, CNRS, Univ Evry, Laboratoire de Mathématiques et Modélisation d'Evry" 
     affiliation-url: http://www.math-evry.cnrs.fr/
   - name: Christophe Ambroise
     url: https://cambroise.github.io/
-    affiliation: "LaMME, Université d'Evry Val d'Essonne"
+    affiliation: "Université Paris-Saclay, CNRS, Univ Evry, Laboratoire de Mathématiques et Modélisation d'Evry"
     affiliation-url: http://www.math-evry.cnrs.fr/
   - name: Geneviève Robin
     url: https://genevieverobin.wordpress.com/
-    affiliation: "CNRS, LaMME, Université d'Evry Val d'Essonne"
+    affiliation: "Université Paris-Saclay, CNRS, Univ Evry, Laboratoire de Mathématiques et Modélisation d'Evry"
     affiliation-url: http://www.math-evry.cnrs.fr/
 date: last-modified
 abstract: >+
@@ -1397,8 +1397,11 @@ compared methods also deteriorate as the level of correlation inside clusters
 decreases. Note that the MGLasso performances are sensible to fusion threshold
 $\epsilon_{fuse}$ set to $10^{-6}$ for this simulation study. </old>
 
-<revision>
-The expected empirical evidence that MGLasso would work reasonably well for strongly correlated variables is somehow highlighted in @fig-ari-low-cor and @fig-ari-high-cor. The performances of MGLasso slightly improve when going from @fig-ari-low-cor to @fig-ari-high-cor, which corresponds to correlation levels of 0.1 and 0.3 between variables belonging to the same block, respectively. We observe the same trend for the HAC and the k-means. Compared to these two approaches, the MGLasso presents the lowest values of adjusted Rand indices, thus suggesting a lower quality of clustering. It should be noted that the performance of MGLasso can be sensitive to the selection of the Lasso penalty parameter and the threshold fixed to determine clusters' fusion. In practice, this fusion threshold is varied in a grid of values close to zero and lower than $10^{-3}$. The value leading to the maximum number of intermediate clusters in the clustering path is chosen. Using non-trivial weights could also improve the overall performance of MGLasso. </revision>
+The expected empirical evidence that MGLasso would work reasonably well for strongly correlated variables is somehow highlighted in @fig-ari-low-cor and @fig-ari-high-cor. The performances of MGLasso slightly improve when going from @fig-ari-low-cor to @fig-ari-high-cor, which corresponds to correlation levels of 0.1 and 0.3 between variables belonging to the same block, respectively. We observe the same trend for the HAC and the k-means. Compared to these two approaches, the MGLasso presents the lowest values of adjusted Rand indices, thus suggesting a lower quality of clustering. It should be noted that the performance of MGLasso can be sensitive to the selection of the Lasso penalty parameter and the threshold fixed to determine clusters' fusion. In practice, this fusion threshold is varied in a grid of values close to zero and lower than $10^{-3}$. The value leading to the maximum number of intermediate clusters in the clustering path is chosen. Using non-trivial weights could also improve the overall performance of MGLasso.
+
+<revision> 
+During the revision of this paper, an interesting question was raised regarding the behavior of the algorithm in a phylogenetic-based model. To investigate this, extensive numerical experiments were conducted on a phylogenetic-based model that evaluates only clustering performances. The results showed that the MGLASSO algorithm's performance improves, and the method performs as well as some state-of-the-art clustering approaches, including vanilla convex clustering and spectral clustering. In phylogenetic-based models, adjusted Rand indices can be computed between the estimated partition with $k$ clusters and the true partition in $k$ clusters computed from the tree used for the simulation procedure. This differs from the clustering performance evaluation scheme applied in the stochastic block model, where the true partition is considered fixed.
+</revision>
 
 # Applications 
 To illustrate the proposed simultaneous graphs and clusters inference approach,
@@ -2087,6 +2090,9 @@ to a broader family of non-Gaussian distributions belonging to the exponential
 family as outlined by @yang2012graphical.  Our MGLasso approach can be easily
 extended to non-Gaussian distributions belonging to the exponential family and
 mixed graphical models. 
+
+# Acknowledgments {.appendix .unnumbered}  
+The authors would like to thank the Editors and referees for comments that led to substantial improvements in the manuscript.
 
 # Session information {.appendix .unnumbered}
 
