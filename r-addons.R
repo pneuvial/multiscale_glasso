@@ -23,9 +23,11 @@ reticulate::py_install(packages = c("pylearn-parsimony"),
 # 
 # reticulate::py_config()
 
-remotes::install_github("jchiquet/simone")
+remotes::install_github("jchiquet/simone", force = TRUE)
 remotes::install_github("zdk123/SpiecEasi")
 remotes::install_github("ewenme/ghibli")
+remotes::install_github("desanou/mglasso")
+
 BiocManager::install("phyloseq")
 install.packages("parallel")
 

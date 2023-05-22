@@ -3,18 +3,26 @@ title: "Inference of Multiscale Gaussian Graphical Model"
 subtitle: ""
 author:
   - name: Edmond Sanou
+    corresponding: true
+    email: doedmond.sanou@univ-evry.fr 
     url: https://desanou.github.io/
-    affiliation: "Université Paris-Saclay, CNRS, Univ Evry, Laboratoire de Mathématiques et Modélisation d'Evry" 
-    affiliation-url: http://www.math-evry.cnrs.fr/
+    affiliations:
+      - name: Université Paris-Saclay, CNRS, Univ Evry, Laboratoire de Mathématiques et Modélisation d'Evry
+        url: http://www.math-evry.cnrs.fr/
   - name: Christophe Ambroise
+    email: christophe.ambroise@univ-evry.fr
     url: https://cambroise.github.io/
-    affiliation: "Université Paris-Saclay, CNRS, Univ Evry, Laboratoire de Mathématiques et Modélisation d'Evry"
-    affiliation-url: http://www.math-evry.cnrs.fr/
+    affiliations:
+      - name: Université Paris-Saclay, CNRS, Univ Evry, Laboratoire de Mathématiques et Modélisation d'Evry
+        url: http://www.math-evry.cnrs.fr/
   - name: Geneviève Robin
+    email: genevievelrobin@gmail.com
     url: https://genevieverobin.wordpress.com/
-    affiliation: "Université Paris-Saclay, CNRS, Univ Evry, Laboratoire de Mathématiques et Modélisation d'Evry"
-    affiliation-url: http://www.math-evry.cnrs.fr/
+    affiliations:
+      - name: Université Paris-Saclay, CNRS, Univ Evry, Laboratoire de Mathématiques et Modélisation d'Evry
+        url: http://www.math-evry.cnrs.fr/
 date: last-modified
+date-modified: last-modified
 abstract: >+
   Gaussian Graphical Models (GGMs) are widely used in high-dimensional data 
   analysis to synthesize the interaction between variables. In many 
@@ -37,45 +45,23 @@ abstract: >+
   to state-of-the-art clustering methods and network inference models. 
   Applications to gut microbiome data and poplar's methylation mixed with 
   transcriptomic data are presented.
+keywords: [Neighborhood selection, Convex hierarchical clustering, Gaussian graphical models]
 citation:
   type: article-journal
   container-title: "Computo"
   doi: "xxxx"
   url: https://github.com/desanou/multiscale_glasso
-github: https://github.com/desanou/multiscale_glasso
+  publisher: "Société Française de Statistique"
+  issn: "2824-7795"
 bibliography: references.bib
+github-user: desanou
 repo: "multiscale_glasso"
-editor: 
-  markdown: 
-    wrap: 72
-editor_options: 
-  markdown: 
-    wrap: 72
+draft: false # set to false once the build is running
+published: false # will be set to true once accepted
+format:
+  computo-html: default
+  computo-pdf: default
 ---
-
-[![build
-status](https://github.com/desanou/multiscale_glasso/actions/workflows/build.yml/badge.svg)](https://github.com/desanou/%7B%7B%3C%20meta%20repo%20%3E%7D%7D)
-[![Creative Commons
-License](https://i.creativecommons.org/l/by/4.0/80x15.png)](http://creativecommons.org/licenses/by/4.0/)
- 
-<!-- Pour les revisions -->
-
-```{=html}
-<style>
-old {color: silver; display: none}
-revision { color: gray-700 }
-</style>
-```
-<!-- Exemple <revision> commentaire </revision> -->
-
-```{r setup, message=FALSE, echo = TRUE}
-knitr::opts_chunk$set(
-  tidy = TRUE,
-  tidy.opts = list(width.cutoff = 80),
-  fig.align = 'center'
-)
-options(htmltools.dir.version = FALSE)
-```
 
 # Introduction 
 
@@ -213,8 +199,8 @@ X^i
 \perp \!\!\! \perp X^j |X^{\setminus (i, j)} \Leftrightarrow \Omega_{ij} = 0.
 $$
 
-Let $\boldsymbol X = {\Large(} \boldsymbol X_1^T, \dots, \boldsymbol X_n^T
-{\Large)}^T$ be the $n \times p$-dimensional data matrix composed of $n$ i.i.d
+Let $\boldsymbol X = \left( \boldsymbol X_1^T, \dots, \boldsymbol X_n^T
+\right )^T$ be the $n \times p$-dimensional data matrix composed of $n$ i.i.d
 samples of the Gaussian random vector $\mathbf X$. To perform graphical model
 inference, @Meinshausen2006 consider $p$ separate linear regressions of the
 form: 
@@ -321,24 +307,6 @@ Illustration of the permutation between regression coefficients in the MGLasso
 model. 
 :::
 
-<!-- \begin{equation} -->
-<!--    (\boldsymbol \beta^i,  \textcolor{blue}{\boldsymbol \tau_{ij}} -->
-<!--    \boldsymbol \beta^j)  = -->
-<!--    \begin{pmatrix} -->
-<!--         \beta_1^i & \beta_2^i & \dots & \tikzmarknode{a}{\beta_j^i} & -->
-<!--         \dots \dots & \tikzmarknode{b}{\beta_k^i} & \dots & \beta_p^i\\ -->
-<!--         \\ -->
-<!--         \\ -->
-<!--         \beta_1^j & \beta_2^j & \dots & \tikzmarknode{c}{\beta_k^j} & -->
-<!--         \dots \dots & \tikzmarknode{d}{\beta_i^j} & \dots & \beta_p^j -->
-<!--     \end{pmatrix} -->
-<!-- \end{equation} -->
-<!-- \begin{tikzpicture}[remember picture,overlay] -->
-<!-- \draw[blue,-latex]([yshift=0.1ex]d.south) to[bend left]node[below]{} -->
-<!--     ([yshift=0.1ex]c.south); -->
-<!-- \draw[blue,-latex]([yshift=-.1000ex]c.north) to[bend left]node[below]{} -->
-<!--     ([yshift=-.1000ex]d.north); -->
-<!-- \end{tikzpicture} -->
 
 In practice, when external information about the clustering structure is
 available, the problem can be generalized into: 
@@ -454,47 +422,44 @@ counter for the inner FISTA updates and $i$ is the iteration counter for CONESTA
 updates.
 
 ::: {#conesta}
-```{=html}
-<pre id="conesta">
-
+```pseudocode
 \begin{algorithm}
 \caption{CONESTA solver}
 \begin{algorithmic}
-  \STATE \textbf{Inputs}: \\
+  \State \textbf{Inputs}: \\
     $\quad$ functions $g(\boldsymbol{\theta}), h(\boldsymbol{\theta}), s(\boldsymbol{\theta})$ \\
     $\quad$ precision $\epsilon$ \\
     $\quad$ penalty parameters $\lambda_1, \lambda_2$ \\
     $\quad$ decreasing factor $\boldsymbol \tau \in (0,1)$ for sequence of precisions
     
-  \STATE \textbf{Output:} \\
+  \State \textbf{Output:} \\
     $\quad$ $\boldsymbol{\theta}^{i+1} \in \mathbb{R}^d$
 
-  \STATE \textbf{Initializations:} \\
+  \State \textbf{Initializations:} \\
     $\quad \boldsymbol{\theta}^0 \in \mathbb{R}^d$ \\
     $\quad \epsilon^0 = \boldsymbol \tau \operatorname{GAP}_{\mu = 10^{-8}}(\boldsymbol{\theta}^0)$ \\
     $\quad \mu^0 = \mu_{opt}(\epsilon^0)$
 
   \Repeat
-    \STATE $\epsilon^i_{\mu} = \epsilon^i - \mu^i \lambda_2 \frac{d}{2}$ \\
-    \COMMENT{FISTA}
-    \STATE $k=2$ \COMMENT{new iterator}
-    \STATE $\boldsymbol{\theta}_{\operatorname{FISTA}}^1 = \boldsymbol{\theta}_{\operatorname{FISTA}}^0 = \boldsymbol{\theta}^i$ \COMMENT{Initial parameters value}
-    \STATE $t_{\mu} = \frac{1}{L(g + \lambda_2 s_{\mu})}$ \COMMENT{Compute stepsize with $L(g + \lambda_2 s_{\mu})$ the Lipschitz constant of $\nabla(g + \lambda_2 s_{\mu})$}
+    \State $\epsilon^i_{\mu} = \epsilon^i - \mu^i \lambda_2 \frac{d}{2}$ \\
+    \Comment{FISTA}
+    \State $k=2$ \Comment{new iterator}
+    \State $\boldsymbol{\theta}_{\operatorname{FISTA}}^1 = \boldsymbol{\theta}_{\operatorname{FISTA}}^0 = \boldsymbol{\theta}^i$ \Comment{Initial parameters value}
+    \State $t_{\mu} = \frac{1}{L(g + \lambda_2 s_{\mu})}$ \Comment{Compute stepsize with $L(g + \lambda_2 s_{\mu})$ the Lipschitz constant of $\nabla(g + \lambda_2 s_{\mu})$}
     
     \Repeat
-      \STATE $\boldsymbol{z} = \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} + \frac{k-2}{k+1}(\boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} - \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-2})$
-      \STATE $\boldsymbol{\theta}_{\operatorname{FISTA}}^k = \operatorname{prox}_{\lambda_1 h}(\boldsymbol{z} - t_{\mu} \nabla(g + \lambda_2 s_{\mu})(\boldsymbol{z}))$
+      \State $\boldsymbol{z} = \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} + \frac{k-2}{k+1}(\boldsymbol{\theta}_{\operatorname{FISTA}}^{k-1} - \boldsymbol{\theta}_{\operatorname{FISTA}}^{k-2})$
+      \State $\boldsymbol{\theta}_{\operatorname{FISTA}}^k = \operatorname{prox}_{\lambda_1 h}(\boldsymbol{z} - t_{\mu} \nabla(g + \lambda_2 s_{\mu})(\boldsymbol{z}))$
     \Until{$\operatorname{GAP}_{\mu}(\boldsymbol{\theta}_{\operatorname{FISTA}}^k) \le \epsilon_{\mu}^i$} 
     
-  \STATE $\boldsymbol{\theta}^{i+1} = \boldsymbol{\theta}_{\operatorname{FISTA}}^k$ \\
-  \STATE $\epsilon^i = \operatorname{GAP}_{\mu = \mu_i} \boldsymbol{\theta}^{i+1} + \mu^i \lambda_2 \frac{d}{2}$ \\
-  \STATE $\epsilon^{i+1} = \boldsymbol \tau \epsilon^{i}$ \\
-  \STATE $\mu^{i+1} = \mu_{opt}(\epsilon^{i+1})$
+  \State $\boldsymbol{\theta}^{i+1} = \boldsymbol{\theta}_{\operatorname{FISTA}}^k$ \\
+  \State $\epsilon^i = \operatorname{GAP}_{\mu = \mu_i} \boldsymbol{\theta}^{i+1} + \mu^i \lambda_2 \frac{d}{2}$ \\
+  \State $\epsilon^{i+1} = \boldsymbol \tau \epsilon^{i}$ \\
+  \State $\mu^{i+1} = \mu_{opt}(\epsilon^{i+1})$
   \Until{$\epsilon^i \le \epsilon$}
   
 \end{algorithmic}
 \end{algorithm}
-</pre>
 ```
 :::
 
@@ -531,44 +496,40 @@ We note here that problem in @eq-refpbm is of the same form as the optimization 
 </revision>
 
 ::: {#algo-mglasso}
-```{=html}
-<pre id="algo-mglasso">
-
+```pseudocode
 \begin{algorithm}
 \caption{MGLasso algorithm}
 \begin{algorithmic}
-  \STATE \textbf{Inputs}: \\
+  \State \textbf{Inputs}: \\
     $\quad$ Set of variables $\mathbf{X} = \{\mathbf{X}^1, \dots, \mathbf{X}^p \} \in \mathbb R^{n\times p}$ \\
     $\quad$ Penalty parameters $\lambda_1 \ge 0, {\lambda_2}_{\operatorname{initial}} > 0$ \\
     $\quad$ Increasing factor $\eta > 1$ for fusion penalties $\lambda_2$\\ 
     $\quad$ Fusion threshold $\epsilon_{fuse} \ge 0$
   
-  \STATE \textbf{Outputs:} For $\lambda_1$ fixed and $\lambda_2$ from $0$ to ${\lambda_2}_{\operatorname{initial}} \times \eta^{(I)}$ with $I$ the number of iterations: \\
+  \State \textbf{Outputs:} For $\lambda_1$ fixed and $\lambda_2$ from $0$ to ${\lambda_2}_{\operatorname{initial}} \times \eta^{(I)}$ with $I$ the number of iterations: \\
     $\quad$ Regression vectors $\boldsymbol{\beta}(\lambda_1, \lambda_2) \in \mathbb R^{p \times (p-1)}$, \\
     $\quad$ Clusters partition of variables indices in $K$ clusters: $C(\lambda_1, \lambda_2)$
     
-  \STATE \textbf{Initializations:} \\
+  \State \textbf{Initializations:} \\
     $\quad$ $\boldsymbol{\beta}^i = (\mathbf{X}^i)^{\dagger}\mathbf{X}^i$, $\forall i = 1, \dots, p$ for warm start in CONESTA solver \\
     $\quad$ $C = \left \{\{1\}, \dots, \{p\}\right \}$ Initial clusters with one element per cluster. \\
     $\quad$ Set $\lambda_2 = 0$ \\
     $\quad$ Compute $\boldsymbol{\beta}$ using CONESTA solver \\
     $\quad$ Update clusters $C$ with rule described in \textbf{while} loop.
   
-  \STATE \textbf{Set:} $\lambda_2 = {\lambda_2}_{\operatorname{initial}}$ \\
+  \State \textbf{Set:} $\lambda_2 = {\lambda_2}_{\operatorname{initial}}$ \\
   
-  \COMMENT{Clustering path}
-  \WHILE{$\operatorname{Card}(C) > 1$}
-    \STATE Compute $\boldsymbol{\beta}$ using CONESTA solver with warm start from previous iteration \\
-    \COMMENT{Clusters update}
-    \STATE Compute pairwises distances $d(i,j)=\left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j \right \rVert_2$, $\forall i,j \in \{1, \dots, p\}$ \\
-    \STATE Determine clusters $C_k (k=1, \dots, K)$ with the rule $(i,j) \in C_k$ iff. $d(i,j) \le \epsilon_{fuse}$
+  \Comment{Clustering path}
+  \While{$\operatorname{Card}(C) > 1$}
+    \State Compute $\boldsymbol{\beta}$ using CONESTA solver with warm start from previous iteration \\
+    \Comment{Clusters update}
+    \State Compute pairwises distances $d(i,j)=\left \lVert \boldsymbol{\beta}^i - \boldsymbol \tau_{ij} \boldsymbol{\beta}^j \right \rVert_2$, $\forall i,j \in \{1, \dots, p\}$ \\
+    \State Determine clusters $C_k (k=1, \dots, K)$ with the rule $(i,j) \in C_k$ iff. $d(i,j) \le \epsilon_{fuse}$
   
-    \STATE $\lambda_2 = \lambda_2 \times \nu$
-  \ENDWHILE
+    \State $\lambda_2 = \lambda_2 \times \nu$
+  \EndWhile
 \end{algorithmic}
 \end{algorithm}
-
-</pre>
 ```
 :::
 
@@ -685,12 +646,10 @@ follows. We define $\Omega_{ij} = 0$ if $Z_i\neq Z_j$ ; otherwise, we define
 $\Omega_{ij} = A_{ij}\omega_{ij}$ where, for all $i\in\{1,\ldots,p\}$ and for
 all $j\in\{1,\ldots,p| Z_j = Z_i\}$, $\omega_{ij}$ is given by :
 $$
-\begin{equation*}
 \begin{aligned}
 &\omega_{ii} := \frac{1+\rho(p_{Z_i}-2)}{1+\rho(p_{Z_i}-2)-\rho^2(p_{Z_i}-1)};\\
 &\omega_{ij} := \frac{-\rho}{1+\rho(p_{Z_i}-2)-\rho^2(p_{Z_i}-1)}.
 \end{aligned}
-\end{equation*}
 $$
 If $\alpha_{ll}$ were to be equal to one, this construction of $\mathbf{\Omega}$
 would make it possible to control the level of correlation between the variables
@@ -698,21 +657,14 @@ in each block to $\rho$. Introducing a more realistic scheme with
 $\alpha_{ll}=0.75$ allows only to have an approximate control.
 
 ::: {#fig-model-sbm}
-```{r echo = TRUE, message=FALSE}
-library(ggplot2)
-library(igraph)
-library(simone)
-library(SpiecEasi)
-library(huge)
-library(Matrix)
-library(ghibli)
-library(phyloseq)
-library(ggrepel)
-library(colorspace)
+```{r echo = TRUE, message=FALSE, warning=FALSE}
+remove.packages("mglasso")
+.rs.restartR()
+install.packages("/Users/doedmond.sanou/phd/mglasso_0.1.3.tar.gz", repos = NULL, type = 'source')
 
-path_functions <- "./functions/"
-source(paste0(path_functions, "cost.R"))
-source(paste0(path_functions, "simulate.R"))
+library(mglasso)
+
+path_functions <- "./simulation-experiments/functions/"
 
 set.seed(2020)
 sim_sbm <- sim_data(
@@ -794,98 +746,20 @@ curve, we vary the parameter $\lambda_1$ while the parameter $\lambda_2$
 penalty levels for the $\lambda_2$ parameter; since GLasso does not
 depend on $\lambda_2$, the GLasso ROC curves are replicated.
 
-<old> In a decision rule associated with a sparsity penalty level $\lambda_1$, we
-recall the definition of the two following functions. The sensitivity, also
-called the true positive rate or recall, is given by : \begin{align*} \lambda_1
-&\mapsto \text{sensitivity}(\lambda_1) = \frac{TP(\lambda_1)}{TP(\lambda_1) +
-FN(\lambda_1)}. \end{align*} Specificity, also called true negative rate or
-selectivity, is defined as follows: \begin{align*} \lambda_1 &\mapsto
-\text{specificity}(\lambda_1) = \frac{TN(\lambda_1)}{TN(\lambda_1) +
-FP(\lambda_1)}. \end{align*} The ROC curve with the parameter $\lambda_1$
-represents $\text{sensitivity}(\lambda_1)$ as a function of $1 -
-\text{specificity}(\lambda_1)$ which is the false positive rate. </old>
-
-<revision> In a decision rule associated with a sparsity penalty level $\lambda_1$, we recall the definition of the two following functions. The true positive rate is given by $\frac{TP(\lambda_1)}{TP(\lambda_1) + FN(\lambda_1)}.$ The false positive rate is defined as follows $1 - \frac{TN(\lambda_1)}{TN(\lambda_1) + FP(\lambda_1)}$, where $TP$ is the number of true positives, $TN$ the number of true negatives, $FN$ the number of false negatives and $FP$ the number of false positives. The ROC curve represents the true positive rate as a function of the false positive rate. For a given level of true positive rate, the best method minimizes the false positive rate. </revision>
+In a decision rule associated with a sparsity penalty level $\lambda_1$, we recall the definition of the two following functions. The true positive rate is given by $\frac{TP(\lambda_1)}{TP(\lambda_1) + FN(\lambda_1)}.$ The false positive rate is defined as follows $1 - \frac{TN(\lambda_1)}{TN(\lambda_1) + FP(\lambda_1)}$, where $TP$ is the number of true positives, $TN$ the number of true negatives, $FN$ the number of false negatives and $FP$ the number of false positives. The ROC curve represents the true positive rate as a function of the false positive rate. For a given level of true positive rate, the best method minimizes the false positive rate.
 
 For each configuration ($n, p$ fixed), we generate $50$ replications and
 their associated ROC curves, which are then averaged. The average ROC
 curves for the three models are given in @fig-roc-erdos, @fig-roc-sfree
 and @fig-roc-sbm by varying $\frac{n}{p}\in \{0.5,1,2\}$.
 
-```{r eval = FALSE, echo = TRUE, include=TRUE}
-# Performances calculation ------------------------------------------------
-# Launched on a cluster using 72 cores
-
-## Settings ----------------------------------------------------------------
-### Model -------------------------------------------------------------------
-# NA values for some parameter mean they are not relevant
-p         <- 40
-seq_n     <- c(20, 40, 80)
-seq_rho   <- 0.95
-seq_dnsty <- NA 
-type      <- NA
-alpha     <- rep(1/5, 5)
-ngroup    <- length(alpha)
-pi        <- diag(0.75, ngroup)
-
-### Simulation --------------------------------------------------------------
-n_simu      <- 50
-list_ii_rho <- configs_simu(n_simu, seq_rho, seq_dnsty, seq_n, type)
-no_cores    <- min(72, length(list_ii_rho))
-
-### Erdos -------------------------------------------------------------------
-runtime_roc_config_p40_erdos01 <- system.time(
-  roc_config_p40_erdos01 <- mclapply(
-    list_ii_rho, 
-    FUN = one_simu_ROC, 
-    model = "erdos",
-    mc.cores = no_cores)
-)
-
-save(roc_config_p40_erdos01, 
-     file = paste0(path_data, "roc_config_p40_erdos01.RData"))
-save(runtime_roc_config_p40_erdos01, 
-     file = paste0(path_data, "runtime_roc_config_p40_erdos01.RData"))
-
-## Erdos
-load(paste0(path_data, "roc_config_p40_erdos01.RData")) 
-dt_full <- roc_config_p40_erdos01
-
-### Merge in one graph
-# Three sample sizes are used and the vector c(20,40,80) is replicated 50 times
-# I subset the dataframe in three parts corresponding to the relevant sample sizes
-index <- seq(1, 150, by = 3)
-roc_dt20 <- dt_full[index]
-
-index <- seq(2, 150, by = 3)
-roc_dt40 <- dt_full[index]
-
-index <- seq(3, 150, by = 3)
-roc_dt80 <- dt_full[index]
-
-# Here we compute the mean over the 50 ROC curves
-roc_dt20 <- get_mean_ROC_stat(roc_dt20)
-roc_dt40 <- get_mean_ROC_stat(roc_dt40)
-roc_dt80 <- get_mean_ROC_stat(roc_dt80)
-
-# I restructure the list result in a matrix for plot
-roc_dt20 <- reformat_roc_res_for_ggplot(roc_dt20)
-roc_dt20$np <- 0.5 # add a ratio n over p variable
-roc_dt40 <- reformat_roc_res_for_ggplot(roc_dt40)
-roc_dt40$np <- 1
-roc_dt80 <- reformat_roc_res_for_ggplot(roc_dt80)
-roc_dt80$np <- 2
-
-roc_dtf_erdos <- rbind(roc_dt20, roc_dt40, roc_dt80)
-```
-
 ::: {#fig-roc-erdos}
 ```{r roc_erdos, message=FALSE, echo = TRUE}
 #| fig-width: 12
 #| fig-height: 7
 
-source(paste0(path_functions, "plot.R"))
-source(paste0(path_functions, "clustering.R"))
+library(ggplot2)
+library(ghibli)
 load("./data/roc_dtf_erdos.RData")
 
 np.labs <- c("frac(n, p) == 0.5", "frac(n, p) == 1", "frac(n, p) == 2")
@@ -934,86 +808,18 @@ than GLasso. For $\lambda_2 = 0$, the MGLasso approach is equivalent to GLasso
 in its neighborhood selection version.
 :::
 
-```{r eval = FALSE, echo = TRUE}
-# Performances calculation ------------------------------------------------
-# Launched on a cluster using 72 cores
-
-## Settings ----------------------------------------------------------------
-### Model -------------------------------------------------------------------
-# NA values for some parameter mean they are not relevant
-p         <- 40
-seq_n     <- c(20, 40, 80)
-seq_rho   <- 0.95
-seq_dnsty <- NA 
-type      <- NA
-alpha     <- rep(1/5, 5)
-ngroup    <- length(alpha)
-pi        <- diag(0.75, ngroup)
-
-### Simulation --------------------------------------------------------------
-n_simu      <- 50
-list_ii_rho <- configs_simu(n_simu, seq_rho, seq_dnsty, seq_n, type)
-no_cores    <- min(72, length(list_ii_rho))
-
-
-### Scale-Free --------------------------------------------------------------
-runtime_roc_config_p40_scalefree <- system.time(
-  roc_config_p40_scalefree <- mclapply(
-    list_ii_rho, 
-    FUN = one_simu_ROC, 
-    model = "scale_free",
-    mc.cores = no_cores)
-)
-
-save(roc_config_p40_scalefree, 
-     file = paste0(path_data, "roc_config_p40_scalefree.RData"))
-save(runtime_roc_config_p40_scalefree, 
-     file = paste0(path_data, "runtime_roc_config_p40_scalefree.RData"))
-
-## Scale-free
-load(paste0(path_data, "roc_config_p40_scalefree.RData")) 
-dt_full <- roc_config_p40_scalefree
-
-### Merge in one graph
-index <- seq(1, 150, by = 3)
-roc_dt20 <- dt_full[index]
-
-index <- seq(2, 150, by = 3)
-roc_dt40 <- dt_full[index]
-
-index <- seq(3, 150, by = 3)
-roc_dt80 <- dt_full[index]
-
-roc_dt20 <- get_mean_ROC_stat(roc_dt20)
-roc_dt40 <- get_mean_ROC_stat(roc_dt40)
-roc_dt80 <- get_mean_ROC_stat(roc_dt80)
-
-roc_dt20 <- reformat_roc_res_for_ggplot(roc_dt20)
-roc_dt20$np <- 0.5
-roc_dt40 <- reformat_roc_res_for_ggplot(roc_dt40)
-roc_dt40$np <- 1
-roc_dt80 <- reformat_roc_res_for_ggplot(roc_dt80)
-roc_dt80$np <- 2
-
-roc_dtf_sfree <- rbind(roc_dt20, roc_dt40, roc_dt80)
-
-### Save
-save(roc_dtf_sfree,
-     file = paste0(path_data, "roc_dtf_sfree.RData"))
-```
-
 ::: {#fig-roc-sfree}
 ```{r roc_scale_free , message=FALSE, echo = TRUE}
 #| fig-width: 12
 #| fig-height: 7
+
+load("./data/roc_dtf_sfree.RData")
 
 np.labs <- c("frac(n, p) == 0.5", "frac(n, p) == 1", "frac(n, p) == 2")
 names(np.labs) <- c("0.5", "1", "2")
 
 tv.labs <- c("lambda[2] == 0", "lambda[2] == 3.33", "lambda[2] == 10")
 names(tv.labs) <- c("0", "3.33", "10")
-
-load("./data/roc_dtf_sfree.RData")
 
 roc_dtf_sfree <- dplyr::filter(roc_dtf_sfree, tv != 6.67)
 
@@ -1055,80 +861,18 @@ than GLasso. For $\lambda_2 = 0$, the MGLasso approach is equivalent to Glasso
 in its neighborhood selection version.
 :::
 
-```{r eval = FALSE, echo = TRUE}
-# Launched on a cluster using 72 cores
-## Settings ----------------------------------------------------------------
-### Model -------------------------------------------------------------------
-# NA values for some parameter mean they are not relevant
-p         <- 40
-seq_n     <- c(20, 40, 80)
-seq_rho   <- 0.95
-seq_dnsty <- NA 
-type      <- NA
-alpha     <- rep(1/5, 5)
-ngroup    <- length(alpha)
-pi        <- diag(0.75, ngroup)
-
-### Simulation --------------------------------------------------------------
-n_simu      <- 50
-list_ii_rho <- configs_simu(n_simu, seq_rho, seq_dnsty, seq_n, type)
-no_cores    <- min(72, length(list_ii_rho))
-
-### Stochastic Block Diagonal -----------------------------------------------
-runtime_roc_config_p40_bdiagflip001 <- system.time(
-  roc_config_p40_bdiagflip001 <- mclapply(
-    list_ii_rho, 
-    FUN = one_simu_ROC, 
-    model = "block_diagonal",
-    mc.cores = no_cores)
-)
-save(roc_config_p40_bdiagflip001, 
-     file = paste0(path_data, "roc_config_p40_bdiagflip001.RData"))
-save(runtime_roc_config_p40_bdiagflip001, 
-     file = paste0(path_data, "runtime_roc_config_p40_bdiagflip001.RData"))
-
-load(paste0(path_data, "roc_config_p40_bdiagflip001.RData")) 
-dt_full <- roc_config_p40_bdiagflip001
-
-### Merge in one graph
-index <- seq(1, 150, by = 3)
-roc_dt20 <- dt_full[index]
-
-index <- seq(2, 150, by = 3)
-roc_dt40 <- dt_full[index]
-
-index <- seq(3, 150, by = 3)
-roc_dt80 <- dt_full[index]
-
-roc_dt20 <- get_mean_ROC_stat(roc_dt20)
-roc_dt40 <- get_mean_ROC_stat(roc_dt40)
-roc_dt80 <- get_mean_ROC_stat(roc_dt80)
-
-roc_dt20 <- reformat_roc_res_for_ggplot(roc_dt20)
-roc_dt20$np <- 0.5
-roc_dt40 <- reformat_roc_res_for_ggplot(roc_dt40)
-roc_dt40$np <- 1
-roc_dt80 <- reformat_roc_res_for_ggplot(roc_dt80)
-roc_dt80$np <- 2
-
-roc_dtf_sbm <- rbind(roc_dt20, roc_dt40, roc_dt80)
-
-save(roc_dtf_sbm,
-     file = paste0(path_data, "roc_dtf_sbm.RData"))
-```
-
 ::: {#fig-roc-sbm}
 ```{r roc_sbm , message=FALSE, echo = TRUE}
 #| fig-width: 12
 #| fig-height: 7
+
+load("./data/roc_dtf_sbm.RData")
 
 np.labs <- c("frac(n, p) == 0.5", "frac(n, p) == 1", "frac(n, p) == 2")
 names(np.labs) <- c("0.5", "1", "2")
 
 tv.labs <- c("lambda[2] == 0", "lambda[2] == 3.33", "lambda[2] == 10")
 names(tv.labs) <- c("0", "3.33", "10")
-
-load("./data/roc_dtf_sbm.RData")
 
 roc_dtf_sbm <- dplyr::filter(roc_dtf_sbm, tv != 6.67)
 
@@ -1199,137 +943,6 @@ estimated a stability-like parameter in a sample of graphs simulated via the
 stochastic block model. This estimation of edge variability was then used as the
 threshold for the StARS method. The parameter $\lambda_2$ has been varied. 
 
-```{r eval=FALSE, echo=TRUE, include=TRUE}
-# Launch simulations ------------------------------------------------------
-## Settings ----------------------------------------------------------------
-### Model -------------------------------------------------------------------
-p         <- 40
-seq_n     <- c(20, 40, 80) 
-alpha     <- rep(1/5, 5)
-seq_rho   <- c(0.25, 0.95)
-seq_dnsty <- c(0.75)
-type      <- NA     #1 ## unused to do: delete in configs_simu parameters
-ngroup    <- length(alpha)
-pi        <- diag(0.75, ngroup)
-
-### Simulation --------------------------------------------------------------
-n_simu      <- 100
-list_ii_rho <- configs_simu(n_simu, seq_rho, seq_dnsty, seq_n, type)
-mc_cores    <- min(80, length(list_ii_rho))
-RNGkind("L'Ecuyer-CMRG")
-
-## Test --------------------------------------------------------------------
-# For a quicker test: 
-#   #set nl2 to 2 in one_simu_extended
-#   set p = 9 & n = 10
-test <-
-  one_simu_extended(list_ii_rho$`1`, verbose = TRUE, model = "block_diagonal")
-
-## Models ------------------------------------------------------------------
-# After the quicker test: 
-#   reset nl2 to 20
-
-### Stochastic Block Diagonal -----------------------------------------------
-runtime_rand100_config_p40_bdiagflip001_cor025 <- system.time(
-  rand100_config_p40_bdiagflip001_cor025 <- mclapply(
-    list_ii_rho, 
-    FUN = one_simu_extended, 
-    model = "block_diagonal",
-    mc.cores = mc_cores)
-)
-
-save(rand100_config_p40_bdiagflip001_cor025, 
-     file = paste0(path_data, "rand100_config_p40_bdiagflip001_cor025.RData"))
-
-################################################################
-########################### Correlation parameter set to 0.95
-################################################################
-
-# Launch simulations ------------------------------------------------------
-## Settings ----------------------------------------------------------------
-### Model -------------------------------------------------------------------
-p         <- 40
-seq_n     <- c(20, 40, 80)
-alpha     <- rep(1 / 5, 5)
-seq_rho   <- c(0.95)
-seq_dnsty <- c(0.75)
-type      <-
-  NA     #1 ## unused to do: delete in configs_simu parameters
-ngroup    <- length(alpha)
-pi        <- diag(0.75, ngroup)
-
-### Simulation --------------------------------------------------------------
-n_simu      <- 100
-list_ii_rho <- configs_simu(n_simu, seq_rho, seq_dnsty, seq_n, type)
-mc_cores    <- min(80, length(list_ii_rho))
-RNGkind("L'Ecuyer-CMRG")
-
-## Test --------------------------------------------------------------------
-# For a quicker test: 
-#   #set nl2 to 2 in one_simu_extended
-#   set p = 9 & n = 10
-test <-
-  one_simu_extended(list_ii_rho$`1`, verbose = TRUE, model = "block_diagonal")
-
-## Models ------------------------------------------------------------------
-# After the quicker test: 
-#   reset nl2 to 20
-
-### Stochastic Block Diagonal -----------------------------------------------
-runtime_rand100_config_p40_bdiagflip001_cor95 <- system.time(
-  rand100_config_p40_bdiagflip001_cor95 <- mclapply(
-    list_ii_rho, 
-    FUN = one_simu_extended, 
-    model = "block_diagonal",
-    mc.cores = mc_cores)
-)
-
-save(rand100_config_p40_bdiagflip001_cor95, 
-     file = paste0(path_data, "rand100_config_p40_bdiagflip001_cor95.RData"))
-
-# Clustering  
-# Settings:  
-# - Inter-clusters edge probability $0.01$ (flip on all the missing edges)  
-
-## Rand index  
-load(paste0(path_data, "rand100_config_p40_bdiagflip001_cor025.RData")) 
-dt <- rand100_config_p40_bdiagflip001_cor025
-
-# Calculate clusters partitions with thresh_fuse as the required difference
-# threshold for merging two regression vectors
-list_res <-
-  lapply(dt, function(e) {
-    get_perf_from_raw("rand", e, thresh_fuse = 1e-6)
-  })
-dt_rand <- do.call(rbind, list_res)
-
-save(dt_rand,
-     file = paste0(path_data, "rand_dt_lower_cor_sbm.RData"))
-
-################################################################
-########################### Correlation parameter set to 0.95
-################################################################
-
-# Clustering  
-# Settings:  
-# - Inter-clusters edge probability $0.01$ (flip on all the missing edges)  
-
-## Rand index  
-load(paste0(path_data, "rand100_config_p40_bdiagflip001_cor95.RData")) 
-dt <- rand100_config_p40_bdiagflip001_cor95
-
-# Calculate clusters partitions with thresh_fuse as the required difference
-# threshold for merging two regression vectors
-list_res <-
-  lapply(dt, function(e) {
-    get_perf_from_raw("rand", e, thresh_fuse = 1e-6)
-  })
-dt_rand <- do.call(rbind, list_res)
-
-save(dt_rand,
-     file = paste0(path_data, "rand_dt_higher_cor_sbm.RData"))
-```
-
 ::: {#fig-ari-low-cor}
 ```{r echo = TRUE}
 #| fig-width: 12
@@ -1388,15 +1001,6 @@ regression vectors for a given value of $\lambda_2.$ The higher the ARI values, 
 the estimated clustering partition is.
 :::
 
-<old> The results shown in @fig-ari-low-cor and @fig-ari-high-cor demonstrate that,
-particularly at the lower to medium levels of the hierarchy (between $20$ and $10$
-clusters), the hierarchical clustering structure uncovered by MGLasso is
-comparable to popular clustering methods used in practice. For the higher levels
-(5 clusters), the performances of MGLasso deteriorate. As expected, the three
-compared methods also deteriorate as the level of correlation inside clusters
-decreases. Note that the MGLasso performances are sensible to fusion threshold
-$\epsilon_{fuse}$ set to $10^{-6}$ for this simulation study. </old>
-
 The expected empirical evidence that MGLasso would work reasonably well for strongly correlated variables is somehow highlighted in @fig-ari-low-cor and @fig-ari-high-cor. The performances of MGLasso slightly improve when going from @fig-ari-low-cor to @fig-ari-high-cor, which corresponds to correlation levels of 0.1 and 0.3 between variables belonging to the same block, respectively. We observe the same trend for the HAC and the k-means. Compared to these two approaches, the MGLasso presents the lowest values of adjusted Rand indices, thus suggesting a lower quality of clustering. It should be noted that the performance of MGLasso can be sensitive to the selection of the Lasso penalty parameter and the threshold fixed to determine clusters' fusion. In practice, this fusion threshold is varied in a grid of values close to zero and lower than $10^{-3}$. The value leading to the maximum number of intermediate clusters in the clustering path is chosen. Using non-trivial weights could also improve the overall performance of MGLasso.
 
 <revision> 
@@ -1452,65 +1056,15 @@ computed from estimated centroids $\hat{\boldsymbol \beta}$ and projected onto
 two principal components of the original data. The path is not always
 agglomerative, but the clusters' splits observed ensure optimal solutions.
 
-```{r eval = FALSE, echo = TRUE, include=TRUE}
-source(paste0(path_functions, "perform.R"))
-source(paste0(path_functions, "select_model_mglasso.R"))
-
-#Load 
-load(paste0(path_data, "amgut1.filt.rda"))
-dta <- amgut1.filt
-
-#Transform data using `clr` approach or non paranormal method
-dta <- t(clr(dta + 1 , 1))
-
-#Stars selection  
-mb_out      <- neighbor_select(data = dta, lambda_min = 1e-2, nlambda = 20, 
-                               nresamples = 50, verbose = TRUE, estim_var = 0.05)
-lambda1     <- mb_out$lambda_opt
-
-##########################################
-############ Sequence 1 of lambda2 values 
-##########################################
-pen_params <- seq_l2_l1_fixed(dt = dta, l1 = lambda1, nl2 = 20, l2_max = TRUE) 
-system.time(mgl_amgut_rev <- lapply(pen_params, 
-                                FUN = mglasso_pair_param, 
-                                X_ = dta, 
-                                type = "initial"))
-save(mgl_amgut_rev, 
-     file = paste0(path_real_data, "mgl_amgut_rev_l2_seq0to1_20val.RData"))
-
-##########################################
-############ Sequence 2 of lambda2 values 
-##########################################
-pen_params <- seq_l2_l1_fixed(dt = dta, l1 = lambda1, nl2 = 20, l2_max = 20) 
-pen_params[[1]] <- NULL # remove l2 = 0, already computed in prev list
-system.time(mgl_amgut_rev_set2 <- mclapply(pen_params, 
-                                FUN = mglasso_pair_param, 
-                                X_ = dta, 
-                                type = "initial",
-                                mc.cores = 19))
-save(mgl_amgut_rev_set2, 
-     file = paste0(path_real_data, "mgl_amgut_rev_l2_seq1to20_20val.RData"))
-
-##########################################
-############ Sequence 3 of lambda2 values 
-##########################################
-pen_params <- seq_l2_l1_fixed(dt = dta, l1 = lambda1, nl2 = 20, l2_max = 4.3) 
-pen_params[[1]] <- NULL # remove l2 = 0, already computed in prev list
-system.time(mgl_amgut_rev_set3 <- mclapply(pen_params, 
-                                FUN = mglasso_pair_param, 
-                                X_ = dta, 
-                                type = "initial",
-                                mc.cores = 19))
-save(mgl_amgut_rev_set3, 
-     file = paste0(path_real_data, "mgl_amgut_rev_l2_seq0to4_20val.RData"))
-```
-
 :::{#fig-clusterpath}
 
 ```{r}
 #| message: false
 #| warning: false
+library(SpiecEasi)
+library(colorspace)
+library(ggrepel)
+
 path_data <- "./data/"
 load(paste0(path_data, "mgl_amgut_rev_l2_seq0to1_20val.RData"))
 load(paste0(path_data, "mgl_amgut_rev_l2_seq1to20_20val.RData"))
@@ -1521,64 +1075,13 @@ amgut1.filt <- t(clr(amgut1.filt + 1 , 1))
 
 
 hac_amgut <- hclust(dist(t(amgut1.filt)), method = "ward.D")
-labels_hac <- cutree(hac_amgut, 4)
-repart_clusters <- table(labels_hac)
-
-
+# labels_hac <- cutree(hac_amgut, 4)
+# repart_clusters <- table(labels_hac)
 
 #########
 taxas <- amgut1.filt.phy@tax_table@.Data
 rank2_table <- table(taxas[,"Rank2"])
 col_leaves <- as.factor(rep(rainbow_hcl(6, c=90, l=50), times = rank2_table))
-
-# levels(col_leaves) <- list("p__Tenericutes" = "#0082CE",
-#                            "p__Proteobacteria" = "#009681",
-#                            "p__Firmicutes" = "#228B00",
-#                            "p__Bacteroidetes" = "#9F7000",
-#                            = "#B646C7",
-#                            "p__Actinobacteria" = "#CC476B")
-##########
-
-# plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps) {
-#   ## Initialisations
-#   p <- ncol(X)
-#   df.paths <- data.frame(x=c(),y=c(), group=c())
-#   nlevel <- length(mglasso_res)
-# 
-#   ## Principal component analysis
-#   svdX <- svd(X)                ## singular value decomposition
-#   pc <- svdX$u[,3:4,drop=FALSE] ## singular vectors
-# 
-#   for (j in 1:nlevel) {
-#     Beta <- mglasso_res[[j]]$selected_Theta
-#     Xpred <- sapply(1:p, function(i){X %*% Beta[i,]})
-#     pcs <- t(pc)%*%Xpred
-#     x <- pcs[1,]
-#     y <- pcs[2,]
-#     df <- data.frame(x=pcs[1,], y=pcs[2,], group=1:p)
-#     df.paths <- rbind(df.paths,df)
-#   }
-# 
-#   # X_data <- as.data.frame(t(X) %*% pc) ## PCA projections (scores)
-#   X_data <- df.paths[1:p,]
-#   colnames(X_data) <- c("x", "y")
-#   ifelse(is.null(colnames_),
-#          X_data$Name <- colnames(X),
-#          X_data$Name <- colnames_)
-#   data_plot <- ggplot(data = df.paths, aes(x = x, y = y))
-#   data_plot <-
-#     data_plot + geom_path(aes(group = group), colour = 'grey30', alpha = 0.5)
-#   data_plot <-
-#     data_plot + geom_text_repel(data = X_data,
-#                                 aes(x = x, y = y, label = Name),
-#                                 max.overlaps = max.overlaps)
-#   data_plot <-
-#     data_plot + geom_point(data = X_data, aes(x = x, y = y), size = 1.5)
-#   data_plot <-
-#     data_plot + xlab('Principal Component 3') + ylab('Principal Component 4')
-#   data_plot + theme_bw()
-# }
-
 
 plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps, cut_k_vars = 5, colors_) {
   ## Initialisations
@@ -1620,9 +1123,6 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps, cut
   data_plot + theme_bw()
 }
 
-# plot_clusterpath(amgut1.filt,
-#                  c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), max.overlaps = 10)
-
 plot_clusterpath(amgut1.filt, c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), max.overlaps = 10, cut_k_vars = 1, colors_ = taxas[,"Rank2"])
 ```
 
@@ -1645,13 +1145,14 @@ variables.
 
 :::{#fig-meta-graphs}
 ```{r}
-#| layout: [[1], [1,1], [1,1]]
 #| fig-cap:
 #|   - "127 clusters graph" 
 #|   - "Meta-variables graph with 63 clusters"
 #|   - "Meta-variables graph with 31 clusters"
 #|   - "Meta-variables graph with 15 clusters"
 #|   - "Meta-variables graph with 2 clusters"
+
+library(igraph)
 
 all_clusters_partition <-
   lapply(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), function(x)
@@ -1701,6 +1202,7 @@ plot_network(
   layout.method = layout_with_fr,
   color = "Rank2"
 )
+
 ind <- which(all_num_clusters == 31)[1]
 clusters <- as.character(all_clusters_partition[[ind]])
 vec <- extract_meta(clusters = all_clusters_partition[[ind]])
@@ -1765,9 +1267,7 @@ plot_network(
 )
 ```
 
-Estimated graphs at multiple levels of granularity. The first graph shows a
-network inferred when $\lambda_2 =0$. The number of clusters is equal to the
-number of OTUs. Increasing the fusion penalty makes it possible to uncover graphs built on the representative variable of each cluster. OTUs are colored according to their phylum taxonomic classifier. The number
+Estimated graphs at multiple levels of granularity. The first graph shows a network inferred when $\lambda_2 =0$. The number of clusters is equal to the number of OTUs. Increasing the fusion penalty makes it possible to uncover graphs built on the representative variable of each cluster. OTUs are colored according to their phylum taxonomic classifier. The number
 of clusters is computed from the regression vectors with a fixed fusion
 threshold.
 :::
@@ -1789,6 +1289,9 @@ ind <- which(all_num_clusters == 2)[1]
 clusters <- as.character(all_clusters_partition[[ind]])
 taxas <- amgut1.filt.phy@tax_table@.Data
 taxonomic.classification <- taxas[,"Rank2"]
+
+## remove "p__" characters in species names
+taxonomic.classification <- sub("p__", "", taxonomic.classification)
 
 tables::as.tabular(table(clusters, taxonomic.classification))
 ```
@@ -1834,15 +1337,11 @@ splicing [@sow2019role].
 modification in the DNA sequence [@plomion2016forest]. Epigenetic marks in
 forest trees can be studied via  -->
 
-:::{#fig-context-epitree}
-```{r}
-#| layout: [[25,75]]
-#| fig-cap:
-#|   - Black poplar (C. Fischer Wikimedia)
-#|   - Map of genotypes
-knitr::include_graphics("./figures/peuplier-noir-Christian-Fischer.jpeg")
-knitr::include_graphics("./figures/carte-genotypes.png")
-```
+::: {#fig-context-epitree layout-ncol=2}
+
+![Black poplar (C. Fischer Wikimedia)](./figures/peuplier-noir-Christian-Fischer.jpeg)
+
+![Map of genotypes](./figures/carte-genotypes.png)
 
 Black poplar and sampling areas.
 :::
@@ -1868,40 +1367,6 @@ threshold $0.05$. In the resulting clustering path (see
 @fig-clusterpath-poplar), we can identify three distinct and coherent clusters,
 which are samples corresponding to gene expression genotypes, gene-body
 methylation samples, and gene promoter samples.
-
-```{r eval = FALSE, echo = TRUE, include=TRUE}
-# Data
-epit_sparse <- readRDS(paste0(path_data, "epit-spca-select.rds"))
-
-#Selection of sparsity penalty parameter
-mb_out      <-
-  neighbor_select(
-    data = epit_sparse,
-    lambda_min = 1e-3,
-    nlambda = 50,
-    nresamples = 50,
-    verbose = TRUE,
-    estim_var = 0.05
-  )
-
-lambda1_genot     <- mb_out$lambda_opt
-
-pen_params_genot <-
-  seq_l2_l1_fixed(
-    dt = epit_sparse,
-    l1 = lambda1_genot,
-    nl2 = 20,
-    l2_max = 30.94
-  )
-
-mgl_epit_sparse_geno <- lapply(pen_params_genot,
-                               FUN = mglasso_pair_param,
-                               X_ = epit_sparse,
-                               type = "initial")
-
-saveRDS(paste0(path_data, "mgl_epit_sparse_geno.rds"))
-```
-
 
 :::{#fig-clusterpath-poplar}
 ```{r}
@@ -2005,7 +1470,6 @@ can be computed after choosing a fusion threshold as in @fig-meta-graphs.
 
 :::{#fig-graphpath-poplar}
 ```{r}
-#| layout: [[1], [1,1], [1,1]]
 #| fig-cap:
 #|   - Full graph with $\lambda_2$ = 0
 #|   - Full graph with $\lambda_2$ = 1.63
@@ -2016,24 +1480,6 @@ can be computed after choosing a fusion threshold as in @fig-meta-graphs.
 # Plot adjacency matrices for some levels 
 # Selection based on network interpretability  
 #' symmetrize matrix of regression vectors pxp
-symmetrize <- function(mat, rule = "and"){
-  diag(mat) <- 0
-  if (rule == "and"){
-    mat <- sign(mat) * pmin(abs(mat),t(abs(mat)))
-  }else{ ## or rule
-    mat <- pmax(mat,t(mat)) - pmax(-mat,-t(mat)) 
-  }
-  return(mat)
-}
-
-adj_mat <- function(mat, sym_rule = "and") {
-  mat <- symmetrize(as.matrix(mat), rule = sym_rule)
-  mat[ abs(mat) < 1e-10] <- 0
-  mat[mat != 0] <- 1
-  mat <- as(mat, "sparseMatrix")
-  return(mat)
-}
-
 Matrix::image(
   adj_mat(mglasso_genot$`1`$selected_Theta[order_omics, order_omics]),
   sub = "",
