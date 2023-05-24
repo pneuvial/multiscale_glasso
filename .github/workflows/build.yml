@@ -18,7 +18,6 @@ jobs:
         uses: quarto-dev/quarto-actions/setup@v2
         with:
           tinytex: true
-          version: pre-release
       
       - name: Install Computo extension for Quarto
         run: |
@@ -40,46 +39,3 @@ jobs:
           target: gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-          
-# - name: Installing dependencies with Miniconda
-      #   uses: conda-incubator/setup-miniconda@v2
-      #   with:
-      #     auto-update-conda: true
-      #     auto-activate-base: false
-      #     miniconda-version: 'latest'
-      #     python-version: 3.8
-      #     environment-file: environment.yml
-      #     activate-environment: computo
-          
-      # - name: Installing dependencies with Micromamba
-      #   uses: mamba-org/provision-with-micromamba@v14
-      #   with:
-      #     cache-env: true
-      #     extra-specs: | 
-      #       python=3.8
-        
-        
-# - name: Install additional R dependencies
-      #   run: | 
-      #     conda run -n computo Rscript r-addons.R
-      #     
-
-# - name: Rendering with Quarto
-      #   shell: bash -l {0}
-      #   run: |
-      #       quarto render ${{ env.quarto_file }}.qmd
-      #       mkdir _build
-      #       mv ${{ env.quarto_file }}.html _build/index.html
-      #       mv -vf ${{ env.quarto_file }}_files figures ${{ env.quarto_file }}.pdf _build/
-      #       cp environment.yml _build/
-      #       touch _build/.nojekyll
-      # 
-      # - name: Deploying article on github pages
-      #   uses: JamesIves/github-pages-deploy-action@v4
-      #   with:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     BRANCH: gh-pages
-      #     FOLDER: _build
-      #     CLEAN: true
-      

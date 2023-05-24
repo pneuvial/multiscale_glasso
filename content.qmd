@@ -658,13 +658,7 @@ $\alpha_{ll}=0.75$ allows only to have an approximate control.
 
 ::: {#fig-model-sbm}
 ```{r echo = TRUE, message=FALSE, warning=FALSE}
-remove.packages("mglasso")
-.rs.restartR()
-install.packages("/Users/doedmond.sanou/phd/mglasso_0.1.3.tar.gz", repos = NULL, type = 'source')
-
 library(mglasso)
-
-path_functions <- "./simulation-experiments/functions/"
 
 set.seed(2020)
 sim_sbm <- sim_data(
@@ -1144,7 +1138,7 @@ levels of granularity which are built on the meta-variables or representative
 variables.
 
 :::{#fig-meta-graphs}
-```{r}
+```{r message=FALSE}
 #| fig-cap:
 #|   - "127 clusters graph" 
 #|   - "Meta-variables graph with 63 clusters"
