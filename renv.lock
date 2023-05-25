@@ -513,6 +513,12 @@
       ],
       "Hash": "92edfac53774706b4d6099f3ee6f6306"
     },
+    "ghibli": {
+      "Package": "ghibli",
+      "Version": "0.3.3",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
     "gld": {
       "Package": "gld",
       "Version": "2.6.6",
@@ -1099,6 +1105,11 @@
         "stats"
       ],
       "Hash": "9067f962730f58b14d8ae54ca885509f"
+    },
+    "simone": {
+      "Package": "simone",
+      "Version": "1.0-4",
+      "Source": "GitHub"
     },
     "survival": {
       "Package": "survival",
