@@ -786,7 +786,7 @@ ggplot(roc_dtf_erdos, aes(
   scale_colour_manual(
     name = "Method",
     labels = c("GLasso", "MGLasso"),
-    values = ghibli_palette("MarnieMedium1")[5:6]
+    values = ghibli::ghibli_palette("MarnieMedium1")[5:6]
   )
 ```
 
@@ -1147,6 +1147,7 @@ variables.
 #|   - "Meta-variables graph with 2 clusters"
 
 library(igraph)
+library(phyloseq)
 
 all_clusters_partition <-
   lapply(c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), function(x)
