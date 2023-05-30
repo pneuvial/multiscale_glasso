@@ -659,7 +659,6 @@ $\alpha_{ll}=0.75$ allows only to have an approximate control.
 ::: {#fig-model-sbm}
 ```{r echo = TRUE, message=FALSE, warning=FALSE}
 library(mglasso)
-
 set.seed(2020)
 sim_sbm <- sim_data(
   p = 40,
@@ -717,9 +716,7 @@ $40$. An example of scale-free graph is shown in @fig-model-sfree.
 ```{r echo = TRUE}
 set.seed(2022)
 sim_sfree <- sim_data(p = 40, structure = "scale_free")
-
 gsfree <- adj_mat(sim_sfree$graph)
-
 Matrix::image(as(gsfree, "sparseMatrix"),
       sub = "", xlab = "", ylab = "")
 ```
@@ -755,15 +752,11 @@ and @fig-roc-sbm by varying $\frac{n}{p}\in \{0.5,1,2\}$.
 library(ggplot2)
 library(ghibli)
 load("./data/roc_dtf_erdos.RData")
-
 np.labs <- c("frac(n, p) == 0.5", "frac(n, p) == 1", "frac(n, p) == 2")
 names(np.labs) <- c("0.5", "1", "2")
-
 tv.labs <- c("lambda[2] == 0", "lambda[2] == 3.33", "lambda[2] == 10")
 names(tv.labs) <- c("0", "3.33", "10")
-
 roc_dtf_erdos <- dplyr::filter(roc_dtf_erdos, tv != 6.67)
-
 ggplot(roc_dtf_erdos, aes(
   x     = 100 * fpr,
   y     = 100 * tpr,
@@ -808,15 +801,11 @@ in its neighborhood selection version.
 #| fig-height: 7
 
 load("./data/roc_dtf_sfree.RData")
-
 np.labs <- c("frac(n, p) == 0.5", "frac(n, p) == 1", "frac(n, p) == 2")
 names(np.labs) <- c("0.5", "1", "2")
-
 tv.labs <- c("lambda[2] == 0", "lambda[2] == 3.33", "lambda[2] == 10")
 names(tv.labs) <- c("0", "3.33", "10")
-
 roc_dtf_sfree <- dplyr::filter(roc_dtf_sfree, tv != 6.67)
-
 ggplot(roc_dtf_sfree, aes(
   x     = 100 * fpr,
   y     = 100 * tpr,
@@ -861,15 +850,11 @@ in its neighborhood selection version.
 #| fig-height: 7
 
 load("./data/roc_dtf_sbm.RData")
-
 np.labs <- c("frac(n, p) == 0.5", "frac(n, p) == 1", "frac(n, p) == 2")
 names(np.labs) <- c("0.5", "1", "2")
-
 tv.labs <- c("lambda[2] == 0", "lambda[2] == 3.33", "lambda[2] == 10")
 names(tv.labs) <- c("0", "3.33", "10")
-
 roc_dtf_sbm <- dplyr::filter(roc_dtf_sbm, tv != 6.67)
-
 ggplot(roc_dtf_sbm, aes(
   x     = 100 * fpr,
   y     = 100 * tpr,
@@ -1067,12 +1052,6 @@ load(paste0(path_data, "amgut1.filt.phy.rda"))
 load(paste0(path_data, "amgut1.filt.rda"))
 amgut1.filt <- t(clr(amgut1.filt + 1 , 1))
 
-
-hac_amgut <- hclust(dist(t(amgut1.filt)), method = "ward.D")
-# labels_hac <- cutree(hac_amgut, 4)
-# repart_clusters <- table(labels_hac)
-
-#########
 taxas <- amgut1.filt.phy@tax_table@.Data
 rank2_table <- table(taxas[,"Rank2"])
 col_leaves <- as.factor(rep(rainbow_hcl(6, c=90, l=50), times = rank2_table))
@@ -1275,9 +1254,6 @@ variables. The cluster $2$ is exclusively composed of OTUs
 belonging to the Proteobacteria phylum. The cluster $1$ also contains
 Proteobacteria OTUs, so those identified in cluster $2$ might share more
 intimate characteristics.
-<!-- A Chisq test of independence showed with a p-value of `r
-chisq.test(clusters, taxas[,"Rank2"])$p.value` that the two classifications
-might be related.  -->
 
 ```{r}
 ind <- which(all_num_clusters == 2)[1]
