@@ -1,5 +1,11 @@
 # SUPPORT RECOVERY --------------------------------------------------------
 
+library(simone)
+library(ghibli)
+library(phyloseq)
+library(rmarkdown)
+library(knitr)
+
 library(parallel)
 library(huge)
 library(mglasso)
