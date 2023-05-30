@@ -5,6 +5,8 @@ library(ghibli)
 library(phyloseq)
 library(rmarkdown)
 library(knitr)
+library(dplyr)
+library(tables)
 
 library(parallel)
 library(huge)
