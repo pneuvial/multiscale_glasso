@@ -22,7 +22,7 @@ jobs:
       - name: Install Computo extension for Quarto
         run: |
             quarto add --no-prompt computorg/computo-quarto-extension
-            quarto add leovan/quarto-pseudocode
+            quarto add --no-prompt leovan/quarto-pseudocode
       
       - name: Install cURL Headers
         run: sudo apt-get install libcurl4-openssl-dev
