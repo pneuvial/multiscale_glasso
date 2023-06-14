@@ -25,6 +25,7 @@ runtime_rand100_config_p40_bdiagflip001_cor025 <- system.time(
     p=p,
     pi=pi,
     alpha=alpha,
+    path_extended=path_extended,
     mc.cores = mc_cores)
 )
 

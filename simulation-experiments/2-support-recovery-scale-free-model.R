@@ -28,6 +28,7 @@ runtime_roc_config_p40_scalefree <- system.time(
     p=p,
     pi=pi,
     alpha=alpha,
+    path_roc=path_roc,
     mc.cores = no_cores)
 )
 
