@@ -1048,7 +1048,7 @@ path_data <- "./data/"
 load(paste0(path_data, "mgl_amgut_rev_l2_seq0to1_20val.RData"))
 load(paste0(path_data, "mgl_amgut_rev_l2_seq1to20_20val.RData"))
 load(paste0(path_data, "mgl_amgut_rev_l2_seq0to4_20val.RData"))
-load(paste0(path_data, "amgut1.filt.phy.rda"))
+load(paste0(path_data, "amgut1.filt.phy.rda")) # Data for the phylum taxonomic classifier loaded from supplementary files of the SpiecEasi package. See https://github.com/zdk123/SpiecEasi/blob/master/data/amgut2.filt.phy.rda
 load(paste0(path_data, "amgut1.filt.rda"))
 amgut1.filt <- t(clr(amgut1.filt + 1 , 1))
 
