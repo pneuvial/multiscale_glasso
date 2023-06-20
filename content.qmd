@@ -59,8 +59,12 @@ repo: "multiscale_glasso"
 draft: false # set to false once the build is running
 published: false # will be set to true once accepted
 format:
-  computo-html: default
+  computo-html:
+    code-fold: true
+    code-summary: "Show the code"
   computo-pdf: default
+execute:
+  echo: false
 ---
 
 # Introduction 
@@ -1095,9 +1099,12 @@ plot_clusterpath <- function(X, mglasso_res, colnames_ = NULL, max.overlaps, cut
     data_plot + xlab('Principal Component 3') + ylab('Principal Component 4')
   data_plot + theme_bw()
 }
+```
 
+```{r}
 plot_clusterpath(amgut1.filt, c(mgl_amgut_rev, mgl_amgut_rev_set2, mgl_amgut_rev_set3), max.overlaps = 10, cut_k_vars = 1, colors_ = taxas[,"Rank2"])
 ```
+
 
 Clustering path of the MGLasso convex clustering solutions on microbiome data
 with $127$ OTUs. The predicted data are projected onto the two
