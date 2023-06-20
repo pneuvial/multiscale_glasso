@@ -1052,7 +1052,7 @@ path_data <- "./data/"
 load(paste0(path_data, "mgl_amgut_rev_l2_seq0to1_20val.RData"))
 load(paste0(path_data, "mgl_amgut_rev_l2_seq1to20_20val.RData"))
 load(paste0(path_data, "mgl_amgut_rev_l2_seq0to4_20val.RData"))
-load(paste0(path_data, "amgut1.filt.phy.rda"))
+load(paste0(path_data, "amgut1.filt.phy.rda")) # Data for the phylum taxonomic classifier loaded from supplementary files of the SpiecEasi package. See https://github.com/zdk123/SpiecEasi/blob/master/data/amgut2.filt.phy.rda
 load(paste0(path_data, "amgut1.filt.rda"))
 amgut1.filt <- t(clr(amgut1.filt + 1 , 1))
 
@@ -1514,6 +1514,9 @@ to a broader family of non-Gaussian distributions belonging to the exponential
 family as outlined by @yang2012graphical.  Our MGLasso approach can be easily
 extended to non-Gaussian distributions belonging to the exponential family and
 mixed graphical models. 
+
+# Appendix {.appendix .unnumbered}  
+The scripts to reproduce the simulations are available at <https://github.com/desanou/multiscale_glasso/tree/main/simulation-experiments>.
 
 # Acknowledgments {.appendix .unnumbered}  
 The authors would like to thank the Editors and referees for comments that led to substantial improvements in the manuscript.
